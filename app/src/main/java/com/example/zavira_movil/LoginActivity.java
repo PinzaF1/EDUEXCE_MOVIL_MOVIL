@@ -135,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Navegación → HomeActivity
     private void goToHome() {
-        Intent i = new Intent(this, HomeActivity.class);
+        Intent i = new Intent(this, com.example.zavira_movil.ui.ranking.RankingLogrosActivity.class);
         startActivity(i);
         finish();
     }

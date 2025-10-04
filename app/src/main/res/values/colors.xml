@@ -7,4 +7,17 @@
     <color name="teal_200">#03DAC5</color>
     <color name="teal_700">#018786</color>
     <color name="blue_zavira">#2979FF</color>
+    <color name="darker_gray">#A9A9A9</color>
+
+    <color name="purple_500">#6200EE</color>
+
+    <color name="pastel_rosa">#FFC1CC</color>
+    <color name="pastel_azul">#A8D5E2</color>
+    <color name="pastel_verde">#C1E1C1</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_500">#9E9E9E</color>
+
+
+
+
 </resources>

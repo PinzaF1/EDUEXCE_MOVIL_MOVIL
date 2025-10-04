@@ -17,6 +17,11 @@ import com.example.zavira_movil.model.IslaResumenResponse;
 import com.example.zavira_movil.model.IslaCerrarResponse;
 import com.example.zavira_movil.model.IslaSimulacroResponse;
 import com.example.zavira_movil.model.IslaSimulacroRequest;
+import com.example.zavira_movil.model.RankingResponse;
+import com.example.zavira_movil.model.LogrosResponse;
+import com.example.zavira_movil.model.OtorgarAreaRequest;
+import com.example.zavira_movil.model.OtorgarAreaResponse;
+import com.example.zavira_movil.model.LogrosTodosResponse;
 
 
 import com.example.zavira_movil.model.KolbRequest;
@@ -40,6 +45,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -99,5 +105,15 @@ public interface ApiService {
     // Resumen
     @GET("movil/isla/simulacro/{id}/resumen")
     Call<IslaResumenResponse> getIslaResumen(@Path("id") int idSesion);
+
+
+    @GET("movil/ranking")
+    Call<RankingResponse> getRanking();
+
+    @GET("movil/logros")
+    Call<LogrosResponse> getMisLogros();
+
+    @POST("movil/logros/otorgar-area")
+    Call<OtorgarAreaResponse> otorgarInsigniaArea(@Body OtorgarAreaRequest body);
 
 }

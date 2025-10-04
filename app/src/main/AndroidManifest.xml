@@ -55,6 +55,7 @@
         <activity android:name=".Home.SubjectDetailActivity" />
         <activity android:name=".Home.QuizActivity" />
         <activity android:name=".Home.SimulacroActivity" />
+        <activity android:name=".ui.ranking.RankingLogrosActivity" android:exported="false"/>
 
 
     </application>

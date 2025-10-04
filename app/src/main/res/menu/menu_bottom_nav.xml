@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_islas"
+        android:icon="@drawable/ic_home_24"
+        android:title="Islas"/>
+
+    <item
+        android:id="@+id/nav_progreso"
+        android:icon="@drawable/ic_stats_24"
+        android:title="Progreso"/>
+
+    <item
+        android:id="@+id/nav_logros"
+        android:icon="@drawable/ic_trophy_24"
+        android:title="Logros"/>
+
+    <item
+        android:id="@+id/nav_retos"
+        android:icon="@drawable/ic_swords_24"
+        android:title="Retos"/>
+
+    <item
+        android:id="@+id/nav_perfil"
+        android:icon="@drawable/ic_profile_24"
+        android:title="Perfil"/>
+</menu>
