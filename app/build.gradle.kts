@@ -36,7 +36,6 @@ android {
     }
 }
 
-// 👇 Agrega este bloque para forzar la versión de Material
 configurations.all {
     resolutionStrategy.force("com.google.android.material:material:1.13.0-alpha05")
 }
@@ -61,6 +60,7 @@ dependencies {
 
     // CircleProgress (desde JitPack)
     implementation("com.github.lzyzsd:circleprogress:1.2.1")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

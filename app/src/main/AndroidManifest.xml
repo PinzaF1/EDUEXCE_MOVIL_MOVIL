@@ -12,7 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/robot"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ZAVIRA_MOVIL">
+        android:theme="@style/Theme.ZAVIRA_MOVIL"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".RetosActivity"
+            android:exported="false" />
         <activity
             android:name=".InfoAcademico"
             android:exported="false" />

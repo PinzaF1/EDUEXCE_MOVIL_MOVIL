@@ -10,43 +10,55 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.model.ProgresoMateria;
+import com.example.zavira_movil.model.MateriaDetalle;
 
 import java.util.List;
 
-public class ProgresoAdapter extends RecyclerView.Adapter<ProgresoAdapter.VH> {
+public class ProgresoAdapter extends RecyclerView.Adapter<ProgresoAdapter.ViewHolder> {
 
-    private final List<ProgresoMateria> data;
+    private List<MateriaDetalle> lista;
 
-    public ProgresoAdapter(List<ProgresoMateria> data) {
-        this.data = data;
+    public ProgresoAdapter(List<MateriaDetalle> lista) {
+        this.lista = lista;
     }
 
-    @NonNull @Override
-    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_materia, parent, false);
-        return new VH(v);
+    public void setLista(List<MateriaDetalle> nueva) {
+        this.lista = nueva;
+        notifyDataSetChanged();
     }
 
-    @Override public void onBindViewHolder(@NonNull VH h, int position) {
-        ProgresoMateria m = data.get(position);
-        h.txtNombre.setText(m.getNombre());
-        h.txtPorcentaje.setText(m.getProgreso() + "%");
-        h.progress.setProgress(m.getProgreso());
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_materia, parent, false);
+        return new ViewHolder(v);
     }
 
-    @Override public int getItemCount() {
-        return data == null ? 0 : data.size();
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        MateriaDetalle item = lista.get(position);
+        holder.txtNombre.setText(item.getNombre());
+        holder.txtProgreso.setText(item.getPorcentaje() + "%");
+        holder.txtEtiqueta.setText(item.getEtiqueta());
+        holder.progress.setProgress(item.getPorcentaje());
     }
 
-    static class VH extends RecyclerView.ViewHolder {
-        TextView txtNombre, txtPorcentaje;
+    @Override
+    public int getItemCount() {
+        return lista != null ? lista.size() : 0;
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView txtNombre, txtProgreso, txtEtiqueta;
         ProgressBar progress;
-        VH(@NonNull View itemView) {
+
+        ViewHolder(View itemView) {
             super(itemView);
-            txtNombre = itemView.findViewById(R.id.txtNombreMateria);
-            txtPorcentaje = itemView.findViewById(R.id.txtPorcentajeMateria);
-            progress = itemView.findViewById(R.id.progressMateria);
+            txtNombre   = itemView.findViewById(R.id.tvNombreMateria);
+            txtProgreso = itemView.findViewById(R.id.tvProgreso);
+            txtEtiqueta = itemView.findViewById(R.id.tvEtiqueta);
+            progress    = itemView.findViewById(R.id.progressMateria);
         }
     }
 }

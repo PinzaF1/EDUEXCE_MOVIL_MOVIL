@@ -6,22 +6,13 @@ public class MateriaDetalle {
     @SerializedName("nombre")
     private String nombre;
 
-    @SerializedName("progreso")
-    private int progreso;
+    @SerializedName("porcentaje")
+    private int porcentaje;
 
-    public String getNombre() {
-        return nombre;
-    }
+    @SerializedName("etiqueta")
+    private String etiqueta;
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public int getProgreso() {
-        return progreso;
-    }
-
-    public void setProgreso(int progreso) {
-        this.progreso = progreso;
-    }
+    public String getNombre() { return nombre; }
+    public int getPorcentaje() { return porcentaje; }
+    public String getEtiqueta() { return etiqueta; }
 }

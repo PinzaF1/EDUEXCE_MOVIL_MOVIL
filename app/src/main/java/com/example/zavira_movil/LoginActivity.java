@@ -13,6 +13,8 @@ import com.example.zavira_movil.databinding.ActivityLoginBinding;
 import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.model.LoginResponse;
+import com.example.zavira_movil.ProgresoActivity;
+import com.example.zavira_movil.progreso.FragmentReto;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.gson.Gson;
@@ -134,8 +136,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // Navegación → HomeActivity
-    private void goToHome() {
-        Intent i = new Intent(this, com.example.zavira_movil.ui.ranking.RankingLogrosActivity.class);
+private void goToHome() {
+        Intent i = new Intent(this, HomeActivity.class);
         startActivity(i);
         finish();
     }

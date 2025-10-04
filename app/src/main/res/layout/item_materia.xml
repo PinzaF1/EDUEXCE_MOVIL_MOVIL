@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp">
 
     <TextView
-        android:id="@+id/txtNombreMateria"
-        android:text="Lenguaje"
+        android:id="@+id/tvNombreMateria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:textSize="16sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvProgreso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp" />
+
+    <TextView
+        android:id="@+id/tvEtiqueta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp" />
 
     <ProgressBar
         android:id="@+id/progressMateria"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="8dp"
+        android:layout_height="wrap_content"
         android:max="100"
         android:progress="0"
-        android:layout_marginTop="6dp" />
-
-    <TextView
-        android:id="@+id/txtPorcentajeMateria"
-        android:text="0%"
-        android:textSize="14sp"
-        android:layout_marginTop="6dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:progressTint="@android:color/holo_blue_light"
+        android:indeterminate="false"
+        android:paddingTop="4dp"/>
 </LinearLayout>

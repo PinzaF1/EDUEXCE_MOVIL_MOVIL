@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Bullet izquierdo -->
+        <View
+            android:id="@+id/dotLeft"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/dot_circle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvNivelNombre" />
+
+        <!-- Nombre del nivel -->
+        <TextView
+            android:id="@+id/tvNivelNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/dotLeft"
+            app:layout_constraintEnd_toStartOf="@id/ivNivelStar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Estrella (opcional) -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivNivelStar"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:visibility="gone"
+            app:srcCompat="@android:drawable/btn_star_big_on"
+            app:tint="@color/level_intermediate"
+            android:layout_marginEnd="6dp"
+            app:layout_constraintEnd_toStartOf="@id/tvNivelRango"
+            app:layout_constraintTop_toTopOf="@id/tvNivelNombre"
+            app:layout_constraintBottom_toBottomOf="@id/tvNivelNombre" />
+
+        <!-- Rango a la derecha -->
+        <TextView
+            android:id="@+id/tvNivelRango"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0-50%"
+            android:textSize="13sp"
+            android:textColor="@color/text_muted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvNivelNombre"
+            app:layout_constraintBottom_toBottomOf="@id/tvNivelNombre" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Barra de progreso redondeada -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <ProgressBar
+            android:id="@+id/pbNivel"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:max="100"
+            android:progress="0"
+            android:indeterminate="false"
+            android:progressDrawable="@drawable/progress_rounded" />
+    </FrameLayout>
+
+    <!-- Separador suave -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/divider_soft"/>
+</LinearLayout>
