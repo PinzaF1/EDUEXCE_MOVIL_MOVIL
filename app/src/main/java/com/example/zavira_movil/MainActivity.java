@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
             // Si no hay token → va al Login
             startActivity(new Intent(this, LoginActivity.class));
         }
+
         // Cierra MainActivity para que no regrese con "back"
         finish();
     }

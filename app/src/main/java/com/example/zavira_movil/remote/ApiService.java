@@ -1,13 +1,31 @@
 package com.example.zavira_movil.remote;
 
+import com.example.zavira_movil.BasicResponse;
+import com.example.zavira_movil.PreguntaAcademica;
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
 import com.example.zavira_movil.model.AceptarRetoResponse;
 import com.example.zavira_movil.model.EstadoRetoResponse;
-import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.HistorialResponse;
+import com.example.zavira_movil.QuizResponse;
+import com.example.zavira_movil.model.CerrarRequest;
+import com.example.zavira_movil.model.CerrarResponse;
+import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
+import com.example.zavira_movil.model.SimulacroRequest;
+import com.example.zavira_movil.model.SimulacroResponse;
+import com.example.zavira_movil.model.IslaCerrarRequest;
+import com.example.zavira_movil.model.IslaResumenResponse;
+import com.example.zavira_movil.model.IslaCerrarResponse;
+import com.example.zavira_movil.model.IslaSimulacroResponse;
+import com.example.zavira_movil.model.IslaSimulacroRequest;
+import com.example.zavira_movil.model.RankingResponse;
+import com.example.zavira_movil.model.LogrosResponse;
+import com.example.zavira_movil.model.OtorgarAreaRequest;
+import com.example.zavira_movil.model.OtorgarAreaResponse;
+import com.example.zavira_movil.model.LogrosTodosResponse;
+
 
 import com.example.zavira_movil.model.KolbRequest;
 import com.example.zavira_movil.model.KolbResponse;
@@ -18,6 +36,9 @@ import com.example.zavira_movil.model.RetoCreadoResponse;
 import com.example.zavira_movil.model.RetoCreateRequest;
 import com.example.zavira_movil.model.RondaRequest;
 import com.example.zavira_movil.model.RondaResponse;
+import com.example.zavira_movil.model.ParadaRequest;
+import com.example.zavira_movil.model.ParadaResponse;
+import com.example.zavira_movil.model.PreguntasKolb;
 
 
 import java.util.List;
@@ -41,17 +62,14 @@ public interface ApiService {
     //Logue Estudiante
     @POST("estudiante/login")
     Call<ResponseBody> loginEstudiante(@Body LoginRequest request);
-
     @GET("perfilEstudiante")
     Call<Estudiante> getPerfilEstudiante();
 
     //Estilo de Kold
     @GET("kolb/preguntas")
     Call<List<PreguntasKolb>> getPreguntas();
-
     @POST("kolb/enviar")
     Call<KolbResponse> guardarRespuestas(@Body KolbRequest request);
-
     @GET("kolb/resultado")
     Call<KolbResultado> obtenerResultado();
 
@@ -61,7 +79,6 @@ public interface ApiService {
             @Header("Authorization") String bearerToken,
             @Body Map<String, Object> body
     );
-
     @POST("quiz-inicial/cerrar")
     Call<ResponseBody> cerrar(
             @Header("Authorization") String bearerToken,
@@ -72,10 +89,12 @@ public interface ApiService {
     @Multipart
     @POST("users/me/photo")
     Call<ResponseBody> subirFoto(@Part MultipartBody.Part foto);
-
     @DELETE("users/me/photo")
     Call<ResponseBody> eliminarFoto();
 
+    //Test y Niveles por Area
+    @POST("sesion/parada")
+    Call<ParadaResponse> crearParada(@Body ParadaRequest body);
 
 
 
@@ -110,4 +129,34 @@ public interface ApiService {
     // 4) Estado del reto -> { id_reto, estado, ganador, jugadores[] }
     @GET("movil/retos/{id}")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
+    @POST("sesion/cerrar")
+    Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);
+
+    @POST("movil/simulacro")
+    Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
+    @POST("movil/simulacro/cerrar")
+    Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
+
+    // Iniciar simulacro
+    @POST("movil/isla/simulacro")
+    Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest req);
+
+    // Cerrar simulacro
+    @POST("movil/isla/simulacro/cerrar")
+    Call<IslaCerrarResponse> cerrarIslaSimulacro(@Body IslaCerrarRequest req);
+
+    // Resumen
+    @GET("movil/isla/simulacro/{id}/resumen")
+    Call<IslaResumenResponse> getIslaResumen(@Path("id") int idSesion);
+
+
+    @GET("movil/ranking")
+    Call<RankingResponse> getRanking();
+
+    @GET("movil/logros")
+    Call<LogrosResponse> getMisLogros();
+
+    @POST("movil/logros/otorgar-area")
+    Call<OtorgarAreaResponse> otorgarInsigniaArea(@Body OtorgarAreaRequest body);
+
 }

@@ -4,75 +4,77 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.example.zavira_movil.LoginActivity;
+
+import org.json.JSONObject;
 
 public class TokenManager {
-
-    private static final String PREFS = "ZAVIRA_PREFS";
-    private static final String KEY_TOKEN = "TOKEN";
+    private static final String PREF = "auth_prefs";
+    private static final String KEY_TOKEN = "token";
     private static final String KEY_USER_ID = "user_id";
 
-    // ----- TOKEN -----
-    public static void setToken(Context ctx, String token) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    /** Guarda token */
+    public static void saveToken(Context ctx, String token) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
         sp.edit().putString(KEY_TOKEN, token).apply();
     }
 
+    /** Obtiene token */
     public static String getToken(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
         return sp.getString(KEY_TOKEN, null);
     }
 
-    public static void clearToken(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        sp.edit().remove(KEY_TOKEN).apply();
-    }
-
-    // ----- USER ID -----
-    public static void setUserId(Context ctx, int id) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        sp.edit().putInt(KEY_USER_ID, id).apply();
-    }
-
-    public static int getUserId(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        return sp.getInt(KEY_USER_ID, -1);
-    }
-
-    public static void clearUserId(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        sp.edit().remove(KEY_USER_ID).apply();
-    }
-
-    // ----- CLEAR ALL -----
+    /** Limpia todo */
     public static void clearAll(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
         sp.edit().clear().apply();
     }
 
-    // ----- EXTRAER USER ID DEL JWT -----
-    /**
-     * Extrae el "id" del payload del JWT sin librerías externas.
-     * Si no lo encuentra, retorna -1.
-     */
-    public static int extractUserIdFromJwt(String jwt) {
-        if (jwt == null) return -1;
+    /** Alias de saveToken */
+    public static void setToken(LoginActivity loginActivity, String token) {
+        saveToken(loginActivity, token);
+    }
+
+    /** Guarda userId explícitamente */
+    public static void setUserId(Context ctx, int userId) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
+        sp.edit().putInt(KEY_USER_ID, userId).apply();
+    }
+
+    /** Obtiene userId guardado, o si no existe, intenta sacarlo del JWT */
+    public static int getUserId(Context ctx) {
+        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
+        int saved = sp.getInt(KEY_USER_ID, -1);
+        if (saved != -1) return saved;
+
+        // fallback: decodificar del JWT
+        String token = getToken(ctx);
+        return extractUserIdFromJwt(token);
+    }
+
+    /** Decodifica el JWT para obtener userId si viene en el payload */
+    public static int extractUserIdFromJwt(String token) {
         try {
-            String[] parts = jwt.split("\\.");
+            if (token == null || !token.contains(".")) return -1;
+
+            String[] parts = token.split("\\.");
             if (parts.length < 2) return -1;
 
-            byte[] decoded = Base64.decode(parts[1], Base64.URL_SAFE);
-            String payload = new String(decoded, StandardCharsets.UTF_8);
+            String payloadJson = new String(Base64.decode(parts[1], Base64.URL_SAFE));
+            JSONObject payload = new JSONObject(payloadJson);
 
-            // Busca: "id": 123  ó  "id":123
-            Matcher m = Pattern.compile("\"id\"\\s*:\\s*(\\d+)").matcher(payload);
-            if (m.find()) {
-                return Integer.parseInt(m.group(1));
+            if (payload.has("id_usuario")) {
+                return payload.getInt("id_usuario");
+            } else if (payload.has("userId")) {
+                return payload.getInt("userId");
+            } else if (payload.has("sub")) {
+                return payload.getInt("sub");
             }
-        } catch (Exception ignored) {}
-
-        return -1;
+            return -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }
