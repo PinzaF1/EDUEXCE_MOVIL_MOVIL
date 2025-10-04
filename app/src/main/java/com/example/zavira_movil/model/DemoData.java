@@ -1,84 +1,86 @@
 package com.example.zavira_movil.model;
 
 import com.example.zavira_movil.R;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class DemoData {
 
-    public static List<Subject> subjects() {
-        return Arrays.asList(
-                new Subject(
-                        "1",
-                        "Matemáticas",
-                        "Desarrolla habilidades para resolver problemas numéricos, algebraicos, geométricos y estadísticos en contexto real.",
-                        0, 5,
-                        R.drawable.ic_book_24, R.drawable.bg_subject_header,
-                        Arrays.asList(
-                                new Subject.Level("Nivel 1 — Aritmética", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 2 — Álgebra", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 3 — Geometría", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 4 — Estadística y Probabilidad", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 5 — Funciones y Gráficas", "Pendiente", Collections.emptyList())
-                        )
-                ),
-                new Subject(
-                        "2",
-                        "Lectura Crítica",
-                        "Analiza y evalúa diferentes tipos de textos para identificar información explícita, implícita y la intención del autor.",
-                        0, 5,
-                        R.drawable.ic_book_24, R.drawable.bg_subject_header,
-                        Arrays.asList(
-                                new Subject.Level("Nivel 1 — Comprensión literal", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 2 — Vocabulario en contexto", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 3 — Comprensión inferencial", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 4 — Lectura crítica", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 5 — Tipos de texto", "Pendiente", Collections.emptyList())
-                        )
-                ),
-                new Subject(
-                        "3",
-                        "Ciencias Sociales",
-                        "Comprende procesos históricos, geográficos, económicos, políticos y culturales que explican la sociedad actual.",
-                        0, 5,
-                        R.drawable.ic_book_24, R.drawable.bg_subject_header,
-                        Arrays.asList(
-                                new Subject.Level("Nivel 1 — Historia", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 2 — Geografía", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 3 — Filosofía y ciudadanía", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 4 — Economía", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 5 — Cultura y sociedad", "Pendiente", Collections.emptyList())
-                        )
-                ),
-                new Subject(
-                        "4",
-                        "Ciencias Naturales",
-                        "Explica fenómenos de la biología, química, física y ciencias de la Tierra aplicados a la vida diaria.",
-                        0, 5,
-                        R.drawable.ic_book_24, R.drawable.bg_subject_header,
-                        Arrays.asList(
-                                new Subject.Level("Nivel 1 — Biología", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 2 — Química", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 3 — Física", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 4 — Ciencias de la Tierra", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 5 — Indagación científica", "Pendiente", Collections.emptyList())
-                        )
-                ),
-                new Subject(
-                        "5",
-                        "Inglés",
-                        "Desarrolla competencias de comprensión y producción en inglés, enfocadas en lectura y uso del lenguaje.",
-                        0, 5,
-                        R.drawable.ic_book_24, R.drawable.bg_subject_header,
-                        Arrays.asList(
-                                new Subject.Level("Nivel 1 — Grammar", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 2 — Vocabulary", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 3 — Reading Comprehension", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 4 — Listening", "Pendiente", Collections.emptyList()),
-                                new Subject.Level("Nivel 5 — Writing", "Pendiente", Collections.emptyList())
-                        )
-                )
+    public static List<Subject> getSubjects() {
+        List<Subject> list = new ArrayList<>();
+
+        // ========================= MATEMÁTICAS
+        Subject mate = subjectBase("Matemáticas", R.drawable.ic_math_24, R.drawable.bg_header_math);
+        mate.levels = Arrays.asList(
+                level("Nivel 1", "Aritmética"),
+                level("Nivel 2", "Álgebra"),
+                level("Nivel 3", "Geometría"),
+                level("Nivel 4", "Estadística y Probabilidad"),
+                level("Nivel 5", "Funciones y Gráficas")
         );
+        list.add(mate);
+
+        // ========================= LECTURA CRÍTICA (área API = Lenguaje)
+        Subject lect = subjectBase("Lectura crítica", R.drawable.ic_read_24, R.drawable.bg_header_reading);
+        lect.levels = Arrays.asList(
+                level("Nivel 1", "Comprensión lectora"),
+                level("Nivel 2", "Cohesión textual"),
+                level("Nivel 3", "Relaciones semánticas"),
+                level("Nivel 4", "Conectores lógicos"),
+                level("Nivel 5", "Propósito del autor")
+        );
+        list.add(lect);
+
+        // ========================= SOCIALES
+        Subject soc = subjectBase("Sociales y ciudadanas", R.drawable.ic_social_24, R.drawable.bg_header_social);
+        soc.levels = Arrays.asList(
+                level("Nivel 1", "Geografía"),
+                level("Nivel 2", "Historia"),
+                level("Nivel 3", "Economía"),
+                level("Nivel 4", "Ciudadanía"),
+                level("Nivel 5", "Pensamiento social")
+        );
+        list.add(soc);
+
+        // ========================= CIENCIAS NATURALES
+        Subject cie = subjectBase("Ciencias naturales", R.drawable.ic_science_24, R.drawable.bg_header_science);
+        cie.levels = Arrays.asList(
+                level("Nivel 1", "Biología"),
+                level("Nivel 2", "Química"),
+                level("Nivel 3", "Física"),
+                level("Nivel 4", "Ciencias de la Tierra"),
+                level("Nivel 5", "Método científico")
+        );
+        list.add(cie);
+
+        // ========================= INGLÉS
+        Subject eng = subjectBase("Inglés", R.drawable.ic_english_24, R.drawable.bg_header_english);
+        eng.levels = Arrays.asList(
+                level("Nivel 1", "Reading básico"),
+                level("Nivel 2", "Reading intermedio"),
+                level("Nivel 3", "Grammar y uso"),
+                level("Nivel 4", "Listening y contexto"),
+                level("Nivel 5", "Writing")
+        );
+        list.add(eng);
+
+        return list;
+    }
+
+    // helpers
+    private static Subject subjectBase(String title, int icon, int header) {
+        Subject s = new Subject();
+        s.title = title;
+        s.iconRes = icon;
+        s.headerDrawableRes = header;
+        s.done = 0;
+        s.total = 5;
+        return s;
+    }
+
+    // ✅ Ahora usamos Level externo, no Subject.Level
+    private static Level level(String name, String subtopic) {
+        Level l = new Level(name);
+        l.subtopics.add(new Subject.Subtopic(subtopic));
+        return l;
     }
 }

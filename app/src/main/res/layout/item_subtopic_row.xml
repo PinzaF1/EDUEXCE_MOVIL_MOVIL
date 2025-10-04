@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:background="@drawable/bg_level_row"
+    android:padding="12dp"
     android:gravity="center_vertical"
-    android:paddingStart="16dp"
-    android:paddingEnd="12dp">
+    android:clickable="false"
+    android:focusable="false">
 
-    <!-- Título del subtema / nivel -->
-    <TextView
-        android:id="@+id/tvSubtopicTitle"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Nivel 1 — Aritmética"
-        android:textSize="10sp"
-        android:textColor="#111827" />
+        android:orientation="vertical">
 
-    <!-- Botón Comenzar a la derecha -->
+        <TextView
+            android:id="@+id/tvSubtopicTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Subtema"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#111827" />
+
+        <TextView
+            android:id="@+id/tvHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Responde correctamente para desbloquear el siguiente"
+            android:textSize="12sp"
+            android:textColor="#6B7280" />
+    </LinearLayout>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStart"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
         android:text="Comenzar"
-        android:textAllCaps="false"
-        app:cornerRadius="18dp"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+        android:textSize="14sp"
+        android:insetLeft="12dp"
+        android:insetRight="12dp" />
 </LinearLayout>
