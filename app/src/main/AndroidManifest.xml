@@ -26,6 +26,20 @@
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".Home.IslaSimulacroActivity"
+            android:exported="true"
+            android:label="Simulacro Isla"/>
+
+        <activity
+            android:name=".Home.IslaPreguntasActivity"
+            android:exported="true"
+            android:label="Preguntas Simulacro"/>
+
+        <activity
+            android:name=".Home.IslaResultadoActivity"
+            android:exported="true"
+            android:label="Resultados Simulacro"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -41,6 +55,7 @@
         <activity android:name=".Home.SubjectDetailActivity" />
         <activity android:name=".Home.QuizActivity" />
         <activity android:name=".Home.SimulacroActivity" />
+
 
     </application>
 

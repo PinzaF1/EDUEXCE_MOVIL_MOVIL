@@ -12,6 +12,11 @@ import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.model.SimulacroResponse;
+import com.example.zavira_movil.model.IslaCerrarRequest;
+import com.example.zavira_movil.model.IslaResumenResponse;
+import com.example.zavira_movil.model.IslaCerrarResponse;
+import com.example.zavira_movil.model.IslaSimulacroResponse;
+import com.example.zavira_movil.model.IslaSimulacroRequest;
 
 
 import com.example.zavira_movil.model.KolbRequest;
@@ -34,6 +39,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface ApiService {
 
@@ -81,5 +87,17 @@ public interface ApiService {
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
     @POST("movil/simulacro/cerrar")
     Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
+
+    // Iniciar simulacro
+    @POST("movil/isla/simulacro")
+    Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest req);
+
+    // Cerrar simulacro
+    @POST("movil/isla/simulacro/cerrar")
+    Call<IslaCerrarResponse> cerrarIslaSimulacro(@Body IslaCerrarRequest req);
+
+    // Resumen
+    @GET("movil/isla/simulacro/{id}/resumen")
+    Call<IslaResumenResponse> getIslaResumen(@Path("id") int idSesion);
 
 }

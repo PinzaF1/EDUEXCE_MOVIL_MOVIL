@@ -69,6 +69,13 @@
                 app:srcCompat="@drawable/ic_bell_24"
                 app:tint="#374151" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnIslaSimulacro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Probar Isla Simulacro"/>
+
     </com.google.android.material.card.MaterialCardView>
 
     <!-- RecyclerView -->

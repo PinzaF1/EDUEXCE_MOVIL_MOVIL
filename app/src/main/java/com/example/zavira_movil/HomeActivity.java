@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.zavira_movil.Home.IslaSimulacroActivity;
 import com.example.zavira_movil.databinding.ActivityHomeBinding;
 import com.example.zavira_movil.Home.SubjectAdapter;
 import com.example.zavira_movil.model.DemoData;
@@ -44,5 +45,11 @@ public class HomeActivity extends AppCompatActivity {
         binding.rvSubjects.setLayoutManager(new LinearLayoutManager(this));
         adapter = new SubjectAdapter(DemoData.getSubjects(), intent -> launcher.launch(intent));
         binding.rvSubjects.setAdapter(adapter);
+
+        findViewById(R.id.btnIslaSimulacro).setOnClickListener(v -> {
+            Intent i = new Intent(HomeActivity.this, IslaSimulacroActivity.class);
+            startActivity(i);
+        });
+
     }
 }
