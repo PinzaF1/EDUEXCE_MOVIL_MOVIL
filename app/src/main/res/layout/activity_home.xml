@@ -3,25 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
->
+    >
 
     <!-- Top bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="80dp"
+        android:layout_marginTop="40dp"
         app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
         app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="12dp">
 
@@ -29,8 +30,8 @@
                 android:id="@+id/ivAppLogo"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_logo_z"
-                android:contentDescription="@string/app_name" />
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_logo_z" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -44,17 +45,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Zavira"
-                    android:textStyle="bold"
+                    android:textColor="#1E293B"
                     android:textSize="20sp"
-                    android:textColor="#1E293B" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Plataforma ICFES"
-                    android:textSize="13sp"
-                    android:textColor="#6B7280" />
+                    android:textColor="#6B7280"
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <ImageButton
@@ -68,32 +69,17 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Lista de materias -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSubjects"
+    <!-- Contenedor de Fragments -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- FAB Perfil -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabPerfil"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Perfil"
-        app:srcCompat="@drawable/ic_profile_24"
-        app:tint="@android:color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="12dp" />
-
-    <!-- Divisor superior fino de la barra -->
+    <!-- Divisor superior fino -->
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
@@ -103,21 +89,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- BottomNavigationView PLANA -->
+    <!-- BottomNavigationView (plana, ocupa todo ancho) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="105dp"
         android:background="@android:color/white"
         android:paddingTop="4dp"
-        app:itemHorizontalTranslationEnabled="false"
+        android:paddingBottom="6dp"
         app:itemIconSize="22dp"
         app:itemIconTint="@color/bnv_tint"
         app:itemTextColor="@color/bnv_tint"
+        app:itemHorizontalTranslationEnabled="false"
         app:labelVisibilityMode="labeled"
+        app:menu="@menu/menu_bottom_nav"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu_bottom_nav" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- FAB Perfil (opcional; lo mantenemos) -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

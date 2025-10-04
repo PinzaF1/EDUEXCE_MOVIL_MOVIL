@@ -1,15 +1,16 @@
 package com.example.zavira_movil;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.fragment.app.Fragment;
 
 import com.example.zavira_movil.databinding.ActivityHomeBinding;
-import com.example.zavira_movil.Home.SubjectAdapter;
-import com.example.zavira_movil.model.DemoData;
+import com.example.zavira_movil.ui.ranking.home.IslasFragment;
+import com.example.zavira_movil.ui.progreso.ProgresoFragment;
+import com.example.zavira_movil.ui.ranking.RankingLogrosFragment; // nuevo fragment
+import com.example.zavira_movil.ui.ranking.perfil.PerfilFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -21,46 +22,44 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Top bar
         binding.btnBell.setOnClickListener(v ->
-                Toast.makeText(this, "Notificaciones pronto", Toast.LENGTH_SHORT).show()
-        );
+                Toast.makeText(this, "Notificaciones pronto", Toast.LENGTH_SHORT).show());
 
-        // FAB Perfil (si todavía es Activity)
-        binding.fabPerfil.setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileActivity.class))
-        );
+        // Cargar por defecto "Islas"
+        if (savedInstanceState == null) {
+            show(new IslasFragment());
+            binding.bottomNav.setSelectedItemId(R.id.nav_islas);
+        }
 
-        // Lista de materias
-        binding.rvSubjects.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvSubjects.setAdapter(new SubjectAdapter(DemoData.subjects()));
-
-        // Bottom Navigation
-        setupBottomNav();
+        setupBottomNav(binding.bottomNav);
     }
 
-    private void setupBottomNav() {
-        BottomNavigationView bottomNav = binding.bottomNav;
-        bottomNav.setSelectedItemId(R.id.nav_islas);
-
-        bottomNav.setOnItemSelectedListener(item -> {
+    private void setupBottomNav(BottomNavigationView nav) {
+        nav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            Fragment f;
             if (id == R.id.nav_islas) {
-                return true;
+                f = new IslasFragment();
             } else if (id == R.id.nav_progreso) {
-                startActivity(new Intent(this, ProgresoActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
+                f = new ProgresoFragment();
             } else if (id == R.id.nav_logros) {
-                startActivity(new Intent(this, com.example.zavira_movil.ui.ranking.RankingLogrosActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
+                f = new RankingLogrosFragment(); // reemplaza a Activity
+            } else if (id == R.id.nav_retos) {
+                f = new ProgresoFragment(); // usa el que tengas o tu fragment de retos
             } else if (id == R.id.nav_perfil) {
-                startActivity(new Intent(this, ProfileActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            return false;
+                f = new com.example.zavira_movil.ui.ranking.perfil.PerfilFragment();
+            } else return false;
+
+            show(f);
+            return true;
         });
+    }
+
+    private void show(Fragment f) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.fragmentContainer, f)
+                .commit();
     }
 }
