@@ -10,8 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
+import com.example.zavira_movil.adapter.NivelesAdapter;
 import com.example.zavira_movil.model.ResumenGeneral;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
@@ -24,43 +27,58 @@ import retrofit2.Response;
 public class FragmentGeneral extends Fragment {
 
     private CircularProgressIndicator progresoGeneral;
-    private TextView textoProgreso;
+    private TextView textoProgreso, tvNivelActual;
+    private RecyclerView recyclerNiveles;
+    private NivelesAdapter nivelesAdapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_general, container, false);
+        View v = inflater.inflate(R.layout.fragment_general, container, false);
 
-        progresoGeneral = view.findViewById(R.id.progresoGeneral);
-        textoProgreso = view.findViewById(R.id.textoProgreso);
+        progresoGeneral = v.findViewById(R.id.progresoGeneral);
+        textoProgreso   = v.findViewById(R.id.textoProgreso);
+        tvNivelActual   = v.findViewById(R.id.tvNivelActual);
+        recyclerNiveles = v.findViewById(R.id.recyclerNiveles);
+
+        progresoGeneral.setIndeterminate(false);
+        progresoGeneral.setMax(100);
+
+        nivelesAdapter = new NivelesAdapter();
+        recyclerNiveles.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerNiveles.setAdapter(nivelesAdapter);
 
         cargarResumen();
-
-        return view;
+        return v;
     }
 
     private void cargarResumen() {
-        ApiService apiService = RetrofitClient.getInstance(getContext()).create(ApiService.class);
-        apiService.getResumen().enqueue(new Callback<ResumenGeneral>() {
-            @Override
-            public void onResponse(Call<ResumenGeneral> call, Response<ResumenGeneral> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ResumenGeneral resumen = response.body();
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+        api.getResumen().enqueue(new Callback<ResumenGeneral>() {
+            @Override public void onResponse(Call<ResumenGeneral> call, Response<ResumenGeneral> res) {
+                if (!isAdded()) return;
+                if (res.isSuccessful() && res.body()!=null) {
+                    ResumenGeneral rg = res.body();
 
-                    Log.d("API", "Progreso recibido: " + resumen.getValor());
+                    int valor = rg.getProgresoGlobal();
+                    Log.d("API","progresoGlobal="+valor);
 
-                    progresoGeneral.setProgress(resumen.getValor());
-                    textoProgreso.setText(resumen.getValor() + "%");
+                    try { progresoGeneral.setProgressCompat(valor, true); }
+                    catch (NoSuchMethodError e) { progresoGeneral.setProgress(valor); }
+                    textoProgreso.setText(valor + "%");
+
+                    tvNivelActual.setText(rg.getNivelActual() != null ? rg.getNivelActual() : "");
+
+                    if (rg.getNiveles()!=null) {
+                        nivelesAdapter.setData(rg.getNiveles());
+                    }
                 } else {
-                    Log.e("API", "Error en respuesta: " + response.code());
-                    textoProgreso.setText("Error al cargar");
+                    Log.e("API","HTTP "+res.code());
                 }
             }
-
-            @Override
-            public void onFailure(Call<ResumenGeneral> call, Throwable t) {
-                Log.e("API", "Fallo de conexión: " + t.getMessage());
-                textoProgreso.setText("Error al cargar");
+            @Override public void onFailure(Call<ResumenGeneral> call, Throwable t) {
+                if (!isAdded()) return;
+                Log.e("API","Fallo: "+t.getMessage());
             }
         });
     }

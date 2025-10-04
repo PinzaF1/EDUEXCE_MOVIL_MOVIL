@@ -1,56 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:gravity="center_horizontal">
+    android:fillViewport="true">
 
-    <!-- Título -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Progreso Global"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <!-- Progreso circular -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progresoGeneral"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:indicatorSize="150dp"
-        app:trackThickness="12dp"
-        app:indicatorDirectionCircular="clockwise"
-        app:indicatorColor="@color/purple_500"
-        app:trackColor="@color/darker_gray" />
-    <!-- Texto del progreso -->
-    <TextView
-        android:id="@+id/textoProgreso"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0%"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="12dp" />
-
-    <!-- Nivel actual -->
-    <TextView
-        android:id="@+id/tvNivelActual"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nivel actual: "
-        android:textColor="#FFA000"
-        android:layout_marginTop="8dp" />
-
-    <!-- Contenedor de niveles -->
     <LinearLayout
-        android:id="@+id/layoutNiveles"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
-</LinearLayout>
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/bg_surface">
+
+        <!-- CARD: Progreso Global -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="18dp"
+            app:cardUseCompatPadding="true"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/card_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Progreso Global"
+                    android:textStyle="bold"
+                    android:textSize="19sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Anillo + % centrados -->
+                <RelativeLayout
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/progresoGeneral"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:indeterminate="false"
+                        app:indicatorSize="200dp"
+                        app:trackThickness="18dp"
+                        app:indicatorInset="0dp"
+                        app:indicatorDirectionCircular="clockwise"
+                        app:indicatorColor="@color/progress_primary"
+                        app:trackColor="@color/progress_track" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/textoProgreso"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textStyle="bold"
+                            android:textSize="26sp"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="2dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Completado"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nivel actual"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_muted"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="2dp"/>
+
+                <TextView
+                    android:id="@+id/tvNivelActual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Intermedio"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/level_intermediate"
+                    android:layout_gravity="center_horizontal"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CARD: Línea de Niveles -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardUseCompatPadding="true"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/card_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Línea de Niveles"
+                    android:textStyle="bold"
+                    android:textSize="19sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="10dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerNiveles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    android:clipToPadding="false"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="68dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="12dp"/>
+    </LinearLayout>
+</ScrollView>

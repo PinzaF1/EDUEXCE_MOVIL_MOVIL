@@ -1,32 +1,22 @@
 package com.example.zavira_movil.model;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 public class ResumenGeneral {
 
-    @SerializedName("nombre")
-    private String nombre;
+    @SerializedName("progresoGlobal")
+    private int progresoGlobal;
 
-    @SerializedName("min")
-    private int min;
+    @SerializedName("nivelActual")
+    private String nivelActual;
 
-    @SerializedName("max")
-    private int max;
+    @SerializedName("niveles")
+    private List<Nivel> niveles;
 
-    @SerializedName("rango")
-    private String rango;
+    // --- si tenías más campos, déjalos como estaban ---
 
-    @SerializedName("actual")
-    private boolean actual;
-
-    @SerializedName("valor")
-    private int valor;
-
-    // Getters
-    public String getNombre() { return nombre; }
-    public int getMin() { return min; }
-    public int getMax() { return max; }
-    public String getRango() { return rango; }
-    public boolean isActual() { return actual; }
-    public int getValor() { return valor; }
+    public int getProgresoGlobal() { return progresoGlobal; }
+    public String getNivelActual() { return nivelActual; }
+    public List<Nivel> getNiveles() { return niveles; }
 }

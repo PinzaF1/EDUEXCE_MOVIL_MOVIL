@@ -3,7 +3,6 @@ package com.example.zavira_movil.model;
 import com.google.gson.annotations.SerializedName;
 
 public class MateriaDetalle {
-
     @SerializedName("nombre")
     private String nombre;
 
@@ -13,7 +12,6 @@ public class MateriaDetalle {
     @SerializedName("etiqueta")
     private String etiqueta;
 
-    // Getters
     public String getNombre() { return nombre; }
     public int getPorcentaje() { return porcentaje; }
     public String getEtiqueta() { return etiqueta; }

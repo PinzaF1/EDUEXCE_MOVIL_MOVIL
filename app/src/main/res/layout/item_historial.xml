@@ -7,28 +7,26 @@
 
     <TextView
         android:id="@+id/tvMateria"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Materia"
         android:textStyle="bold"
-        android:textSize="16sp"/>
-
-    <TextView
-        android:id="@+id/tvNivel"
+        android:textSize="16sp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nivel"/>
+        android:layout_height="wrap_content"/>
 
     <TextView
         android:id="@+id/tvPorcentaje"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0%"/>
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tvNivel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"/>
 
     <TextView
         android:id="@+id/tvFecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fecha"/>
-
+        android:paddingTop="2dp"/>
 </LinearLayout>

@@ -2,22 +2,22 @@ package com.example.zavira_movil.remote;
 
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
+import com.example.zavira_movil.model.AceptarRetoResponse;
+import com.example.zavira_movil.model.EstadoRetoResponse;
 import com.example.zavira_movil.model.Estudiante;
-import com.example.zavira_movil.model.HistorialItem;
+import com.example.zavira_movil.model.HistorialResponse;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
 
 import com.example.zavira_movil.model.KolbRequest;
 import com.example.zavira_movil.model.KolbResponse;
-import com.example.zavira_movil.model.MateriaDetalle;
+import com.example.zavira_movil.model.MateriasResponse;
 import com.example.zavira_movil.model.PreguntasKolb;
-import com.example.zavira_movil.model.MateriaProgreso;
-import com.example.zavira_movil.model.ProgresoMateria;
 import com.example.zavira_movil.model.ResumenGeneral;
-import com.example.zavira_movil.model.Reto;
-import com.example.zavira_movil.model.RetoEstado;
-import com.example.zavira_movil.model.RetoRespuesta;
-import com.example.zavira_movil.model.RetoRonda;
+import com.example.zavira_movil.model.RetoCreadoResponse;
+import com.example.zavira_movil.model.RetoCreateRequest;
+import com.example.zavira_movil.model.RondaRequest;
+import com.example.zavira_movil.model.RondaResponse;
 
 
 import java.util.List;
@@ -84,29 +84,30 @@ public interface ApiService {
         Call<ResumenGeneral> getResumen();
 
     @GET("movil/progreso/materias")
-    Call<List<MateriaDetalle>> getMaterias();
+    Call<MateriasResponse> getMaterias();
+
 
     @GET("movil/progreso/historial")
-    Call<List<HistorialItem>> getHistorial();
+    Call<HistorialResponse> getHistorial(
+            @Query("page") int page,
+            @Query("limit") int limit  );
 
 
         // retos 1 vs 1
 
-        @POST("movil/retos")
-        Call<Reto> crearReto(@Body Reto reto);
+    // 1) Crear reto
+    @POST("movil/retos")
+    Call<RetoCreadoResponse> crearReto(@Body RetoCreateRequest body);
 
-    // 2. Aceptar un reto
-    @POST("movil/retos/{id_reto}/aceptar")
-    Call<RetoEstado> aceptarReto(@Path("id_reto") int idReto);
+    // 2) Aceptar reto -> devuelve reto, sesiones[], preguntas[]
+    @POST("movil/retos/{id}/aceptar")
+    Call<AceptarRetoResponse> aceptarReto(@Path("id") String idReto);
 
-    // 3. Responder una ronda
+    // 3) Responder ronda -> { id_sesion, respuestas:[{orden, opcion}] }
     @POST("movil/retos/ronda")
-    Call<RetoRespuesta> responderRonda(@Body RetoRonda ronda);
+    Call<RondaResponse> responderRonda(@Body RondaRequest body);
 
-    // 4. Ver estado de un reto
-    @GET("movil/retos/{id_reto}")
-    Call<RetoEstado> estadoReto(@Path("id_reto") int idReto);
-
-
-
+    // 4) Estado del reto -> { id_reto, estado, ganador, jugadores[] }
+    @GET("movil/retos/{id}")
+    Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
 }

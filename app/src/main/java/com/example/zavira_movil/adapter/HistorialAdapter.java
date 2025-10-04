@@ -1,61 +1,52 @@
+// com/example/zavira_movil/adapter/HistorialAdapter.java
 package com.example.zavira_movil.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.HistorialItem;
-
+import java.util.ArrayList;
 import java.util.List;
 
-public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.HistorialViewHolder> {
+public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.VH> {
+    private final List<HistorialItem> data = new ArrayList<>();
 
-    private List<HistorialItem> lista;
-
-    public HistorialAdapter(List<HistorialItem> lista) {
-        this.lista = lista;
+    public void setData(List<HistorialItem> nuevos) {
+        data.clear();
+        if (nuevos != null) data.addAll(nuevos);
+        notifyDataSetChanged();
     }
 
-    public void setLista(List<HistorialItem> nuevaLista) {
-        this.lista = nuevaLista;
-    }
-
-    @NonNull
-    @Override
-    public HistorialViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    @NonNull @Override
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_historial, parent, false);
-        return new HistorialViewHolder(v);
+        return new VH(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HistorialViewHolder holder, int position) {
-        HistorialItem item = lista.get(position);
-        holder.tvMateria.setText(item.getMateria());
-        holder.tvNivel.setText(item.getNivel());
-        holder.tvPorcentaje.setText(item.getPorcentaje() + "%");
-        holder.tvFecha.setText(item.getFecha());
+    public void onBindViewHolder(@NonNull VH h, int pos) {
+        HistorialItem it = data.get(pos);
+        h.tvMateria.setText(it.getMateria());
+        h.tvPorcentaje.setText(it.getPorcentaje() + "%");
+        h.tvNivel.setText(it.getNivel());
+        h.tvFecha.setText(it.getFecha());
     }
 
-    @Override
-    public int getItemCount() {
-        return lista != null ? lista.size() : 0;
-    }
+    @Override public int getItemCount() { return data.size(); }
 
-    static class HistorialViewHolder extends RecyclerView.ViewHolder {
-        TextView tvMateria, tvNivel, tvPorcentaje, tvFecha;
-
-        public HistorialViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvMateria = itemView.findViewById(R.id.tvMateria);
-            tvNivel = itemView.findViewById(R.id.tvNivel);
-            tvPorcentaje = itemView.findViewById(R.id.tvPorcentaje);
-            tvFecha = itemView.findViewById(R.id.tvFecha);
+    static class VH extends RecyclerView.ViewHolder {
+        TextView tvMateria, tvPorcentaje, tvNivel, tvFecha;
+        VH(@NonNull View v) {
+            super(v);
+            tvMateria    = v.findViewById(R.id.tvMateria);
+            tvPorcentaje = v.findViewById(R.id.tvPorcentaje);
+            tvNivel      = v.findViewById(R.id.tvNivel);
+            tvFecha      = v.findViewById(R.id.tvFecha);
         }
     }
 }

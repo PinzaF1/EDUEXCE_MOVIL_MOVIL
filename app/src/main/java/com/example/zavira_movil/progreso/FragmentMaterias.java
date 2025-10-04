@@ -1,6 +1,7 @@
 package com.example.zavira_movil.progreso;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.adapter.MateriasAdapter;
+import com.example.zavira_movil.adapter.ProgresoAdapter;
 import com.example.zavira_movil.model.MateriaDetalle;
+import com.example.zavira_movil.model.MateriasResponse;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 
@@ -27,7 +29,7 @@ import retrofit2.Response;
 public class FragmentMaterias extends Fragment {
 
     private RecyclerView recyclerMaterias;
-    private MateriasAdapter materiaAdapter;
+    private ProgresoAdapter adapter;
 
     @Nullable
     @Override
@@ -35,30 +37,36 @@ public class FragmentMaterias extends Fragment {
         View view = inflater.inflate(R.layout.fragment_materias, container, false);
 
         recyclerMaterias = view.findViewById(R.id.recyclerMaterias);
-        recyclerMaterias.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerMaterias.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        materiaAdapter = new MateriasAdapter(new ArrayList<>());
-        recyclerMaterias.setAdapter(materiaAdapter);
+        adapter = new ProgresoAdapter(new ArrayList<>());
+        recyclerMaterias.setAdapter(adapter);
 
         cargarMaterias();
-
         return view;
     }
 
     private void cargarMaterias() {
-        ApiService apiService = RetrofitClient.getInstance(getContext()).create(ApiService.class);
-        apiService.getMaterias().enqueue(new Callback<List<MateriaDetalle>>() {
+        ApiService apiService = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+
+        apiService.getMaterias().enqueue(new Callback<MateriasResponse>() {
             @Override
-            public void onResponse(Call<List<MateriaDetalle>> call, Response<List<MateriaDetalle>> response) {
+            public void onResponse(Call<MateriasResponse> call, Response<MateriasResponse> response) {
+                if (!isAdded()) return;
+
                 if (response.isSuccessful() && response.body() != null) {
-                    List<MateriaDetalle> materias = response.body();
-                    materiaAdapter.setLista(materias);
-                    materiaAdapter.notifyDataSetChanged();
+                    List<MateriaDetalle> materias = response.body().getMaterias();
+                    adapter.setLista(materias);
+                } else {
+                    Log.e("Materias", "Error HTTP: " + response.code());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<MateriaDetalle>> call, Throwable t) {}
+            public void onFailure(Call<MateriasResponse> call, Throwable t) {
+                if (!isAdded()) return;
+                Log.e("Materias", "Fallo: " + t.getMessage());
+            }
         });
     }
 }

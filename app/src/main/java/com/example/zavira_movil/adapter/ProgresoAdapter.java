@@ -10,20 +10,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.model.MateriaProgreso;
+import com.example.zavira_movil.model.MateriaDetalle;
 
 import java.util.List;
 
 public class ProgresoAdapter extends RecyclerView.Adapter<ProgresoAdapter.ViewHolder> {
 
-    private List<MateriaProgreso> lista;
+    private List<MateriaDetalle> lista;
 
-    public ProgresoAdapter(List<MateriaProgreso> lista) {
+    public ProgresoAdapter(List<MateriaDetalle> lista) {
         this.lista = lista;
     }
 
-    public void setLista(List<MateriaProgreso> nuevaLista) {
-        this.lista = nuevaLista;
+    public void setLista(List<MateriaDetalle> nueva) {
+        this.lista = nueva;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -36,7 +37,7 @@ public class ProgresoAdapter extends RecyclerView.Adapter<ProgresoAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        MateriaProgreso item = lista.get(position);
+        MateriaDetalle item = lista.get(position);
         holder.txtNombre.setText(item.getNombre());
         holder.txtProgreso.setText(item.getPorcentaje() + "%");
         holder.txtEtiqueta.setText(item.getEtiqueta());
@@ -54,7 +55,7 @@ public class ProgresoAdapter extends RecyclerView.Adapter<ProgresoAdapter.ViewHo
 
         ViewHolder(View itemView) {
             super(itemView);
-            txtNombre   = itemView.findViewById(R.id.tvNombreMateria); // ID corregido
+            txtNombre   = itemView.findViewById(R.id.tvNombreMateria);
             txtProgreso = itemView.findViewById(R.id.tvProgreso);
             txtEtiqueta = itemView.findViewById(R.id.tvEtiqueta);
             progress    = itemView.findViewById(R.id.progressMateria);
