@@ -17,18 +17,29 @@ import com.example.zavira_movil.model.DemoData;
 public class IslasFragment extends Fragment {
     private FragmentIslasBinding binding;
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentIslasBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
-    @Override public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
+    @Override
+    public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
+        super.onViewCreated(v, s);
+
+        // Configurar RecyclerView con adaptador y callback vacío
         binding.rvSubjects.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.rvSubjects.setAdapter(new SubjectAdapter(DemoData.subjects()));
+        binding.rvSubjects.setAdapter(new SubjectAdapter(
+                DemoData.getSubjects(),
+                intent -> {} // callback vacío (no hace nada por ahora)
+        ));
     }
 
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }

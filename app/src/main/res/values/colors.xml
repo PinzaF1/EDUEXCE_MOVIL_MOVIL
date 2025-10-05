@@ -8,8 +8,9 @@
     <color name="teal_700">#018786</color>
     <color name="blue_zavira">#2979FF</color>
     <color name="darker_gray">#A9A9A9</color>
+    <color name="primary">#3B82F6</color>
+    <color name="bnv_tint">#374151</color>
 
-    <color name="purple_500">#6200EE</color>
 
     <color name="pastel_rosa">#FFC1CC</color>
     <color name="pastel_azul">#A8D5E2</color>
@@ -77,6 +78,8 @@
     <color name="row_violet">#F3EDFF</color>
 
     <color name="stroke_soft">#1A000000</color>
+
+
 
 
 </resources>

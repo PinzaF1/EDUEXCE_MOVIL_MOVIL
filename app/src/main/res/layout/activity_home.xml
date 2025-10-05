@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <!-- Top bar -->
     <com.google.android.material.card.MaterialCardView
@@ -72,15 +71,16 @@
             android:id="@+id/btnIslaSimulacro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Probar Isla Simulacro"/>
-
+            android:text="Probar Isla Simulacro" />
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Contenedor de Fragments -->
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
+    <!-- RecyclerView (para el adaptador de materias) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSubjects"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="16dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +96,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- BottomNavigationView (plana, ocupa todo ancho) -->
+    <!-- Contenedor de Fragments -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!-- BottomNavigationView -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -114,6 +125,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- FAB Perfil (opcional; lo mantenemos) -->
+    <!-- FAB Perfil -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPerfil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_person"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/primary"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Perfil" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

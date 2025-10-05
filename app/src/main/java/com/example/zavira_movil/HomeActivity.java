@@ -24,7 +24,6 @@ public class HomeActivity extends AppCompatActivity {
     private ActivityHomeBinding binding;
     private SubjectAdapter adapter;
 
-    // Launcher para refrescar niveles desbloqueados
     private final ActivityResultLauncher<Intent> launcher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && adapter != null) {
@@ -52,7 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.rvSubjects.setAdapter(adapter);
 
         // Botón Isla Simulacro
-        findViewById(R.id.btnIslaSimulacro).setOnClickListener(v -> {
+        binding.btnIslaSimulacro.setOnClickListener(v -> {
             Intent i = new Intent(HomeActivity.this, IslaSimulacroActivity.class);
             startActivity(i);
         });
@@ -76,11 +75,11 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_progreso) {
                 f = new ProgresoFragment();
             } else if (id == R.id.nav_logros) {
-                f = new RankingLogrosFragment(); // reemplaza a Activity
+                f = new RankingLogrosFragment();
             } else if (id == R.id.nav_retos) {
-                f = new ProgresoFragment(); // usa el que tengas o tu fragment de retos
+                f = new ProgresoFragment();
             } else if (id == R.id.nav_perfil) {
-                f = new com.example.zavira_movil.ui.ranking.perfil.PerfilFragment();
+                f = new PerfilFragment();
             } else return false;
 
             show(f);

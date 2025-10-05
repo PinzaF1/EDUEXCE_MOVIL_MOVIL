@@ -1,5 +1,6 @@
 package com.example.zavira_movil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -279,18 +280,20 @@ public class TestAcademico extends AppCompatActivity {
                 });
     }
 
-    /** Diálogo modal que NO cierra la Activity hasta que el usuario toque Aceptar */
     private void showResultado(String titulo, String mensaje) {
         new AlertDialog.Builder(this)
                 .setTitle(titulo)
                 .setMessage(mensaje == null ? "" : mensaje)
                 .setCancelable(false)
-                .setPositiveButton("Aceptar", (d, w) -> {
-                    // Si quieres cerrar después de ver el resultado, descomenta:
-                    // finish();
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    dialog.dismiss();
+                    // 🔹 Ir al HomeActivity
+                    startActivity(new Intent(TestAcademico.this, HomeActivity.class));
+                    finish(); // cierra la pantalla actual
                 })
                 .show();
     }
+
 
     private void toast(String s) { Toast.makeText(this, s, Toast.LENGTH_LONG).show(); }
 }
