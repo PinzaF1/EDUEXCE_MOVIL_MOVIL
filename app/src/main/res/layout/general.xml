@@ -20,7 +20,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/ic_materia_default"
+            android:src="@drawable/ic_matematicas"
             android:contentDescription="Imagen materia"/>
 
         <TextView
