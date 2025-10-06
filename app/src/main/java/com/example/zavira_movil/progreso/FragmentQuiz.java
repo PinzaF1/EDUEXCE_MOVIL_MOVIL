@@ -64,7 +64,6 @@ public class FragmentQuiz extends Fragment {
         RecyclerView rv = v.findViewById(R.id.optionsList);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         optionsAdapter = new OptionAdapter(key -> {
-            // selección única + habilitar "Siguiente"
             marcadas.put(index, key);
             btnNext.setEnabled(true);
         });
@@ -127,7 +126,6 @@ public class FragmentQuiz extends Fragment {
         api.responderRonda(new RondaRequest(idSesion, items))
                 .enqueue(new Callback<RondaResponse>() {
                     @Override public void onResponse(Call<RondaResponse> call, Response<RondaResponse> resp) {
-                        // Luego de la ronda, consulta estado para mostrar resultados
                         consultarEstado();
                     }
                     @Override public void onFailure(Call<RondaResponse> call, Throwable t) {
@@ -145,20 +143,22 @@ public class FragmentQuiz extends Fragment {
                     Bundle b = new Bundle();
                     b.putString("estadoJson", new Gson().toJson(e));
 
-                    com.example.zavira_movil.progreso.FragmentResultadoReto f =
-                            new com.example.zavira_movil.progreso.FragmentResultadoReto();
+                    FragmentResultadoReto f = new FragmentResultadoReto();
                     f.setArguments(b);
 
-                    requireActivity().getSupportFragmentManager().beginTransaction()
+                    // NAVEGAR a Resultado dentro del overlay (manager del padre)
+                    getParentFragmentManager().beginTransaction()
                             .replace(R.id.container, f)
                             .addToBackStack(null)
                             .commit();
                 } else {
-                    requireActivity().getSupportFragmentManager().popBackStack();
+                    // cerrar overlay si algo sale mal
+                    getParentFragmentManager().popBackStack();
                 }
             }
             @Override public void onFailure(Call<EstadoRetoResponse> call, Throwable t) {
-                requireActivity().getSupportFragmentManager().popBackStack();
+                // cerrar overlay si falla
+                getParentFragmentManager().popBackStack();
             }
         });
     }

@@ -1,16 +1,22 @@
 package com.example.zavira_movil.progreso;
 
 import android.os.Bundle;
-import android.view.*;
-import android.widget.*;
-import androidx.annotation.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.AceptarRetoResponse;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
-import com.example.zavira_movil.progreso.FragmentQuiz;
 import com.google.gson.Gson;
 
 import retrofit2.Call;
@@ -94,11 +100,15 @@ public class FragmentLoadingSalaReto extends Fragment {
                 FragmentQuiz f = new FragmentQuiz();
                 f.setArguments(args);
 
-                if (!isAdded() || getActivity() == null) return;
-                View overlay = getActivity().findViewById(R.id.container);
-                if (overlay != null) overlay.setVisibility(View.VISIBLE);
+                // MOSTRAR OVERLAY del layout padre (RetosFragment)
+                View parentView = requireParentFragment().getView();
+                if (parentView != null) {
+                    View overlay = parentView.findViewById(R.id.container);
+                    if (overlay != null) overlay.setVisibility(View.VISIBLE);
+                }
 
-                getActivity().getSupportFragmentManager().beginTransaction()
+                // NAVEGAR dentro del overlay (manager del padre)
+                getParentFragmentManager().beginTransaction()
                         .replace(R.id.container, f)
                         .addToBackStack(null)
                         .commit();

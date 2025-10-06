@@ -44,8 +44,13 @@ public class FragmentGeneral extends Fragment {
         progresoGeneral.setIndeterminate(false);
         progresoGeneral.setMax(100);
 
-        nivelesAdapter = new NivelesAdapter();
+        // Para que el RecyclerView se expanda dentro del ScrollView
         recyclerNiveles.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerNiveles.setNestedScrollingEnabled(false);
+        recyclerNiveles.setHasFixedSize(false);
+        recyclerNiveles.setItemAnimator(null);
+
+        nivelesAdapter = new NivelesAdapter();
         recyclerNiveles.setAdapter(nivelesAdapter);
 
         cargarResumen();
@@ -55,30 +60,39 @@ public class FragmentGeneral extends Fragment {
     private void cargarResumen() {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.getResumen().enqueue(new Callback<ResumenGeneral>() {
-            @Override public void onResponse(Call<ResumenGeneral> call, Response<ResumenGeneral> res) {
+            @Override
+            public void onResponse(Call<ResumenGeneral> call, Response<ResumenGeneral> res) {
                 if (!isAdded()) return;
-                if (res.isSuccessful() && res.body()!=null) {
+
+                if (res.isSuccessful() && res.body() != null) {
                     ResumenGeneral rg = res.body();
 
                     int valor = rg.getProgresoGlobal();
-                    Log.d("API","progresoGlobal="+valor);
+                    Log.d("API", "progresoGlobal=" + valor);
 
-                    try { progresoGeneral.setProgressCompat(valor, true); }
-                    catch (NoSuchMethodError e) { progresoGeneral.setProgress(valor); }
+                    try {
+                        progresoGeneral.setProgressCompat(valor, true);
+                    } catch (NoSuchMethodError e) {
+                        progresoGeneral.setProgress(valor);
+                    }
                     textoProgreso.setText(valor + "%");
 
                     tvNivelActual.setText(rg.getNivelActual() != null ? rg.getNivelActual() : "");
 
-                    if (rg.getNiveles()!=null) {
+                    if (rg.getNiveles() != null) {
+                        // >>> IMPORTANTE: primero el % global, luego la lista
+                        nivelesAdapter.setGlobalProgress(valor);
                         nivelesAdapter.setData(rg.getNiveles());
                     }
                 } else {
-                    Log.e("API","HTTP "+res.code());
+                    Log.e("API", "HTTP " + res.code());
                 }
             }
-            @Override public void onFailure(Call<ResumenGeneral> call, Throwable t) {
+
+            @Override
+            public void onFailure(Call<ResumenGeneral> call, Throwable t) {
                 if (!isAdded()) return;
-                Log.e("API","Fallo: "+t.getMessage());
+                Log.e("API", "Fallo: " + t.getMessage());
             }
         });
     }

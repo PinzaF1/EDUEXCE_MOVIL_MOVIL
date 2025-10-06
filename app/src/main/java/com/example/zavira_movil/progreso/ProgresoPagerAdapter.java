@@ -11,23 +11,22 @@ public class ProgresoPagerAdapter extends FragmentStateAdapter {
         super(fragmentActivity);
     }
 
+    // NUEVO: para usar desde ProgresoFragment
+    public ProgresoPagerAdapter(@NonNull Fragment fragment) {
+        super(fragment);
+    }
+
     @NonNull
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
-            case 0:
-                return new FragmentGeneral();   // Progreso global
-            case 1:
-                return new FragmentMaterias();  // Materias
-            case 2:
-                return new FragmentHistorial(); // Historial
-            default:
-                return new FragmentGeneral();
+            case 0: return new FragmentGeneral();
+            case 1: return new FragmentMaterias();
+            case 2: return new FragmentHistorial();
+            default: return new FragmentGeneral();
         }
     }
 
     @Override
-    public int getItemCount() {
-        return 3; // Tres tabs
-    }
+    public int getItemCount() { return 3; }
 }

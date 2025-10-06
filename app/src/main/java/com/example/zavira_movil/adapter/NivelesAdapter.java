@@ -1,6 +1,7 @@
 package com.example.zavira_movil.adapter;
 
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +25,23 @@ public class NivelesAdapter extends RecyclerView.Adapter<NivelesAdapter.VH> {
 
     private final List<Nivel> data = new ArrayList<>();
 
-    public void setData(List<Nivel> niveles) {
-        data.clear();
-        if (niveles != null) data.addAll(niveles);  // pinta TODO lo que llega (los 4)
+    // % global (0–100) que viene del anillo
+    private int globalProgress = -1; // -1 = fallback a n.getValor()
+
+    /** Llama esto antes de setData(...) */
+    public void setGlobalProgress(int p) {
+        if (p < 0) p = 0; if (p > 100) p = 100;
+        this.globalProgress = p;
         notifyDataSetChanged();
     }
 
-    @NonNull
-    @Override
+    public void setData(List<Nivel> niveles) {
+        data.clear();
+        if (niveles != null) data.addAll(niveles);
+        notifyDataSetChanged();
+    }
+
+    @NonNull @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_nivel, parent, false);
@@ -42,80 +52,93 @@ public class NivelesAdapter extends RecyclerView.Adapter<NivelesAdapter.VH> {
     public void onBindViewHolder(@NonNull VH h, int pos) {
         Nivel n = data.get(pos);
 
-        // textos
         h.tvNombre.setText(n.getNombre());
         h.tvRango.setText(n.getRango());
 
-        // progreso relativo al rango del nivel
-        int min = n.getMin(), max = n.getMax(), valor = n.getValor();
-        int progress = 0;
-        if (max > min) {
-            int clamped = Math.max(min, Math.min(valor, max));
-            progress = Math.round(100f * (clamped - min) / (max - min));
-        }
+        int min = n.getMin();
+        int max = n.getMax();
+
+        int gp = (globalProgress >= 0) ? globalProgress : n.getValor();
+        if (gp < 0) gp = 0; if (gp > 100) gp = 100;
+
+        boolean future  = gp <  min;
+        boolean current = gp >= min && gp < max;
+        boolean passed  = gp >= max;
+
+        int progress;
+        if (future)       progress = 0;     // aún no llega → 0%
+        else if (passed)  progress = 100;   // superado → 100%
+        else              progress = Math.round(100f * (gp - min) / (max - min)); // dentro del rango
+
         h.pb.setMax(100);
         h.pb.setProgress(progress);
+        h.ivStar.setVisibility(current ? View.VISIBLE : View.INVISIBLE);
 
-        // nivel actual -> estrella visible
-        final boolean esActual = n.isActual();
-        h.ivStar.setVisibility(esActual ? View.VISIBLE : View.INVISIBLE);
-
-        // ===== Color por nivel (activo fuerte, inactivo opaco) =====
-        int colorFinal;
+        // Colores por nivel
+        int activeColor, dimColor;
         switch (n.getNombre()) {
             case "Básico":
-                colorFinal = ContextCompat.getColor(
-                        h.itemView.getContext(),
-                        esActual ? R.color.level_basic : R.color.level_basic_dim
-                );
+                activeColor = ContextCompat.getColor(h.itemView.getContext(), R.color.level_basic);
+                dimColor    = ContextCompat.getColor(h.itemView.getContext(), R.color.level_basic_dim);
                 break;
             case "Intermedio":
-                colorFinal = ContextCompat.getColor(
-                        h.itemView.getContext(),
-                        esActual ? R.color.level_intermediate : R.color.level_intermediate_dim
-                );
+                activeColor = ContextCompat.getColor(h.itemView.getContext(), R.color.level_intermediate);
+                dimColor    = ContextCompat.getColor(h.itemView.getContext(), R.color.level_intermediate_dim);
                 break;
             case "Avanzado":
-                colorFinal = ContextCompat.getColor(
-                        h.itemView.getContext(),
-                        esActual ? R.color.level_advanced : R.color.level_advanced_dim
-                );
+                activeColor = ContextCompat.getColor(h.itemView.getContext(), R.color.level_advanced);
+                dimColor    = ContextCompat.getColor(h.itemView.getContext(), R.color.level_advanced_dim);
                 break;
-            default: // "Experto"
-                colorFinal = ContextCompat.getColor(
-                        h.itemView.getContext(),
-                        esActual ? R.color.level_expert : R.color.level_expert_dim
-                );
+            default: // Experto
+                activeColor = ContextCompat.getColor(h.itemView.getContext(), R.color.level_expert);
+                dimColor    = ContextCompat.getColor(h.itemView.getContext(), R.color.level_expert_dim);
                 break;
         }
 
-        // Punto (dotLeft) tintado
+        // Dot a la izquierda: color del nivel (si quieres opacarlo cambia a dimColor cuando future)
         Drawable dot = h.dotLeft.getBackground();
         if (dot != null) {
             dot = dot.mutate();
-            dot.setTint(colorFinal);
+            dot.setTint(future ? dimColor : activeColor);
             h.dotLeft.setBackground(dot);
         }
 
-        // Barra de progreso tintada sobre tu drawable redondeado
-        Drawable base = AppCompatResources.getDrawable(h.itemView.getContext(), R.drawable.progress_rounded);
-        if (base != null) {
-            Drawable wrapped = DrawableCompat.wrap(base.mutate());
-            DrawableCompat.setTint(wrapped, colorFinal);
-            h.pb.setProgressDrawable(wrapped);
+        // Barra: track gris SIEMPRE + progreso con color solo si alcanzado (current/passed)
+        Drawable d = AppCompatResources.getDrawable(h.itemView.getContext(), R.drawable.progress_rounded);
+        if (d != null) {
+            d = d.mutate();
+            int track = ContextCompat.getColor(h.itemView.getContext(), R.color.progress_track);
+
+            if (d instanceof LayerDrawable) {
+                LayerDrawable ld = (LayerDrawable) d;
+                Drawable bg = ld.findDrawableByLayerId(android.R.id.background);
+                Drawable pr = ld.findDrawableByLayerId(android.R.id.progress);
+
+                if (bg != null) {
+                    bg = bg.mutate();
+                    DrawableCompat.setTint(bg, track); // fondo gris
+                }
+                if (pr != null) {
+                    pr = pr.mutate();
+                    DrawableCompat.setTint(pr, (future ? dimColor : activeColor)); // progreso
+                }
+                h.pb.setProgressDrawable(ld);
+            } else {
+                // Fallback: al menos deja el color correcto en progreso
+                Drawable wrapped = DrawableCompat.wrap(d);
+                DrawableCompat.setTint(wrapped, (future ? dimColor : activeColor));
+                h.pb.setProgressDrawable(wrapped);
+            }
         }
-        // ===========================================================
     }
 
-    @Override
-    public int getItemCount() { return data.size(); }
+    @Override public int getItemCount() { return data.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvNombre, tvRango;
         ProgressBar pb;
         ImageView ivStar;
-        View dotLeft; // puntito a la izquierda
-
+        View dotLeft;
         VH(@NonNull View v) {
             super(v);
             tvNombre = v.findViewById(R.id.tvNivelNombre);

@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:paddingBottom="140dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +52,7 @@
                         android:layout_height="match_parent"
                         android:indeterminate="false"
                         app:indicatorSize="200dp"
-                        app:trackThickness="18dp"
+                        app:trackThickness="28dp"
                         app:indicatorInset="0dp"
                         app:indicatorDirectionCircular="clockwise"
                         app:indicatorColor="@color/progress_primary"

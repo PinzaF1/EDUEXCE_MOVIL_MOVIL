@@ -36,10 +36,12 @@ public class FragmentMaterias extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_materias, container, false);
 
-        recyclerMaterias = view.findViewById(R.id.recyclerMaterias);
+        recyclerMaterias = view.findViewById(R.id.recyclerMaterias); // ← ID exacto de tu XML
         recyclerMaterias.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerMaterias.setHasFixedSize(false);
+        recyclerMaterias.setItemAnimator(null); // opcional: evita “saltos” al refrescar
 
-        adapter = new ProgresoAdapter(new ArrayList<>());
+        adapter = new ProgresoAdapter(new ArrayList<>()); // mismo adapter que ya usas
         recyclerMaterias.setAdapter(adapter);
 
         cargarMaterias();
@@ -56,9 +58,10 @@ public class FragmentMaterias extends Fragment {
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<MateriaDetalle> materias = response.body().getMaterias();
-                    adapter.setLista(materias);
+                    adapter.setLista(materias != null ? materias : new ArrayList<>());
                 } else {
                     Log.e("Materias", "Error HTTP: " + response.code());
+                    adapter.setLista(new ArrayList<>());
                 }
             }
 
@@ -66,6 +69,7 @@ public class FragmentMaterias extends Fragment {
             public void onFailure(Call<MateriasResponse> call, Throwable t) {
                 if (!isAdded()) return;
                 Log.e("Materias", "Fallo: " + t.getMessage());
+                adapter.setLista(new ArrayList<>());
             }
         });
     }

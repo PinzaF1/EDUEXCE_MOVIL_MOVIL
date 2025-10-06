@@ -5,8 +5,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.zavira_movil.progreso.FragmentReto;       // Tab 1: Crear Reto
-import com.example.zavira_movil.progreso.FragmentRetosRecibidos;  // Tab 2: Recibidos (visual)
+import com.example.zavira_movil.progreso.FragmentReto;
+import com.example.zavira_movil.progreso.FragmentRetosRecibidos;
 
 public class RetosTabsAdapter extends FragmentStateAdapter {
 
@@ -14,15 +14,17 @@ public class RetosTabsAdapter extends FragmentStateAdapter {
         super(fa);
     }
 
+    // NUEVO: para usarlo desde RetosFragment
+    public RetosTabsAdapter(@NonNull Fragment fragment) {
+        super(fragment);
+    }
+
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        if (position == 0) return new FragmentReto();
-        else return new FragmentRetosRecibidos();
+        return (position == 0) ? new FragmentReto() : new FragmentRetosRecibidos();
     }
 
     @Override
-    public int getItemCount() {
-        return 2;
-    }
+    public int getItemCount() { return 2; }
 }
