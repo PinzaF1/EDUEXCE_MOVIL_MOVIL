@@ -43,9 +43,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.btnBell.setOnClickListener(v ->
                 Toast.makeText(this, "Notificaciones pronto 😊", Toast.LENGTH_SHORT).show());
 
-        // Acción FAB perfil
-        binding.fabPerfil.setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileActivity.class)));
+
 
         // Configurar RecyclerView (Islas)
         binding.rvSubjects.setLayoutManager(new LinearLayoutManager(this));

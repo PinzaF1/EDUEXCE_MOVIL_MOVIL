@@ -152,7 +152,7 @@
             android:id="@+id/btnVolver"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Volver a Retos"
+            android:text="Aceptar"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textColor="@android:color/white"

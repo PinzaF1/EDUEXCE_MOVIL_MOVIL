@@ -141,7 +141,7 @@
             android:id="@+id/btnComenzar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Volver"
+            android:text="Comenzar reto!"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/brand_pink" />

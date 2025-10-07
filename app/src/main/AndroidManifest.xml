@@ -14,9 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZAVIRA_MOVIL"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".RetosActivity"
-            android:exported="false" />
+
         <activity
             android:name=".InfoAcademico"
             android:exported="false" />

@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.EstadoRetoResponse;
@@ -31,11 +33,12 @@ public class FragmentResultadoReto extends Fragment {
         TextView tvOppDetail = v.findViewById(R.id.tvOppDetail);
         TextView tvOppPoints = v.findViewById(R.id.tvOppPoints);
         Button btnVolver   = v.findViewById(R.id.btnVolver);
+        btnVolver.setText("Aceptar");
 
         String json = getArguments()!=null ? getArguments().getString("estadoJson") : null;
         int totalPreg = getArguments()!=null ? getArguments().getInt("totalPreguntas", 25) : 25;
-
         if (json == null) { getParentFragmentManager().popBackStack(); return; }
+
         EstadoRetoResponse e = new Gson().fromJson(json, EstadoRetoResponse.class);
 
         int youCorrect = 0, oppCorrect = 0;
@@ -78,9 +81,52 @@ public class FragmentResultadoReto extends Fragment {
         tvYouPoints.setText(String.valueOf(youPts));
         tvOppPoints.setText(String.valueOf(oppPts));
 
-        // Volver dentro del overlay (no abrir Activity)
-        btnVolver.setOnClickListener(v12 -> {
-            getParentFragmentManager().popBackStack();
-        });
+        btnVolver.setOnClickListener(view -> volverARetos());
+    }
+
+    private void volverARetos() {
+        if (!isAdded()) return;
+
+        Fragment parent = getParentFragment();
+        if (parent != null) {
+            // 1) Limpiar todo el backstack del overlay (quiz -> resultado)
+            FragmentManager childFm = parent.getChildFragmentManager();
+            childFm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            // 2) Ocultar el overlay (FrameLayout @id/container) si existe
+            View parentView = parent.getView();
+            if (parentView != null) {
+                int containerId = idByName("container");
+                if (containerId != 0) {
+                    View overlay = parentView.findViewById(containerId);
+                    if (overlay != null) overlay.setVisibility(View.GONE);
+                }
+
+                // 3) Si el padre tiene un ViewPager2, moverlo al TAB 0 ("Crear Reto")
+                int[] candidates = new int[]{
+                        idByName("vpRetos"),
+                        idByName("viewPager"),
+                        idByName("viewPager2"),
+                        idByName("retosPager")
+                };
+                for (int cid : candidates) {
+                    if (cid == 0) continue;
+                    View maybeVp = parentView.findViewById(cid);
+                    if (maybeVp instanceof ViewPager2) {
+                        ((ViewPager2) maybeVp).setCurrentItem(0, false);
+                        break;
+                    }
+                }
+            }
+        } else {
+            // Fallback: si no hay padre, solo hacemos pop en el backstack de la Activity
+            requireActivity().getSupportFragmentManager().popBackStack();
+        }
+    }
+
+    private int idByName(String name) {
+        try {
+            return getResources().getIdentifier(name, "id", requireContext().getPackageName());
+        } catch (Exception ignored) { return 0; }
     }
 }

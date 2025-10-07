@@ -53,8 +53,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Botón cerrar sesión
         binding.btnCerrarSesion.setOnClickListener(v -> {
-            TokenManager.clearAll(ProfileActivity.this);
-            irALoginYLimpiarPila();
+            TokenManager.clearAll(ProfileActivity.this); // ✅ Usa el contexto correcto
+            irALoginYLimpiarPila(); //
         });
 
         // Botón editar foto
