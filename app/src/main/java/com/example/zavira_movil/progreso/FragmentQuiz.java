@@ -61,7 +61,6 @@ public class FragmentQuiz extends Fragment {
 
         tvIndex     = v.findViewById(R.id.txtIndex);
         tvPregunta  = v.findViewById(R.id.txtPregunta);
-        btnPrev     = v.findViewById(R.id.btnPrev);
         btnNext     = v.findViewById(R.id.btnNext);
 
         RecyclerView rv = v.findViewById(R.id.optionsList);

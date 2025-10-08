@@ -27,11 +27,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Versión sin barra de bloques:
+ * - Se muestra solo la materia en tvBloque.
+ * - Un único botón abajo: "Siguiente" (avanza de bloque).
+ *   En el último bloque cambia a "Enviar respuestas" y llama a enviar().
+ * - Toda la lógica original de carga, respuestas y envío se mantiene.
+ */
 public class TestAcademico extends AppCompatActivity {
 
     private RecyclerView rvPreguntas;
-    private Button btnEnviar, btnPrevBloque, btnNextBloque;
-    private TextView tvBloque;
+    private Button btnEnviar;                  // único botón
+    private TextView tvBloque;                 // muestra la materia
     private PreguntasAdapter adapter;
 
     // de backend
@@ -40,7 +47,7 @@ public class TestAcademico extends AppCompatActivity {
 
     // navegación por bloques
     private final List<List<PreguntaAcademica>> bloques = new ArrayList<>();
-    private final List<String> nombresBloque = new ArrayList<>(); // área de cada bloque
+    private final List<String> nombresBloque = new ArrayList<>(); // materia/área por bloque
     private int idxBloque = 0;
 
     // respuestas globales (se conservan al cambiar de bloque)
@@ -53,17 +60,27 @@ public class TestAcademico extends AppCompatActivity {
 
         rvPreguntas   = findViewById(R.id.rvPreguntas);
         btnEnviar     = findViewById(R.id.btnEnviar);
-        btnPrevBloque = findViewById(R.id.btnPrevBloque);
-        btnNextBloque = findViewById(R.id.btnNextBloque);
         tvBloque      = findViewById(R.id.tvBloque);
 
         rvPreguntas.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PreguntasAdapter(this, new ArrayList<>());
         rvPreguntas.setAdapter(adapter);
 
-        btnEnviar.setOnClickListener(v -> enviar());
-        btnPrevBloque.setOnClickListener(v -> cambiarBloque(-1));
-        btnNextBloque.setOnClickListener(v -> cambiarBloque(1));
+        // Un SOLO botón: avanza o envía
+        btnEnviar.setOnClickListener(v -> {
+            if (bloques.isEmpty()) return;
+
+            // guarda lo respondido del bloque actual antes de avanzar / enviar
+            adapter.collectSeleccionesTo(respuestasGlobales);
+
+            boolean esUltimo = (idxBloque == bloques.size() - 1);
+            if (esUltimo) {
+                enviar(); // último bloque => enviar respuestas
+            } else {
+                idxBloque++;
+                mostrarBloque(); // avanzar
+            }
+        });
 
         cargar();
     }
@@ -78,7 +95,7 @@ public class TestAcademico extends AppCompatActivity {
         if (token == null || token.isEmpty()) {
             toast("No hay sesión. Inicia sesión primero.");
             btnEnviar.setEnabled(true);
-            btnEnviar.setText("Enviar respuestas");
+            btnEnviar.setText("Siguiente");
             return;
         }
         String bearer = token.startsWith("Bearer ") ? token : "Bearer " + token;
@@ -86,7 +103,7 @@ public class TestAcademico extends AppCompatActivity {
         api.iniciar(bearer, new LinkedHashMap<>()).enqueue(new Callback<QuizInicialResponse>() {
             @Override
             public void onResponse(Call<QuizInicialResponse> call, Response<QuizInicialResponse> res) {
-                btnEnviar.setText("Enviar respuestas");
+                btnEnviar.setText("Siguiente");
                 btnEnviar.setEnabled(true);
 
                 if (!res.isSuccessful() || res.body() == null || res.body().getPreguntas() == null) {
@@ -98,7 +115,7 @@ public class TestAcademico extends AppCompatActivity {
 
                 idSesion = res.body().getIdSesion();
                 preguntas.clear();
-                preguntas.addAll(res.body().getPreguntas()); // 25
+                preguntas.addAll(res.body().getPreguntas()); // p.ej. 25
 
                 // agrupar por área y crear bloques de 5
                 Map<String, List<PreguntaAcademica>> porArea = new LinkedHashMap<>();
@@ -111,7 +128,7 @@ public class TestAcademico extends AppCompatActivity {
                     List<PreguntaAcademica> lista = e.getValue();
                     List<PreguntaAcademica> sub = lista.size() > 5 ? lista.subList(0, 5) : lista;
                     bloques.add(new ArrayList<>(sub));
-                    nombresBloque.add(e.getKey());
+                    nombresBloque.add(e.getKey()); // nombre del área
                 }
 
                 if (bloques.isEmpty()) {
@@ -121,12 +138,12 @@ public class TestAcademico extends AppCompatActivity {
 
                 idxBloque = 0;
                 mostrarBloque();
-                toast("Sesión " + idSesion + " · " + preguntas.size() + " preguntas (5 por área) ");
+                toast("Sesión " + idSesion + " · " + preguntas.size() + " preguntas (5 por área)");
             }
 
             @Override
             public void onFailure(Call<QuizInicialResponse> call, Throwable t) {
-                btnEnviar.setText("Enviar respuestas");
+                btnEnviar.setText("Siguiente");
                 btnEnviar.setEnabled(true);
                 toast("Error de red: " + t.getLocalizedMessage());
             }
@@ -137,14 +154,18 @@ public class TestAcademico extends AppCompatActivity {
         List<PreguntaAcademica> bloque = bloques.get(idxBloque);
         adapter.setPreguntas(bloque, respuestasGlobales);
 
-        String nombre = nombresBloque.get(idxBloque);
-        tvBloque.setText(nombre + " - Bloque " + (idxBloque + 1) + "/" + bloques.size());
+        // Mostrar SOLO la materia/área
+        String nombreMateria = nombresBloque.get(idxBloque);
+        tvBloque.setText(nombreMateria);
 
-        btnPrevBloque.setEnabled(idxBloque > 0);
-        btnNextBloque.setEnabled(idxBloque < bloques.size() - 1);
+        // Texto del botón según si es el último bloque o no
+        boolean esUltimo = (idxBloque == bloques.size() - 1);
+        btnEnviar.setText(esUltimo ? "Enviar respuestas" : "Siguiente");
     }
 
+    // Ya no se usa desde UI, pero lo dejo por compatibilidad si lo llamas desde otro lado
     private void cambiarBloque(int delta) {
+        if (bloques.isEmpty()) return;
         adapter.collectSeleccionesTo(respuestasGlobales);
         idxBloque += delta;
         if (idxBloque < 0) idxBloque = 0;
@@ -199,11 +220,11 @@ public class TestAcademico extends AppCompatActivity {
                         try { raw = res.body() != null ? res.body().string() : ""; } catch (Exception ignored) {}
 
                         if (raw == null || raw.trim().isEmpty()) {
-                            showResultado("Resultado", "Respuestas enviadas ");
+                            showResultado("Resultado", "Respuestas enviadas");
                             return;
                         }
 
-                        // === AQUÍ PARSEO TU FORMATO DE RESPUESTA ===
+                        // === Parser del posible formato devuelto por backend ===
                         try {
                             JSONObject obj = new JSONObject(raw);
 
@@ -231,7 +252,7 @@ public class TestAcademico extends AppCompatActivity {
                             // puntaje por área
                             JSONObject porArea = obj.optJSONObject("puntajes_por_area");
 
-                            // Mensaje bonito
+                            // Mensaje final
                             StringBuilder sb = new StringBuilder("¡Respuestas enviadas!\n\n");
                             if (aciertos >= 0) {
                                 sb.append("Aciertos: ").append(aciertos).append("/").append(totalDet);
@@ -245,7 +266,6 @@ public class TestAcademico extends AppCompatActivity {
                             }
                             if (porArea != null) {
                                 sb.append("\nPor área:\n");
-                                // orden preferido
                                 String[] orden = {"Matemáticas","Lenguaje","Ciencias","Sociales","Inglés"};
                                 boolean alguno = false;
                                 for (String k : orden) {
@@ -255,9 +275,7 @@ public class TestAcademico extends AppCompatActivity {
                                         alguno = true;
                                     }
                                 }
-                                // cualquier otra área no prevista
                                 if (!alguno) {
-                                    // listar todo lo que venga
                                     for (java.util.Iterator<String> it = porArea.keys(); it.hasNext();) {
                                         String k = it.next();
                                         sb.append("• ").append(k).append(": ")
@@ -287,13 +305,14 @@ public class TestAcademico extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Aceptar", (dialog, which) -> {
                     dialog.dismiss();
-                    // 🔹 Ir al HomeActivity
+                    // Ir al HomeActivity
                     startActivity(new Intent(TestAcademico.this, HomeActivity.class));
-                    finish(); // cierra la pantalla actual
+                    finish();
                 })
                 .show();
     }
 
-
-    private void toast(String s) { Toast.makeText(this, s, Toast.LENGTH_LONG).show(); }
+    private void toast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
 }

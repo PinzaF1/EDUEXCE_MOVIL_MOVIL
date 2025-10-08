@@ -56,12 +56,8 @@ public class FragmentReto extends Fragment {
         });
         rvOpp.setAdapter(oppAdapter);
 
-        // Lista visual (cuando tengas endpoint real, cámbiala)
-        oppAdapter.setData(Arrays.asList(
-                new OpponentItem("1","Diego Martín","Básico",3,true),
-                new OpponentItem("2","Sofía Hernández","Avanzado",12,false),
-                new OpponentItem("3","Alejandro Cruz","Intermedio",7,true)
-        ));
+        // ======= CARGA REAL DESDE BACKEND =======
+        cargarOponentes();
 
         View.OnClickListener chips = vv -> {
             clearChipSelection();
@@ -90,29 +86,72 @@ public class FragmentReto extends Fragment {
         btnEnviar.setEnabled(ready);
     }
 
+    /** Llama /movil/oponentes y llena el adapter sin cambiar tu UI */
+    private void cargarOponentes() {
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+        api.listarOponentes().enqueue(new Callback<List<OpponentRaw>>() {
+            @Override public void onResponse(Call<List<OpponentRaw>> call, Response<List<OpponentRaw>> resp) {
+                if (!isAdded()) return;
+
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    Toast.makeText(requireContext(), "Error oponentes: " + resp.code(), Toast.LENGTH_SHORT).show();
+                    oppAdapter.setData(Collections.emptyList());
+                    return;
+                }
+
+                List<OpponentItem> lista = new ArrayList<>();
+                for (OpponentRaw r : resp.body()) {
+                    String id = String.valueOf(r.idUsuario);
+                    String nivel = (r.grado != null || r.curso != null)
+                            ? ((r.grado != null ? r.grado : "") + "° " + (r.curso != null ? r.curso : "")).trim()
+                            : "—";
+                    boolean online = r.estado != null && r.estado.equalsIgnoreCase("disponible");
+                    // wins no viene; lo marcamos 0 (tu item lo muestra a la derecha)
+                    lista.add(new OpponentItem(id,
+                            r.nombre != null ? r.nombre : "Sin nombre",
+                            nivel, 0, online));
+                }
+                oppAdapter.setData(lista);
+            }
+
+            @Override public void onFailure(Call<List<OpponentRaw>> call, Throwable t) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(), "Fallo oponentes: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                oppAdapter.setData(Collections.emptyList());
+            }
+        });
+    }
+
     /** 1) Crear reto -> 2) Ir a “Sala de Reto” (Comenzar) */
     private void crearRetoIrALobby() {
         if (!btnEnviar.isEnabled()) return;
 
-        // 1) Token obligatorio
         String tok = TokenManager.getToken(requireContext());
         if (TextUtils.isEmpty(tok)) {
             Toast.makeText(requireContext(),"No hay token (login requerido)",Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 2) Validaciones básicas
         if (TextUtils.isEmpty(selectedArea) || TextUtils.isEmpty(selectedOpponentId)) {
             Toast.makeText(requireContext(),"Elige área y oponente",Toast.LENGTH_SHORT).show();
             return;
         }
 
         String area = quitarTildes(selectedArea);
-        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
 
+        int oppId;
+        try {
+            oppId = Integer.parseInt(selectedOpponentId);
+        } catch (NumberFormatException e) {
+            Toast.makeText(requireContext(), "Id de oponente inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         btnEnviar.setEnabled(false);
 
-        api.crearReto(new RetoCreateRequest(25, area)).enqueue(new Callback<RetoCreadoResponse>() {
+        // Enviamos (cantidad, area, oponente_id) — backend real
+        api.crearReto(new RetoCreateRequest(25, area, oppId)).enqueue(new Callback<RetoCreadoResponse>() {
             @Override public void onResponse(Call<RetoCreadoResponse> call, Response<RetoCreadoResponse> resp) {
                 btnEnviar.setEnabled(true);
 
@@ -124,7 +163,6 @@ public class FragmentReto extends Fragment {
                 }
                 RetoCreadoResponse creado = resp.body();
 
-                // Verificar el contenedor overlay
                 View overlay = getActivity().findViewById(R.id.container);
                 if (overlay == null) {
                     Toast.makeText(requireContext(),
@@ -134,7 +172,6 @@ public class FragmentReto extends Fragment {
                 }
                 overlay.setVisibility(View.VISIBLE);
 
-                // Navegar al LOBBY (NO aceptar aquí)
                 try {
                     String opName = (selectedOpponentName != null && !selectedOpponentName.isEmpty())
                             ? selectedOpponentName : "Oponente";

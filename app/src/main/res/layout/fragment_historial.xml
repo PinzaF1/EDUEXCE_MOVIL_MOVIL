@@ -22,31 +22,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvPorcentaje"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="2dp"
-            android:visibility="gone"/>
-
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvFecha"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="2dp"
-            android:visibility="gone"/>
-
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvEtiqueta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="2dp"
-            android:visibility="gone"/>
-
+            android:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/progress"
@@ -67,13 +64,15 @@
             android:textColor="@android:color/holo_red_dark"
             android:visibility="gone" />
 
+        <!-- RecyclerView que se muestra completo dentro del ScrollView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPreguntas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="0dp"
-            android:nestedScrollingEnabled="false"/>
-
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
 
     </LinearLayout>
 </ScrollView>

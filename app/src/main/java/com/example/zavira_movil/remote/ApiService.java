@@ -13,6 +13,7 @@ import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
+import com.example.zavira_movil.model.OpponentRaw;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.model.SimulacroResponse;
 import com.example.zavira_movil.model.IslaCerrarRequest;
@@ -112,22 +113,27 @@ public interface ApiService {
             @Query("limit") int limit  );
 
 
-        // retos 1 vs 1
 
-    // 1) Crear reto
+    // === 1 vs 1 (tus rutas actuales) ===
+
+    // Oponentes reales
+    @GET("movil/oponentes")
+    Call<List<OpponentRaw>> listarOponentes();
+
+    // Crear reto (usa RetoCreateRequest CON oponente_id)
     @POST("movil/retos")
     Call<RetoCreadoResponse> crearReto(@Body RetoCreateRequest body);
 
-    // 2) Aceptar reto -> devuelve reto, sesiones[], preguntas[]
+    // Aceptar reto
     @POST("movil/retos/{id}/aceptar")
     Call<AceptarRetoResponse> aceptarReto(@Path("id") String idReto);
 
-    // 3) Responder ronda -> { id_sesion, respuestas:[{orden, opcion}] }
+    // Responder ronda
     @POST("movil/retos/ronda")
     Call<RondaResponse> responderRonda(@Body RondaRequest body);
 
-    // 4) Estado del reto -> { id_reto, estado, ganador, jugadores[] }
-    @GET("movil/retos/{id}")
+    // OJO: tu ruta real es /movil/retos/:id/estado
+    @GET("movil/retos/{id}/estado")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);

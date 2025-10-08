@@ -13,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.EstadoRetoResponse;
+import com.example.zavira_movil.ui.ranking.progreso.RetosFragment;
 import com.google.gson.Gson;
 
 public class FragmentResultadoReto extends Fragment {
@@ -87,41 +88,32 @@ public class FragmentResultadoReto extends Fragment {
     private void volverARetos() {
         if (!isAdded()) return;
 
+        // 1) Si venimos dentro de RetosFragment, limpia su overlay (quiz/resultado)
         Fragment parent = getParentFragment();
         if (parent != null) {
-            // 1) Limpiar todo el backstack del overlay (quiz -> resultado)
             FragmentManager childFm = parent.getChildFragmentManager();
             childFm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-            // 2) Ocultar el overlay (FrameLayout @id/container) si existe
             View parentView = parent.getView();
             if (parentView != null) {
-                int containerId = idByName("container");
-                if (containerId != 0) {
-                    View overlay = parentView.findViewById(containerId);
+                int overlayId = idByName("container");
+                if (overlayId != 0) {
+                    View overlay = parentView.findViewById(overlayId);
                     if (overlay != null) overlay.setVisibility(View.GONE);
                 }
-
-                // 3) Si el padre tiene un ViewPager2, moverlo al TAB 0 ("Crear Reto")
-                int[] candidates = new int[]{
-                        idByName("vpRetos"),
-                        idByName("viewPager"),
-                        idByName("viewPager2"),
-                        idByName("retosPager")
-                };
-                for (int cid : candidates) {
-                    if (cid == 0) continue;
-                    View maybeVp = parentView.findViewById(cid);
-                    if (maybeVp instanceof ViewPager2) {
-                        ((ViewPager2) maybeVp).setCurrentItem(0, false);
-                        break;
-                    }
-                }
             }
-        } else {
-            // Fallback: si no hay padre, solo hacemos pop en el backstack de la Activity
-            requireActivity().getSupportFragmentManager().popBackStack();
         }
+
+        // 2) Navega al FragmentGeneral en el contenedor principal
+        int rootId = idByName("fragmentContainer");
+        if (rootId == 0) rootId = idByName("main_container");
+        if (rootId == 0) rootId = android.R.id.content;
+
+        FragmentManager fm = requireActivity().getSupportFragmentManager();
+        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fm.beginTransaction()
+                .replace(rootId, new RetosFragment())
+                .commit();
     }
 
     private int idByName(String name) {

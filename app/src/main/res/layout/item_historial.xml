@@ -1,50 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <!-- FILA SUPERIOR: Materia (izq) + Pill porcentaje (der) -->
+    <!-- Fila principal: materia + botón + % -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/tvMateria"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:text="Matemáticas"
             android:textStyle="bold"
-            android:textSize="16sp"
-            android:ellipsize="end"
-            android:maxLines="1" />
+            android:textSize="18sp"
+            android:textColor="@color/text_primary" />
 
+        <!-- Botón para ver detalle -->
+        <Button
+            android:id="@+id/btnDetalle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp"
+            android:text="Detalle"
+            android:textColor="@android:color/white" />
+
+        <!-- Porcentaje al lado -->
         <TextView
             android:id="@+id/tvPorcentaje"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
+            android:layout_marginLeft="10dp"
+            android:text="40%"
             android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:drawablePadding="6dp"
-            android:gravity="center_vertical" />
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"/>
     </LinearLayout>
 
-    <!-- Meta debajo (igual que tenías) -->
+    <!-- Nivel -->
     <TextView
         android:id="@+id/tvNivel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="4dp" />
+        android:text="Básico"
+        android:textColor="@color/text_secondary"
+        android:layout_marginTop="6dp"/>
 
+    <!-- Fecha -->
     <TextView
         android:id="@+id/tvFecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="2dp" />
+        android:text="07/10/2025"
+        android:textColor="@color/text_secondary" />
 </LinearLayout>
