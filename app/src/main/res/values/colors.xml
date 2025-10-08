@@ -90,6 +90,9 @@
     <color name="subject_language">#DB2777</color>
     <color name="subject_default">#9CA3AF</color>    <!-- Gris por defecto -->
 
+    <color name="card_stroke_blue">#60A5E7</color>   <!-- azul claro del borde -->
+    <color name="card_stroke_blue_pressed">#54A1E0</color> <!-- un poco más fuerte (opcional) -->
+
 
     <!-- Materias -->
     <color name="area_matematicas">#E53935</color>     <!-- rojo -->

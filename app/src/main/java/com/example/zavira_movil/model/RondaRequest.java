@@ -1,17 +1,20 @@
 package com.example.zavira_movil.model;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class RondaRequest {
-    private int id_sesion;
-    private List<Item> respuestas;
+    @SerializedName("id_sesion") public int idSesion;
+    @SerializedName("respuestas") public List<Item> respuestas;
 
-    public RondaRequest(int id_sesion, List<Item> respuestas) {
-        this.id_sesion = id_sesion; this.respuestas = respuestas;
+    public RondaRequest(int idSesion, List<Item> respuestas) {
+        this.idSesion = idSesion;
+        this.respuestas = respuestas;
     }
+
     public static class Item {
-        private int orden;
-        private String opcion;
+        @SerializedName("orden")  public int orden;
+        @SerializedName("opcion") public String opcion;
         public Item(int orden, String opcion) { this.orden = orden; this.opcion = opcion; }
     }
 }

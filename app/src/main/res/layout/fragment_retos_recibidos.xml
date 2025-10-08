@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="16dp"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/bg_page">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <TextView android:text="Recibidos" android:textStyle="bold" android:textSize="16sp"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:text="(Sección visual, sin consumo de API adicional)"
-        android:textColor="@color/text_muted" android:layout_marginTop="6dp"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:text="No tienes retos recibidos por ahora."
-        android:layout_marginTop="24dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-</LinearLayout>
+    <!-- Lista de retos recibidos -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRecibidos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:overScrollMode="never" />
+
+    <!-- Mensaje vacío (lo busca el código con R.id.tvEmpty) -->
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No tienes retos recibidos"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+</FrameLayout>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"/>
+
+        <TextView
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Detalle del Simulacro"
+            android:textStyle="bold" android:textSize="18sp" android:gravity="center"/>
+
+        <View android:layout_width="36dp" android:layout_height="36dp"/>
+    </LinearLayout>
+
+    <!-- Card superior -->
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp"
+        android:background="@drawable/card_bg" android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/tvMateriaChip"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Matemáticas" android:padding="8dp"
+                android:background="@drawable/bg_chip_selector" android:textColor="@color/text_primary"/>
+            <TextView
+                android:id="@+id/tvFecha"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="20 Feb 2024" android:layout_marginLeft="12dp"
+                android:textColor="@color/text_secondary"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="85%" android:textStyle="bold" android:textSize="28sp"
+                android:textColor="@color/level_advanced" />
+
+            <TextView
+                android:id="@+id/tvNivel"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Avanzado" android:textStyle="bold"
+                android:textColor="@color/text_primary" android:layout_marginLeft="16dp"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnRepetir"
+            android:layout_width="match_parent" android:layout_height="44dp"
+            android:text="Repetir Simulacro" android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabsDetalle"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pagerDetalle"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1"/>
+</LinearLayout>

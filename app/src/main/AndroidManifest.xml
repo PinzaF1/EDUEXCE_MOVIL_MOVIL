@@ -64,11 +64,6 @@
             android:name=".Home.IslaResultadoActivity"
             android:exported="false"
             android:label="Resultados Simulacro" />
-
-        <!-- Otras pantallas -->
-        <activity
-            android:name=".RetosActivity"
-            android:exported="false" />
         <activity
             android:name=".InfoAcademico"
             android:exported="false" />

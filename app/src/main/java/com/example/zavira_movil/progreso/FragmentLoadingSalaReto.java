@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/zavira_movil/progreso/FragmentLoadingSalaReto.java
 package com.example.zavira_movil.progreso;
 
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.AceptarRetoResponse;
@@ -44,7 +46,8 @@ public class FragmentLoadingSalaReto extends Fragment {
         return inflater.inflate(R.layout.fragment_loading_sala_reto, container, false);
     }
 
-    @Override public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
         TextView tvArea = v.findViewById(R.id.tvArea);
@@ -65,8 +68,10 @@ public class FragmentLoadingSalaReto extends Fragment {
     }
 
     private void aceptarYEntrar() {
+        if (!isAdded()) return;
+
         if (idReto == null || idReto.isEmpty()) {
-            Toast.makeText(getContext(), "id_reto inválido", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "id_reto inválido", Toast.LENGTH_SHORT).show();
             return;
         }
         btnComenzar.setEnabled(false);
@@ -75,23 +80,24 @@ public class FragmentLoadingSalaReto extends Fragment {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.aceptarReto(idReto).enqueue(new Callback<AceptarRetoResponse>() {
             @Override public void onResponse(Call<AceptarRetoResponse> call, Response<AceptarRetoResponse> resp) {
+                if (!isAdded()) return;
                 btnComenzar.setEnabled(true);
                 pb.setVisibility(View.GONE);
 
-                if (!resp.isSuccessful() || resp.body()==null) {
-                    Toast.makeText(getContext(), "Error aceptar: " + resp.code(), Toast.LENGTH_SHORT).show();
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    Toast.makeText(requireContext(), "Error aceptar: " + resp.code(), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 AceptarRetoResponse aceptar = resp.body();
 
-                int idSesion = (aceptar.sesiones!=null && !aceptar.sesiones.isEmpty())
+                int idSesion = (aceptar.sesiones != null && !aceptar.sesiones.isEmpty())
                         ? aceptar.sesiones.get(0).id_sesion : -1;
                 if (idSesion <= 0) {
-                    Toast.makeText(getContext(), "Sin id_sesion", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Sin id_sesion", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // → Entrar al Quiz
+                // preparar destino
                 Bundle args = new Bundle();
                 args.putString("aceptarJson", new Gson().toJson(aceptar));
                 args.putInt("idSesion", idSesion);
@@ -100,24 +106,37 @@ public class FragmentLoadingSalaReto extends Fragment {
                 FragmentQuiz f = new FragmentQuiz();
                 f.setArguments(args);
 
-                // MOSTRAR OVERLAY del layout padre (RetosFragment)
-                View parentView = requireParentFragment().getView();
-                if (parentView != null) {
-                    View overlay = parentView.findViewById(R.id.container);
-                    if (overlay != null) overlay.setVisibility(View.VISIBLE);
+                // ¿Este fragment vive dentro de RetosFragment con un FrameLayout @id/container?
+                FragmentManager fm;
+                int containerId;
+
+                View parentView = getParentFragment() != null ? getParentFragment().getView() : null;
+                View containerInParent = (parentView != null) ? parentView.findViewById(R.id.container) : null;
+
+                if (containerInParent != null) {
+                    // Reemplazamos el contenedor del PADRE usando su ChildFragmentManager
+                    fm = getParentFragment().getChildFragmentManager();
+                    containerId = R.id.container;
+
+                    // Mostrar overlay si lo tienes
+                    containerInParent.setVisibility(View.VISIBLE);
+                } else {
+                    // Fallback: contenedor de la Activity (asegúrate de tener ese id en tu layout principal)
+                    fm = requireActivity().getSupportFragmentManager();
+                    containerId = R.id.fragmentContainer;
                 }
 
-                // NAVEGAR dentro del overlay (manager del padre)
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.container, f)
-                        .addToBackStack(null)
+                fm.beginTransaction()
+                        .replace(containerId, f)
+                        .addToBackStack("quiz")
                         .commit();
             }
 
             @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
+                if (!isAdded()) return;
                 btnComenzar.setEnabled(true);
                 pb.setVisibility(View.GONE);
-                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

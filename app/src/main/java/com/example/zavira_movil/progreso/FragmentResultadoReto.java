@@ -8,9 +8,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.EstadoRetoResponse;
+import com.example.zavira_movil.ui.ranking.progreso.RetosFragment;
 import com.google.gson.Gson;
 
 public class FragmentResultadoReto extends Fragment {
@@ -31,11 +34,12 @@ public class FragmentResultadoReto extends Fragment {
         TextView tvOppDetail = v.findViewById(R.id.tvOppDetail);
         TextView tvOppPoints = v.findViewById(R.id.tvOppPoints);
         Button btnVolver   = v.findViewById(R.id.btnVolver);
+        btnVolver.setText("Aceptar");
 
         String json = getArguments()!=null ? getArguments().getString("estadoJson") : null;
         int totalPreg = getArguments()!=null ? getArguments().getInt("totalPreguntas", 25) : 25;
-
         if (json == null) { getParentFragmentManager().popBackStack(); return; }
+
         EstadoRetoResponse e = new Gson().fromJson(json, EstadoRetoResponse.class);
 
         int youCorrect = 0, oppCorrect = 0;
@@ -78,9 +82,43 @@ public class FragmentResultadoReto extends Fragment {
         tvYouPoints.setText(String.valueOf(youPts));
         tvOppPoints.setText(String.valueOf(oppPts));
 
-        // Volver dentro del overlay (no abrir Activity)
-        btnVolver.setOnClickListener(v12 -> {
-            getParentFragmentManager().popBackStack();
-        });
+        btnVolver.setOnClickListener(view -> volverARetos());
+    }
+
+    private void volverARetos() {
+        if (!isAdded()) return;
+
+        // 1) Si venimos dentro de RetosFragment, limpia su overlay (quiz/resultado)
+        Fragment parent = getParentFragment();
+        if (parent != null) {
+            FragmentManager childFm = parent.getChildFragmentManager();
+            childFm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            View parentView = parent.getView();
+            if (parentView != null) {
+                int overlayId = idByName("container");
+                if (overlayId != 0) {
+                    View overlay = parentView.findViewById(overlayId);
+                    if (overlay != null) overlay.setVisibility(View.GONE);
+                }
+            }
+        }
+
+        // 2) Navega al FragmentGeneral en el contenedor principal
+        int rootId = idByName("fragmentContainer");
+        if (rootId == 0) rootId = idByName("main_container");
+        if (rootId == 0) rootId = android.R.id.content;
+
+        FragmentManager fm = requireActivity().getSupportFragmentManager();
+        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fm.beginTransaction()
+                .replace(rootId, new RetosFragment())
+                .commit();
+    }
+
+    private int idByName(String name) {
+        try {
+            return getResources().getIdentifier(name, "id", requireContext().getPackageName());
+        } catch (Exception ignored) { return 0; }
     }
 }

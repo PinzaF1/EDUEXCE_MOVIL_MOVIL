@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,17 +49,18 @@ public class FragmentQuiz extends Fragment {
     private Button btnPrev, btnNext;
     private OptionAdapter optionsAdapter;
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_quiz, container, false);
     }
 
-    @Override public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
         tvIndex     = v.findViewById(R.id.txtIndex);
         tvPregunta  = v.findViewById(R.id.txtPregunta);
-        btnPrev     = v.findViewById(R.id.btnPrev);
         btnNext     = v.findViewById(R.id.btnNext);
 
         RecyclerView rv = v.findViewById(R.id.optionsList);
@@ -138,27 +140,53 @@ public class FragmentQuiz extends Fragment {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.estadoReto(idReto).enqueue(new Callback<EstadoRetoResponse>() {
             @Override public void onResponse(Call<EstadoRetoResponse> call, Response<EstadoRetoResponse> resp) {
+                if (!isAdded()) return;
+
                 if (resp.isSuccessful() && resp.body() != null) {
                     EstadoRetoResponse e = resp.body();
+
                     Bundle b = new Bundle();
                     b.putString("estadoJson", new Gson().toJson(e));
+                    b.putInt("totalPreguntas", (data != null && data.preguntas != null) ? data.preguntas.size() : 25);
 
                     FragmentResultadoReto f = new FragmentResultadoReto();
                     f.setArguments(b);
 
-                    // NAVEGAR a Resultado dentro del overlay (manager del padre)
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.container, f)
-                            .addToBackStack(null)
+                    // ===== Navegación segura al mismo contenedor que usa el overlay =====
+                    FragmentManager fm;
+                    int containerId;
+
+                    Fragment parent = getParentFragment();
+                    View parentView = parent != null ? parent.getView() : null;
+                    View containerInParent = (parentView != null) ? parentView.findViewById(R.id.container) : null;
+
+                    if (containerInParent != null) {
+                        // Estamos dentro de RetosFragment (usa su child FM)
+                        fm = parent.getChildFragmentManager();
+                        containerId = R.id.container;
+                    } else {
+                        // Fallback: contenedor principal de la Activity
+                        fm = requireActivity().getSupportFragmentManager();
+                        containerId = R.id.fragmentContainer;
+                    }
+
+                    fm.beginTransaction()
+                            .replace(containerId, f)
+                            .addToBackStack("resultadoReto")
                             .commit();
                 } else {
-                    // cerrar overlay si algo sale mal
-                    getParentFragmentManager().popBackStack();
+                    // Si falla, solo vuelve al anterior en el mismo stack
+                    if (getParentFragmentManager() != null) {
+                        getParentFragmentManager().popBackStack();
+                    }
                 }
             }
+
             @Override public void onFailure(Call<EstadoRetoResponse> call, Throwable t) {
-                // cerrar overlay si falla
-                getParentFragmentManager().popBackStack();
+                if (!isAdded()) return;
+                if (getParentFragmentManager() != null) {
+                    getParentFragmentManager().popBackStack();
+                }
             }
         });
     }

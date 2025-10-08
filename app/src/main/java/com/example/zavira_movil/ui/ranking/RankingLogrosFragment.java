@@ -54,8 +54,11 @@ public class RankingLogrosFragment extends Fragment {
         api = RetrofitClient.getInstance().create(ApiService.class);
 
         bindViews(v);
-        setupTabs();
         setupRecycler();
+        setupTabs();
+
+        // Estado inicial: Ranking activo
+        setActiveTab(true);
 
         loadRanking();
     }
@@ -76,15 +79,19 @@ public class RankingLogrosFragment extends Fragment {
     }
 
     private void setupTabs() {
-        tabRanking.setOnClickListener(v -> {
-            viewRanking.setVisibility(View.VISIBLE);
-            viewLogros.setVisibility(View.GONE);
-        });
+        tabRanking.setOnClickListener(v -> setActiveTab(true));
         tabLogros.setOnClickListener(v -> {
-            viewRanking.setVisibility(View.GONE);
-            viewLogros.setVisibility(View.VISIBLE);
+            setActiveTab(false);
             if (!badgesLoaded) { loadBadges(); badgesLoaded = true; }
         });
+    }
+
+    /** Alterna vistas y estados visuales de los tabs (usa drawable selectors). */
+    private void setActiveTab(boolean rankingActive) {
+        viewRanking.setVisibility(rankingActive ? View.VISIBLE : View.GONE);
+        viewLogros.setVisibility(rankingActive ? View.GONE : View.VISIBLE);
+        tabRanking.setSelected(rankingActive);
+        tabLogros.setSelected(!rankingActive);
     }
 
     private void setupRecycler() {
@@ -98,53 +105,95 @@ public class RankingLogrosFragment extends Fragment {
         rvBadges.setAdapter(badgesAdapter);
     }
 
+    /** Carga ranking y asegura que el usuario actual aparezca en el cuadro blanco. */
     private void loadRanking() {
         api.getRanking().enqueue(new Callback<RankingResponse>() {
-            @Override public void onResponse(@NonNull Call<RankingResponse> call, @NonNull Response<RankingResponse> resp) {
+            @Override
+            public void onResponse(@NonNull Call<RankingResponse> call,
+                                   @NonNull Response<RankingResponse> resp) {
                 if (!resp.isSuccessful() || resp.body() == null) {
                     Toast.makeText(requireContext(), "No se pudo cargar ranking", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 RankingResponse data = resp.body();
 
+                // ----- 1) Top del servidor -----
                 top.clear();
-                if (data.getTop5() != null) top.addAll(data.getTop5());
-                adapter.notifyDataSetChanged();
+                if (data.getTop5() != null) {
+                    top.addAll(data.getTop5());   // puede venir 4 o 5
+                }
 
-                if (data.getPosiciones() != null && !data.getPosiciones().isEmpty()) {
-                    RankingResponse.Item me = null;
+                // ----- 2) Encontrar "yo" en posiciones -----
+                RankingResponse.Item me = null;
+                if (data.getPosiciones() != null) {
                     for (RankingResponse.Item it : data.getPosiciones()) {
                         if (it.getPosicion() != null && it.getPosicion().equals(data.getPosicion())) {
-                            me = it; break;
+                            me = it;
+                            break;
                         }
                     }
-                    if (me == null) me = data.getPosiciones().get(0);
+                }
+                if (me == null && data.getPosiciones() != null && !data.getPosiciones().isEmpty()) {
+                    me = data.getPosiciones().get(0); // fallback
+                }
 
+                // ----- 3) Si "yo" no estoy en el Top y hay espacio, agregar como #5 -----
+                if (me != null) {
+                    boolean yaEsta = false;
+                    for (RankingResponse.Item it : top) {
+                        if (equalsIgnoreCaseSafe(it.getNombre(), me.getNombre())) {
+                            yaEsta = true;
+                            break;
+                        }
+                    }
+                    if (!yaEsta) {
+                        // Asegura que como máximo quedemos en 5: si ya hay 5, recorta a 4 y agrega "yo".
+                        while (top.size() > 4) top.remove(top.size() - 1);
+                        if (top.size() < 5) top.add(me); // ahora "yo" quedo como último (#5)
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
+
+                // ----- 4) Pintar tarjeta "Tu Posición Actual" -----
+                if (me != null) {
                     String nombre = me.getNombre() == null ? "Estudiante" : me.getNombre();
                     tvUserName.setText(nombre);
                     tvUserRank.setText("Puesto #" + (me.getPosicion() == null ? data.getPosicion() : me.getPosicion())
                             + " en el ranking general");
                     tvUserPoints.setText(String.valueOf(me.getPromedio()));
 
+                    // Iniciales
                     String ini = "JP";
                     String[] parts = nombre.trim().split("\\s+");
                     if (parts.length >= 2) {
-                        ini = (parts[0].substring(0,1) + parts[parts.length-1].substring(0,1)).toUpperCase();
+                        ini = (parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
                     } else if (parts.length == 1 && parts[0].length() >= 1) {
-                        ini = parts[0].substring(0,1).toUpperCase();
+                        ini = parts[0].substring(0, 1).toUpperCase();
                     }
                     tvUserInitials.setText(ini);
                 }
             }
-            @Override public void onFailure(@NonNull Call<RankingResponse> call, @NonNull Throwable t) {
+
+            @Override
+            public void onFailure(@NonNull Call<RankingResponse> call, @NonNull Throwable t) {
                 Toast.makeText(requireContext(), "No se pudo cargar ranking", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // Utilidad para comparar nombres con null-safety
+    private static boolean equalsIgnoreCaseSafe(String a, String b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.trim().equalsIgnoreCase(b.trim());
+    }
+
+
     private void loadBadges() {
         api.getMisLogros().enqueue(new Callback<LogrosResponse>() {
-            @Override public void onResponse(@NonNull Call<LogrosResponse> call, @NonNull Response<LogrosResponse> resp) {
+            @Override
+            public void onResponse(@NonNull Call<LogrosResponse> call, @NonNull Response<LogrosResponse> resp) {
                 if (!resp.isSuccessful() || resp.body() == null) {
                     Toast.makeText(requireContext(), "No se pudo cargar logros", Toast.LENGTH_SHORT).show();
                     return;
@@ -166,37 +215,51 @@ public class RankingLogrosFragment extends Fragment {
                 }
                 badgesAdapter.setData(rows);
             }
-            @Override public void onFailure(@NonNull Call<LogrosResponse> call, @NonNull Throwable t) {
+
+            @Override
+            public void onFailure(@NonNull Call<LogrosResponse> call, @NonNull Throwable t) {
                 Toast.makeText(requireContext(), "No se pudo cargar logros", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    /* Adaptador Top 5 (igual al tuyo) */
+    /** =================== Top 5 Adapter (fila azul clara) =================== */
     private static class TopAdapter extends RecyclerView.Adapter<TopAdapter.VH> {
         private final List<RankingResponse.Item> data;
         TopAdapter(List<RankingResponse.Item> d) { this.data = d; }
 
         static class VH extends RecyclerView.ViewHolder {
-            TextView tvTitle, tvRight;
+            TextView tvRank, tvName, tvPointsSmall, tvPointsRight;
             VH(@NonNull View v) {
                 super(v);
-                tvTitle = v.findViewById(android.R.id.text1);
-                tvRight = v.findViewById(android.R.id.text2);
+                tvRank        = v.findViewById(R.id.tvRank);
+                tvName        = v.findViewById(R.id.tvName);
+                tvPointsSmall = v.findViewById(R.id.tvPointsSmall);
+                tvPointsRight = v.findViewById(R.id.tvPointsRight);
             }
         }
 
-        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int viewType) {
-            View v = View.inflate(p.getContext(), android.R.layout.simple_list_item_2, null);
+        @NonNull @Override
+        public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_top_student, parent, false);
             return new VH(v);
         }
 
-        @Override public void onBindViewHolder(@NonNull VH h, int pos) {
+        @Override
+        public void onBindViewHolder(@NonNull VH h, int pos) {
             RankingResponse.Item it = data.get(pos);
-            h.tvTitle.setText((pos + 1) + ". " + (it.getNombre() == null ? "—" : it.getNombre()));
-            h.tvRight.setText(it.getPromedio() + " pts");
+            h.tvRank.setText("#" + (pos + 1));
+
+            String nombre = (it.getNombre() == null || it.getNombre().trim().isEmpty()) ? "—" : it.getNombre();
+            h.tvName.setText(nombre);
+
+            int puntos = it.getPromedio(); // si es Integer, cámbialo a Integer y maneja null
+            h.tvPointsSmall.setText(puntos + " pts");
+            h.tvPointsRight.setText(String.valueOf(puntos));
         }
 
-        @Override public int getItemCount() { return data.size(); }
+        @Override
+        public int getItemCount() { return data == null ? 0 : data.size(); }
     }
 }

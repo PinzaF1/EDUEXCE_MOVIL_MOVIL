@@ -6,44 +6,26 @@
     android:padding="16dp">
 
     <!-- Título -->
+
+    <!-- MATERIA (se muestra la del bloque actual) -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:gravity="center"
         android:text="Test Académico de Diagnóstico"
-        android:textStyle="bold"
         android:textSize="20sp"
-        android:paddingBottom="8dp"/>
+        android:textStyle="bold" />
 
-    <!-- Barra de bloque / área -->
-    <LinearLayout
+    <TextView
+        android:id="@+id/tvBloque"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="8dp">
-
-        <Button
-            android:id="@+id/btnPrevBloque"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="◀"/>
-
-        <TextView
-            android:id="@+id/tvBloque"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Área - Bloque 1/5"
-            android:textSize="16sp"
-            android:gravity="center"/>
-
-        <Button
-            android:id="@+id/btnNextBloque"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="▶"/>
-    </LinearLayout>
+        android:text="Matemáticas"
+        android:textSize="16sp"
+        android:paddingBottom="8dp"
+        android:gravity="center"/>
 
     <!-- Recycler -->
     <androidx.recyclerview.widget.RecyclerView
@@ -52,11 +34,12 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-    <!-- Enviar -->
+    <!-- Botón de acción: Siguiente / Enviar respuestas -->
     <Button
         android:id="@+id/btnEnviar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enviar respuestas"
+        android:text="Siguiente"
+        android:textAllCaps="false"
         android:layout_marginTop="12dp"/>
 </LinearLayout>
