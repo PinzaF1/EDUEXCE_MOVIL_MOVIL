@@ -3,32 +3,62 @@ package com.example.zavira_movil.model;
 import com.google.gson.annotations.SerializedName;
 
 public class KolbResultado {
-    private String nombre;
-    private String apellido;
+
+    private String estudiante;
+    private String documento;
     private String fecha;
+    private Estilo estilo;     // objeto JSON { idEstilosAprendizajes, estilo, descripcion, caracteristicas, recomendaciones }
+    private Totales totales;   // objeto JSON { ec, or, ca, ea }
 
-    @SerializedName("estilo")
-    private String estilo;
+    // ===== Getters “planos” (compatibles con el resto del app) =====
+    public String getEstudiante() { return estudiante; }
+    public String getDocumento()  { return documento; }
+    public String getFecha()      { return fecha; }
 
-    private String caracteristicas;
-    private String recomendaciones;
+    // Antes tenías getEstilo() -> String. Lo mantenemos:
+    public String getEstilo() {
+        return (estilo != null) ? estilo.estilo : null;
+    }
+    public String getDescripcion() {
+        return (estilo != null) ? estilo.descripcion : null;
+    }
+    public String getCaracteristicas() {
+        return (estilo != null) ? estilo.caracteristicas : null;
+    }
+    public String getRecomendaciones() {
+        return (estilo != null) ? estilo.recomendaciones : null;
+    }
 
-    // Getters y Setters
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public Totales getTotales()   { return totales; }
 
-    public String getApellido() { return apellido; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
+    // ===== Si alguna pantalla quiere el objeto completo, también lo exponemos =====
+    public Estilo  getEstiloObj() { return estilo; }
 
-    public String getFecha() { return fecha; }
-    public void setFecha(String fecha) { this.fecha = fecha; }
+    // ===== Clases internas que mapean tal cual la respuesta =====
+    public static class Estilo {
+        @SerializedName("idEstilosAprendizajes")
+        private int idEstilosAprendizajes;
+        private String estilo;
+        private String descripcion;
+        private String caracteristicas;
+        private String recomendaciones;
 
-    public String getEstilo() { return estilo; }
-    public void setEstilo(String estilo) { this.estilo = estilo; }
+        public int getIdEstilosAprendizajes() { return idEstilosAprendizajes; }
+        public String getEstiloRaw()          { return estilo; }
+        public String getDescripcionRaw()     { return descripcion; }
+        public String getCaracteristicasRaw() { return caracteristicas; }
+        public String getRecomendacionesRaw() { return recomendaciones; }
+    }
 
-    public String getCaracteristicas() { return caracteristicas; }
-    public void setCaracteristicas(String caracteristicas) { this.caracteristicas = caracteristicas; }
+    public static class Totales {
+        private int ec;
+        private int or;
+        private int ca;
+        private int ea;
 
-    public String getRecomendaciones() { return recomendaciones; }
-    public void setRecomendaciones(String recomendaciones) { this.recomendaciones = recomendaciones; }
+        public int getEc() { return ec; }
+        public int getOr() { return or; }
+        public int getCa() { return ca; }
+        public int getEa() { return ea; }
+    }
 }

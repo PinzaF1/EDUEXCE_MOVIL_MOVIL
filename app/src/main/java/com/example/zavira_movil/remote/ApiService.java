@@ -62,7 +62,7 @@ public interface ApiService {
     //Logue Estudiante
     @POST("estudiante/login")
     Call<ResponseBody> loginEstudiante(@Body LoginRequest request);
-    @GET("perfilEstudiante")
+    @GET("estudiante/perfil")
     Call<Estudiante> getPerfilEstudiante();
 
     //Estilo de Kold

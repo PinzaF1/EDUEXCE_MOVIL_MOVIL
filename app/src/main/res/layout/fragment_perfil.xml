@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CDE8F6">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <!-- Avatar + botón editar superpuesto -->
+        <FrameLayout
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_person" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnEditarFoto"
+                android:layout_width="43dp"
+                android:layout_height="69dp"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="6dp"
+                android:contentDescription="Editar foto"
+                android:src="@drawable/ic_edit"
+                app:backgroundTint="@color/area_lenguaje"
+                app:tint="@android:color/white" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Perfil del Estudiante"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#2C3E50"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Datos del estudiante -->
+        <TextView android:id="@+id/tvInstitucion"   android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Institución: -"   android:textSize="18sp"/>
+        <TextView android:id="@+id/tvNombre"        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nombre: -"        android:textSize="18sp"/>
+        <TextView android:id="@+id/tvDocumento"     android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Documento: -"     android:textSize="18sp"/>
+        <TextView android:id="@+id/tvTipoDoc"       android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tipo doc.: -"      android:textSize="18sp"/>
+        <TextView android:id="@+id/tvGrado"         android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Grado: -"         android:textSize="18sp"/>
+        <TextView android:id="@+id/tvCurso"         android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Curso: -"         android:textSize="18sp"/>
+        <TextView android:id="@+id/tvJornada"       android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jornada: -"       android:textSize="18sp"/>
+        <TextView android:id="@+id/tvCorreo"        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Correo: -"        android:textSize="18sp"/>
+        <TextView android:id="@+id/tvTelefono"      android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Teléfono: -"      android:textSize="18sp"/>
+        <TextView android:id="@+id/tvDireccion"     android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dirección: -"     android:textSize="18sp"/>
+        <TextView android:id="@+id/tvEstado"        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Estado: -"        android:textSize="18sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#A0B8C6"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Kolb -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estilo de Aprendizaje (Kolb)"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="#2C3E50"
+            android:layout_marginBottom="8dp" />
+
+        <TextView android:id="@+id/tvEstilo"           android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Estilo: -" />
+        <TextView android:id="@+id/tvFechaKolb"        android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Fecha: -" />
+        <TextView android:id="@+id/tvCaracteristicas"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Características: -" />
+        <TextView android:id="@+id/tvRecomendaciones"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Recomendaciones: -" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarSesion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cerrar sesión"
+            android:textAllCaps="false"
+            android:layout_marginTop="24dp"
+            android:padding="12dp" />
+    </LinearLayout>
+</ScrollView>

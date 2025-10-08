@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.example.zavira_movil.databinding.ActivityInfoTestBinding;
+import com.example.zavira_movil.model.PreguntasKolb;
 
 public class InfoTestActivity extends AppCompatActivity {
 
@@ -23,7 +24,7 @@ public class InfoTestActivity extends AppCompatActivity {
 
         binding.btnStartTest.setOnClickListener(v -> {
 
-            Intent intent = new Intent(InfoTestActivity.this, TestAcademico.class);
+            Intent intent = new Intent(InfoTestActivity.this, TestActivity.class);
             startActivity(intent);
 
 

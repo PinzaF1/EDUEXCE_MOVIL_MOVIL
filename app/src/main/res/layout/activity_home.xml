@@ -56,15 +56,6 @@
                     android:textColor="#6B7280"
                     android:textSize="13sp" />
             </LinearLayout>
-
-            <ImageButton
-                android:id="@+id/btnBell"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Notificaciones"
-                app:srcCompat="@drawable/ic_bell_24"
-                app:tint="#374151" />
         </LinearLayout>
 
         <Button
@@ -124,19 +115,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- FAB Perfil -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabPerfil"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_person"
-        app:tint="@android:color/white"
-        app:backgroundTint="@color/primary"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="Perfil" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

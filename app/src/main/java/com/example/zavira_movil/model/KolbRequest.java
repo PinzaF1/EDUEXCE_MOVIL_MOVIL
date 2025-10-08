@@ -1,60 +1,38 @@
+// com.example.zavira_movil.model.KolbRequest
 package com.example.zavira_movil.model;
 
 import java.util.List;
 
 public class KolbRequest {
-    private int id_usuario;
-    private List<Respuesta> respuestas;
 
-    public KolbRequest(int id_usuario, List<Respuesta> respuestas) {
-        this.id_usuario = id_usuario;
+    private List<Item> respuestas;
+
+    public KolbRequest(List<Item> respuestas) {
         this.respuestas = respuestas;
     }
 
-    public int getId_usuario() {
-        return id_usuario;
-    }
-
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
-    }
-
-    public List<Respuesta> getRespuestas() {
+    public List<Item> getRespuestas() {
         return respuestas;
     }
 
-    public void setRespuestas(List<Respuesta> respuestas) {
+    public void setRespuestas(List<Item> respuestas) {
         this.respuestas = respuestas;
     }
 
-    public static class Respuesta {
-        private int id_pregunta;
-        private int valor;
+    // Cada pregunta = 1 ítem (id_item) con una sola opción elegida (valor 1..4)
+    public static class Item {
+        private int id_item; // usa el id que llega en PreguntasKolb (id_pregunta_estilo_aprendizajes)
+        private int valor;   // 1..4
 
-        public Respuesta(int id_pregunta, int valor) {
-            this.id_pregunta = id_pregunta;
+        public Item(int id_item, int valor) {
+            this.id_item = id_item;
             this.valor = valor;
         }
 
-        public int getId_pregunta() {
-            return id_pregunta;
-        }
+        public int getId_item() { return id_item; }
+        public void setId_item(int id_item) { this.id_item = id_item; }
 
-        public void setId_pregunta(int id_pregunta) {
-            this.id_pregunta = id_pregunta;
-        }
-
-        public int getValor() {
-            return valor;
-        }
-
-        public void setValor(int valor) {
-            this.valor = valor;
-        }
-
-
-        public void setRespuesta(int valor) {
-            this.valor = valor;
-        }
+        public int getValor() { return valor; }
+        public void setValor(int valor) { this.valor = valor; }
     }
 }

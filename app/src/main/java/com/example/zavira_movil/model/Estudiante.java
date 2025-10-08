@@ -4,69 +4,70 @@ import com.google.gson.annotations.SerializedName;
 
 public class Estudiante {
 
-    // nombre
+    @SerializedName("id_usuario")
+    private Integer idUsuario;
+
+    @SerializedName(
+            value = "nombre_institucion",
+            alternate = {"institucion", "institucion_nombre", "nombreInstitucion"}
+    )
+    private String nombreInstitucion;
+
     @SerializedName(
             value = "nombre_usuario",
-            alternate = {"nombreUsuario", "nombre", "firstName"}
+            alternate = {"nombre", "name", "username"}
     )
     private String nombreUsuario;
 
-    // apellido
-    @SerializedName(
-            value = "apellido",
-            alternate = {"lastName"}
-    )
+    @SerializedName("apellido")
     private String apellido;
 
-    // documento
-    @SerializedName(
-            value = "numero_documento",
-            alternate = {"numeroDocumento", "documento", "doc"}
-    )
+    @SerializedName("numero_documento")
     private String numeroDocumento;
 
-    // grado
     @SerializedName(
-            value = "grado",
-            alternate = {"grade"}
+            value = "tipo_documento",
+            alternate = {"tipo_doc", "tdoc", "tipoDocumento"}
     )
+    private String tipoDocumento;
+
+    @SerializedName("grado")
     private String grado;
 
-    // curso
-    @SerializedName(
-            value = "curso",
-            alternate = {"class", "cursoNombre"}
-    )
+    @SerializedName("curso")
     private String curso;
 
-    // jornada
-    @SerializedName(
-            value = "jornada",
-            alternate = {"session"}
-    )
+    @SerializedName("jornada")
     private String jornada;
 
-    // correo / email
-    @SerializedName(
-            value = "correo",
-            alternate = {"email", "correoElectronico"}
-    )
+    @SerializedName("correo")
     private String correo;
 
-    // foto perfil
-    @SerializedName(
-            value = "foto_url",
-            alternate = {"fotoUrl", "foto", "profilePicture", "avatar"}
-    )
+    @SerializedName("telefono")
+    private String telefono;
+
+    @SerializedName("direccion")
+    private String direccion;
+
+    @SerializedName(value = "foto_url", alternate = {"foto", "avatar_url"})
     private String fotoUrl;
 
+    @SerializedName("is_active")
+    private Boolean isActive;
+
     // Getters
-    public String getNombreUsuario()   { return nombreUsuario; }
-    public String getApellido()        { return apellido; }
-    public String getNumeroDocumento() { return numeroDocumento; }
-    public String getGrado()           { return grado; }
-    public String getCurso()           { return curso; }
-    public String getJornada()         { return jornada; }
-    public String getCorreo()          { return correo; }
-    public String getFotoUrl()         { return fotoUrl; }
+    public Integer getIdUsuario()           { return idUsuario; }
+    public String  getNombreInstitucion()   { return nombreInstitucion; }
+    public String  getNombreUsuario()       { return nombreUsuario; }
+    public String  getApellido()            { return apellido; }
+    public String  getNumeroDocumento()     { return numeroDocumento; }
+    public String  getTipoDocumento()       { return tipoDocumento; }
+    public String  getGrado()               { return grado; }
+    public String  getCurso()               { return curso; }
+    public String  getJornada()             { return jornada; }
+    public String  getCorreo()              { return correo; }
+    public String  getTelefono()            { return telefono; }
+    public String  getDireccion()           { return direccion; }
+    public String  getFotoUrl()             { return fotoUrl; }
+    public Boolean getIsActive()            { return isActive; }
 }

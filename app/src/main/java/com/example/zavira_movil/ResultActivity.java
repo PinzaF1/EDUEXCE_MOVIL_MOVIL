@@ -3,10 +3,12 @@ package com.example.zavira_movil;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.zavira_movil.Home.HomeActivity;
 import com.example.zavira_movil.databinding.ActivityResultBinding;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.remote.ApiService;
@@ -26,22 +28,78 @@ import retrofit2.Response;
 
 public class ResultActivity extends AppCompatActivity {
 
-    private ActivityResultBinding binding;   // View Binding
+    private ActivityResultBinding binding;
     private ApiService apiService;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityResultBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        binding.tvNombreCompleto.setVisibility(View.GONE);
+        binding.btnIrHome.setOnClickListener(v -> {
+            Intent i = new Intent(ResultActivity.this, HomeActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finish();
+        });
+
+        String extraFecha  = getIntent().getStringExtra("fecha");
+        String extraEstilo = getIntent().getStringExtra("estilo");
+        String extraCarac  = getIntent().getStringExtra("caracteristicas");
+        String extraRec    = getIntent().getStringExtra("recomendaciones");
+
+        binding.tvFecha.setText("Fecha: " + formatearFechaFlexible(extraFecha));
+        binding.tvEstilo.setText("Estilo: " + safe(extraEstilo));
+        binding.tvCaracteristicas.setText("Características: " + limpiarTexto(extraCarac));
+        binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(extraRec));
+
+        boolean falta = isEmpty(extraFecha) || isEmpty(extraEstilo) || isEmpty(extraCarac) || isEmpty(extraRec);
+        if (falta) {
+            apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+            apiService.obtenerResultado().enqueue(new Callback<KolbResultado>() {
+                @Override public void onResponse(Call<KolbResultado> call, Response<KolbResultado> r) {
+                    if (!r.isSuccessful() || r.body() == null) {
+                        Log.e("KOLB_RESULT", "code=" + r.code());
+                        return;
+                    }
+                    KolbResultado k = r.body();
+
+                    binding.tvFecha.setText("Fecha: " + formatearFechaFlexible(k.getFecha()));
+                    binding.tvEstilo.setText("Estilo: " + safe(k.getEstilo()));
+                    binding.tvCaracteristicas.setText("Características: " + limpiarTexto(k.getCaracteristicas()));
+                    binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(k.getRecomendaciones()));
+
+                    if (k.getEstudiante() != null) {
+                        binding.tvNombreCompleto.setVisibility(View.VISIBLE);
+                        String doc = k.getDocumento() == null ? "" : (" • " + k.getDocumento());
+                        binding.tvNombreCompleto.setText(k.getEstudiante() + doc);
+                    }
+                }
+                @Override public void onFailure(Call<KolbResultado> call, Throwable t) {
+                    Toast.makeText(ResultActivity.this, "No se pudo completar el resultado", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private static boolean isEmpty(String s) { return s == null || s.trim().isEmpty(); }
+    private static String safe(String s) { return isEmpty(s) ? "-" : s; }
 
     private String limpiarTexto(String s) {
         if (s == null) return "-";
         String out = s.replace("\\t", " ")
                 .replace("\t", " ")
                 .replace("\\n", "\n")
-                .replace("\r", "");
-        out = out.trim();
+                .replace("\r", "")
+                .trim();
         return out.isEmpty() ? "-" : out;
     }
 
-    private String formatearFechaFlexible(String fechaIso) {
-        if (fechaIso == null || fechaIso.trim().isEmpty()) return "-";
-        List<String> patrones = Arrays.asList(
+    private String formatearFechaFlexible(String iso) {
+        if (isEmpty(iso)) return "-";
+        List<String> pats = Arrays.asList(
                 "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
                 "yyyy-MM-dd'T'HH:mm:ss.SS'Z'",
                 "yyyy-MM-dd'T'HH:mm:ss'Z'",
@@ -49,97 +107,14 @@ public class ResultActivity extends AppCompatActivity {
                 "yyyy-MM-dd'T'HH:mm:ssXXX",
                 "yyyy-MM-dd"
         );
-        for (String p : patrones) {
+        for (String p : pats) {
             try {
                 SimpleDateFormat in = new SimpleDateFormat(p, Locale.getDefault());
-                if (p.contains("'Z'") || p.endsWith("XXX")) {
-                    in.setTimeZone(TimeZone.getTimeZone("UTC"));
-                }
-                Date d = in.parse(fechaIso);
-                if (d != null) {
-                    return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(d);
-                }
+                if (p.contains("'Z'") || p.endsWith("XXX")) in.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date d = in.parse(iso);
+                if (d != null) return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(d);
             } catch (ParseException ignored) {}
         }
-        return fechaIso;
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Inflate con View Binding
-        binding = ActivityResultBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        // Navegación a HomeActivity
-        binding.btnIrHome.setOnClickListener(v -> {
-            Intent i = new Intent(ResultActivity.this, TestAcademico.class);
-            // Limpia el back stack para no volver a esta pantalla
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            finish();
-        });
-
-        // Lee extras
-        String extraNombre    = getIntent().getStringExtra("nombre");
-        String extraFechaIso  = getIntent().getStringExtra("fecha");
-        String extraEstiloDom = getIntent().getStringExtra("estilo");
-        String extraCaract    = getIntent().getStringExtra("caracteristicas");
-        String extraRecom     = getIntent().getStringExtra("recomendaciones");
-
-        // Pinta UI
-        binding.tvNombreCompleto.setText("Nombre completo: " +
-                (extraNombre != null && !extraNombre.isEmpty() ? extraNombre : "-"));
-        binding.tvFecha.setText("Fecha: " + formatearFechaFlexible(extraFechaIso));
-        binding.tvEstilo.setText("Estilo: " +
-                (extraEstiloDom != null && !extraEstiloDom.isEmpty() ? extraEstiloDom : "-"));
-        binding.tvCaracteristicas.setText("Características: " + limpiarTexto(extraCaract));
-        binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(extraRecom));
-
-        boolean faltaNombre = (extraNombre == null || extraNombre.trim().isEmpty());
-        boolean faltaFecha  = (extraFechaIso == null || extraFechaIso.trim().isEmpty());
-        boolean faltanTextos = (extraCaract == null || extraCaract.trim().isEmpty())
-                || (extraRecom == null || extraRecom.trim().isEmpty());
-
-        if (faltaNombre || faltaFecha || faltanTextos) {
-            apiService = RetrofitClient.getInstance(this).create(ApiService.class);
-            apiService.obtenerResultado().enqueue(new Callback<KolbResultado>() {
-                @Override
-                public void onResponse(Call<KolbResultado> call, Response<KolbResultado> response) {
-                    if (!response.isSuccessful() || response.body() == null) {
-                        Log.e("KOLB_RESULT", "GET /kolb/resultado code=" + response.code());
-                        return;
-                    }
-                    KolbResultado r = response.body();
-
-                    if (faltaNombre) {
-                        String nombreCompleto = ((r.getNombre() != null) ? r.getNombre() : "")
-                                + " " + ((r.getApellido() != null) ? r.getApellido() : "");
-                        nombreCompleto = nombreCompleto.trim();
-                        if (nombreCompleto.isEmpty()) nombreCompleto = "-";
-                        binding.tvNombreCompleto.setText("Nombre completo: " + nombreCompleto);
-                    }
-                    if (faltaFecha) {
-                        binding.tvFecha.setText("Fecha: " + formatearFechaFlexible(r.getFecha()));
-                    }
-                    if (extraCaract == null || extraCaract.trim().isEmpty()) {
-                        binding.tvCaracteristicas.setText("Características: " + limpiarTexto(r.getCaracteristicas()));
-                    }
-                    if (extraRecom == null || extraRecom.trim().isEmpty()) {
-                        binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(r.getRecomendaciones()));
-                    }
-                    if (extraEstiloDom == null || extraEstiloDom.trim().isEmpty()) {
-                        binding.tvEstilo.setText("Estilo: " + (r.getEstilo() != null ? r.getEstilo() : "-"));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<KolbResultado> call, Throwable t) {
-                    Log.e("KOLB_RESULT", "GET /kolb/resultado fail", t);
-                    Toast.makeText(ResultActivity.this, "No se pudo completar el resultado", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+        return iso;
     }
 }

@@ -2,8 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,6 +18,54 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZAVIRA_MOVIL"
         android:usesCleartextTraffic="true">
+
+        <!-- Lanzador -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login / flujo principal -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home.SubjectDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home.QuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home.SimulacroActivity"
+            android:exported="false" />
+
+        <!-- Perfil -->
+        <activity
+            android:name=".Perfil.ProfileActivity"
+            android:exported="false" />
+
+        <!-- Islas / Simulacros -->
+        <activity
+            android:name=".Home.IslaSimulacroActivity"
+            android:exported="false"
+            android:label="Simulacro Isla" />
+        <activity
+            android:name=".Home.IslaPreguntasActivity"
+            android:exported="false"
+            android:label="Preguntas Simulacro" />
+        <activity
+            android:name=".Home.IslaResultadoActivity"
+            android:exported="false"
+            android:label="Resultados Simulacro" />
+
+        <!-- Otras pantallas -->
         <activity
             android:name=".RetosActivity"
             android:exported="false" />
@@ -26,41 +78,30 @@
         <activity
             android:name=".InfoTestActivity"
             android:exported="false" />
+
+        <!-- Ranking -->
         <activity
-            android:name=".ProfileActivity"
+            android:name=".ui.ranking.RankingLogrosActivity"
+            android:exported="false" />
+
+        <!-- Resultados / tests sueltos -->
+        <activity
+            android:name=".TestActivity"
             android:exported="false" />
         <activity
-            android:name=".Home.IslaSimulacroActivity"
-            android:exported="true"
-            android:label="Simulacro Isla"/>
+            android:name=".ResultActivity"
+            android:exported="false" />
 
-        <activity
-            android:name=".Home.IslaPreguntasActivity"
-            android:exported="true"
-            android:label="Preguntas Simulacro"/>
-
-        <activity
-            android:name=".Home.IslaResultadoActivity"
-            android:exported="true"
-            android:label="Resultados Simulacro"/>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".TestActivity" />
-        <activity android:name=".ResultActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".Home.SubjectDetailActivity" />
-        <activity android:name=".Home.QuizActivity" />
-        <activity android:name=".Home.SimulacroActivity" />
-        <activity android:name=".ui.ranking.RankingLogrosActivity" android:exported="false"/>
-
+        <!-- FileProvider para guardar la foto tomada en cache/ -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
