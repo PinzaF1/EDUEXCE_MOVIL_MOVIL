@@ -3,7 +3,6 @@ package com.example.zavira_movil.Home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -11,12 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.zavira_movil.Perfil.ProfileActivity;
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.databinding.ActivityHomeBinding;
 import com.example.zavira_movil.model.DemoData;
 import com.example.zavira_movil.ui.ranking.RankingLogrosFragment;
-
-import com.example.zavira_movil.Perfil.ProfileActivity;
 import com.example.zavira_movil.ui.ranking.progreso.ProgresoFragment;
 import com.example.zavira_movil.ui.ranking.progreso.RetosFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -44,16 +42,10 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Lista principal de islas / materias
+        // RecyclerView único (el primer ítem es la Isla del Conocimiento dentro del SubjectAdapter)
         binding.rvSubjects.setLayoutManager(new LinearLayoutManager(this));
         adapter = new SubjectAdapter(DemoData.getSubjects(), intent -> launcher.launch(intent));
         binding.rvSubjects.setAdapter(adapter);
-
-        // Botón Isla Simulacro
-        binding.btnIslaSimulacro.setOnClickListener(v -> {
-            Intent i = new Intent(HomeActivity.this, IslaSimulacroActivity.class);
-            startActivity(i);
-        });
 
         // Bottom navigation
         setupBottomNav(binding.bottomNav);
@@ -79,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
             // PERFIL es una Activity (no Fragment)
             if (id == R.id.nav_perfil) {
                 startActivity(new Intent(this, ProfileActivity.class));
-                // devuelve false para no “cambiar” la selección del bottom nav
+                // devuelve false para no cambiar la selección del bottom nav
                 return false;
             }
 
@@ -102,7 +94,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void applyTabVisibility(boolean isIslas) {
         binding.rvSubjects.setVisibility(isIslas ? View.VISIBLE : View.GONE);
-        binding.btnIslaSimulacro.setVisibility(isIslas ? View.VISIBLE : View.GONE);
+        // 👇 ya NO existe btnIslaSimulacro: no lo toques aquí
+        // binding.btnIslaSimulacro.setVisibility(...);
     }
 
     private void show(Fragment f) {
