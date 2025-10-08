@@ -13,7 +13,9 @@ import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
+import com.example.zavira_movil.model.OpponentBackend;
 import com.example.zavira_movil.model.OpponentRaw;
+import com.example.zavira_movil.model.RetoListItem;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.model.SimulacroResponse;
 import com.example.zavira_movil.model.IslaCerrarRequest;
@@ -112,15 +114,10 @@ public interface ApiService {
             @Query("page") int page,
             @Query("limit") int limit  );
 
-
-
-    // === 1 vs 1 (tus rutas actuales) ===
-
-    // Oponentes reales
     @GET("movil/oponentes")
-    Call<List<OpponentRaw>> listarOponentes();
+    Call<List<OpponentBackend>> listarOponentes();
 
-    // Crear reto (usa RetoCreateRequest CON oponente_id)
+    // Crear reto (usa RetoCreateRequest con oponente_id)
     @POST("movil/retos")
     Call<RetoCreadoResponse> crearReto(@Body RetoCreateRequest body);
 
@@ -135,6 +132,11 @@ public interface ApiService {
     // OJO: tu ruta real es /movil/retos/:id/estado
     @GET("movil/retos/{id}/estado")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
+
+    // NUEVO: listar retos (recibidos/pendientes del usuarios
+    @GET("movil/retos")
+    Call<List<RetoListItem>> listarRetos();
+
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);
 

@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/zavira_movil/progreso/FragmentLoadingSalaReto.java
 package com.example.zavira_movil.progreso;
 
 import android.os.Bundle;
@@ -41,7 +40,8 @@ public class FragmentLoadingSalaReto extends Fragment {
     private Button btnComenzar;
     private ProgressBar pb;
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_loading_sala_reto, container, false);
     }
@@ -74,12 +74,14 @@ public class FragmentLoadingSalaReto extends Fragment {
             Toast.makeText(requireContext(), "id_reto inválido", Toast.LENGTH_SHORT).show();
             return;
         }
+
         btnComenzar.setEnabled(false);
         pb.setVisibility(View.VISIBLE);
 
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.aceptarReto(idReto).enqueue(new Callback<AceptarRetoResponse>() {
-            @Override public void onResponse(Call<AceptarRetoResponse> call, Response<AceptarRetoResponse> resp) {
+            @Override
+            public void onResponse(Call<AceptarRetoResponse> call, Response<AceptarRetoResponse> resp) {
                 if (!isAdded()) return;
                 btnComenzar.setEnabled(true);
                 pb.setVisibility(View.GONE);
@@ -88,10 +90,13 @@ public class FragmentLoadingSalaReto extends Fragment {
                     Toast.makeText(requireContext(), "Error aceptar: " + resp.code(), Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 AceptarRetoResponse aceptar = resp.body();
 
                 int idSesion = (aceptar.sesiones != null && !aceptar.sesiones.isEmpty())
-                        ? aceptar.sesiones.get(0).id_sesion : -1;
+                        ? aceptar.sesiones.get(0).id_sesion
+                        : -1;
+
                 if (idSesion <= 0) {
                     Toast.makeText(requireContext(), "Sin id_sesion", Toast.LENGTH_SHORT).show();
                     return;
@@ -101,27 +106,26 @@ public class FragmentLoadingSalaReto extends Fragment {
                 Bundle args = new Bundle();
                 args.putString("aceptarJson", new Gson().toJson(aceptar));
                 args.putInt("idSesion", idSesion);
-                args.putString("idReto", aceptar.reto != null ? aceptar.reto.id_reto : idReto);
+
+                // ✅ convertir correctamente el id_reto (int → String)
+                String retoIdStr = aceptar.reto != null ? String.valueOf(aceptar.reto.id_reto) : idReto;
+                args.putString("idReto", retoIdStr);
 
                 FragmentQuiz f = new FragmentQuiz();
                 f.setArguments(args);
 
-                // ¿Este fragment vive dentro de RetosFragment con un FrameLayout @id/container?
+                // determinar contenedor
                 FragmentManager fm;
                 int containerId;
 
-                View parentView = getParentFragment() != null ? getParentFragment().getView() : null;
+                View parentView = (getParentFragment() != null) ? getParentFragment().getView() : null;
                 View containerInParent = (parentView != null) ? parentView.findViewById(R.id.container) : null;
 
                 if (containerInParent != null) {
-                    // Reemplazamos el contenedor del PADRE usando su ChildFragmentManager
                     fm = getParentFragment().getChildFragmentManager();
                     containerId = R.id.container;
-
-                    // Mostrar overlay si lo tienes
                     containerInParent.setVisibility(View.VISIBLE);
                 } else {
-                    // Fallback: contenedor de la Activity (asegúrate de tener ese id en tu layout principal)
                     fm = requireActivity().getSupportFragmentManager();
                     containerId = R.id.fragmentContainer;
                 }
@@ -132,7 +136,8 @@ public class FragmentLoadingSalaReto extends Fragment {
                         .commit();
             }
 
-            @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
+            @Override
+            public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
                 if (!isAdded()) return;
                 btnComenzar.setEnabled(true);
                 pb.setVisibility(View.GONE);

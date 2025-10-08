@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.adapter.OptionAdapter;
 import com.example.zavira_movil.model.AceptarRetoResponse;
-import com.example.zavira_movil.model.PreguntaReto;
 import com.example.zavira_movil.model.RondaRequest;
 import com.example.zavira_movil.model.RondaResponse;
 import com.example.zavira_movil.model.EstadoRetoResponse;
@@ -43,7 +42,7 @@ public class FragmentQuiz extends Fragment {
     private int idSesion;
 
     private int index = 0;
-    private final Map<Integer,String> marcadas = new HashMap<>();
+    private final Map<Integer, String> marcadas = new HashMap<>();
 
     private TextView tvIndex, tvPregunta;
     private Button btnPrev, btnNext;
@@ -61,32 +60,46 @@ public class FragmentQuiz extends Fragment {
 
         tvIndex     = v.findViewById(R.id.txtIndex);
         tvPregunta  = v.findViewById(R.id.txtPregunta);
+        btnPrev     = v.findViewById(R.id.btnPrev);
         btnNext     = v.findViewById(R.id.btnNext);
 
         RecyclerView rv = v.findViewById(R.id.optionsList);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Adaptador recibe callback con la clave (key) seleccionada
         optionsAdapter = new OptionAdapter(key -> {
             marcadas.put(index, key);
             btnNext.setEnabled(true);
         });
+
         rv.setAdapter(optionsAdapter);
 
+        // === Recuperar argumentos del bundle ===
         Bundle args = getArguments();
-        if (args == null) { requireActivity().onBackPressed(); return; }
+        if (args == null) {
+            requireActivity().onBackPressed();
+            return;
+        }
+
         String aceptarJson = args.getString("aceptarJson");
         idSesion = args.getInt("idSesion", -1);
         idReto   = args.getString("idReto", null);
 
         if (TextUtils.isEmpty(aceptarJson) || idSesion <= 0 || TextUtils.isEmpty(idReto)) {
-            requireActivity().onBackPressed(); return;
+            requireActivity().onBackPressed();
+            return;
         }
 
+        // Cargar datos del reto
         data = new Gson().fromJson(aceptarJson, AceptarRetoResponse.class);
-
         render();
 
+        // Navegación
         btnPrev.setOnClickListener(v1 -> {
-            if (index > 0) { index--; render(); }
+            if (index > 0) {
+                index--;
+                render();
+            }
         });
 
         btnNext.setOnClickListener(v12 -> {
@@ -94,52 +107,70 @@ public class FragmentQuiz extends Fragment {
                 Toast.makeText(getContext(), "Selecciona una opción", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             if (index < data.preguntas.size() - 1) {
-                index++; render();
+                index++;
+                render();
             } else {
                 enviarRonda();
             }
         });
     }
 
+    /** Renderiza la pregunta y sus opciones **/
     private void render() {
         if (data == null || data.preguntas == null || data.preguntas.isEmpty()) return;
-        PreguntaReto p = data.preguntas.get(index);
+
+        AceptarRetoResponse.Pregunta p = data.preguntas.get(index);
 
         tvIndex.setText("Pregunta " + (index + 1) + "/" + data.preguntas.size());
-        tvPregunta.setText(p.getPregunta());
+        tvPregunta.setText(p.enunciado != null ? p.enunciado : "Pregunta sin texto");
+
+        // ✅ Pasar lista de opciones directamente (List<Opcion>)
+        List<AceptarRetoResponse.Opcion> opcionesList = new ArrayList<>();
+        if (p.opciones != null) {
+            opcionesList.addAll(p.opciones);
+        }
 
         String sel = marcadas.get(index);
-        optionsAdapter.submit(p.getOpciones(), sel);
+        optionsAdapter.submit(opcionesList, sel);
 
         btnPrev.setEnabled(index > 0);
         btnNext.setText(index == data.preguntas.size() - 1 ? "Finalizar" : "Siguiente");
         btnNext.setEnabled(sel != null);
     }
 
+    /** Envía las respuestas seleccionadas **/
     private void enviarRonda() {
         List<RondaRequest.Item> items = new ArrayList<>();
         for (int i = 0; i < data.preguntas.size(); i++) {
             String key = marcadas.get(i);
-            if (key != null) items.add(new RondaRequest.Item(i + 1, key));
+            if (key != null) {
+                items.add(new RondaRequest.Item(i + 1, key));
+            }
         }
 
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.responderRonda(new RondaRequest(idSesion, items))
                 .enqueue(new Callback<RondaResponse>() {
-                    @Override public void onResponse(Call<RondaResponse> call, Response<RondaResponse> resp) {
+                    @Override
+                    public void onResponse(Call<RondaResponse> call, Response<RondaResponse> resp) {
                         consultarEstado();
                     }
-                    @Override public void onFailure(Call<RondaResponse> call, Throwable t) {
+
+                    @Override
+                    public void onFailure(Call<RondaResponse> call, Throwable t) {
                         consultarEstado();
                     }
                 });
     }
 
+    /** Consulta el estado del reto para mostrar resultados **/
     private void consultarEstado() {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.estadoReto(idReto).enqueue(new Callback<EstadoRetoResponse>() {
-            @Override public void onResponse(Call<EstadoRetoResponse> call, Response<EstadoRetoResponse> resp) {
+            @Override
+            public void onResponse(Call<EstadoRetoResponse> call, Response<EstadoRetoResponse> resp) {
                 if (!isAdded()) return;
 
                 if (resp.isSuccessful() && resp.body() != null) {
@@ -152,7 +183,6 @@ public class FragmentQuiz extends Fragment {
                     FragmentResultadoReto f = new FragmentResultadoReto();
                     f.setArguments(b);
 
-                    // ===== Navegación segura al mismo contenedor que usa el overlay =====
                     FragmentManager fm;
                     int containerId;
 
@@ -161,11 +191,9 @@ public class FragmentQuiz extends Fragment {
                     View containerInParent = (parentView != null) ? parentView.findViewById(R.id.container) : null;
 
                     if (containerInParent != null) {
-                        // Estamos dentro de RetosFragment (usa su child FM)
                         fm = parent.getChildFragmentManager();
                         containerId = R.id.container;
                     } else {
-                        // Fallback: contenedor principal de la Activity
                         fm = requireActivity().getSupportFragmentManager();
                         containerId = R.id.fragmentContainer;
                     }
@@ -175,14 +203,14 @@ public class FragmentQuiz extends Fragment {
                             .addToBackStack("resultadoReto")
                             .commit();
                 } else {
-                    // Si falla, solo vuelve al anterior en el mismo stack
                     if (getParentFragmentManager() != null) {
                         getParentFragmentManager().popBackStack();
                     }
                 }
             }
 
-            @Override public void onFailure(Call<EstadoRetoResponse> call, Throwable t) {
+            @Override
+            public void onFailure(Call<EstadoRetoResponse> call, Throwable t) {
                 if (!isAdded()) return;
                 if (getParentFragmentManager() != null) {
                     getParentFragmentManager().popBackStack();

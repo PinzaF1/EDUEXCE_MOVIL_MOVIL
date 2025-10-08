@@ -10,22 +10,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.model.PreguntaReto;
+import com.example.zavira_movil.model.AceptarRetoResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PreguntasAdapter extends RecyclerView.Adapter<PreguntasAdapter.VH> {
 
-    private final List<PreguntaReto> data = new ArrayList<>();
+    private final List<AceptarRetoResponse.Pregunta> data = new ArrayList<>();
 
-    public void setData(List<PreguntaReto> list) {
+    /** Recibe las preguntas completas del reto */
+    public void setData(List<AceptarRetoResponse.Pregunta> list) {
         data.clear();
         if (list != null) data.addAll(list);
         notifyDataSetChanged();
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_pregunta, parent, false);
@@ -34,22 +36,24 @@ public class PreguntasAdapter extends RecyclerView.Adapter<PreguntasAdapter.VH> 
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
-        PreguntaReto p = data.get(pos);
+        AceptarRetoResponse.Pregunta p = data.get(pos);
 
-        h.tvEnunciado.setText(p.getPregunta());
+        // Texto principal de la pregunta
+        h.tvEnunciado.setText(p.enunciado != null ? p.enunciado : "Pregunta sin texto");
 
+        // Metadatos: área, subtema, dificultad...
         StringBuilder meta = new StringBuilder();
-        if (p.getArea() != null) meta.append(p.getArea());
-        if (p.getSubtema() != null) meta.append(" • ").append(p.getSubtema());
-        if (p.getDificultad() != null) meta.append(" • ").append(p.getDificultad());
-        if (p.getEstilo_kolb() != null) meta.append(" • Kolb: ").append(p.getEstilo_kolb());
+        if (p.area != null) meta.append(p.area);
+        if (p.subtema != null) meta.append(" • ").append(p.subtema);
+        if (p.dificultad != null) meta.append(" • ").append(p.dificultad);
         h.tvMeta.setText(meta.toString());
 
-        // Este OptionAdapter solo muestra opciones (no selecciona nada aquí)
-        h.optionsAdapter.submit(p.getOpciones(), null);
+        // Muestra las opciones (solo modo lectura, sin callback)
+        h.optionsAdapter.submit(p.opciones, null);
     }
 
-    @Override public int getItemCount() { return data.size(); }
+    @Override
+    public int getItemCount() { return data.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvEnunciado, tvMeta;
@@ -62,7 +66,8 @@ public class PreguntasAdapter extends RecyclerView.Adapter<PreguntasAdapter.VH> 
             tvMeta      = itemView.findViewById(R.id.tvMeta);
             rvOpciones  = itemView.findViewById(R.id.rvOpciones);
 
-            optionsAdapter = new OptionAdapter(key -> {}); // callback vacío para listado
+            // OptionAdapter ya usa AceptarRetoResponse.Opcion
+            optionsAdapter = new OptionAdapter(key -> {}); // sin acción, solo mostrar
             rvOpciones.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
             rvOpciones.setAdapter(optionsAdapter);
         }

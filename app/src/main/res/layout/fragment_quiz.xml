@@ -60,15 +60,35 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Navegación (solo Siguiente / Finalizar) -->
-    <Button
-        android:id="@+id/btnNext"
+    <!-- Navegación: Anterior y Siguiente -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Siguiente"
-        android:enabled="false"
-        android:background="@drawable/bg_button_primary"
-        android:textColor="@android:color/white"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnPrev"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Anterior"
+            android:enabled="false"
+            android:background="@drawable/bg_button_secondary"
+            android:textColor="@color/text_primary"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Siguiente"
+            android:enabled="false"
+            android:background="@drawable/bg_button_primary"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="6dp" />
+    </LinearLayout>
 </LinearLayout>
