@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvFrom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre te ha retado"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvMateria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="en Matemáticas"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tvFecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hace 2 min"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"
+            android:textColor="#7A7A7A" />
+
+        <!-- Botones lado a lado -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <!-- RECHAZAR -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRechazar"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Rechazar" />
+
+            <!-- ACEPTAR -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAceptar"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="Aceptar reto" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

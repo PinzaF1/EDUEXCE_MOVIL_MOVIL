@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class RetrofitClient {
 
-    private static final String BASE_URL = "https://overvaliantly-discourseless-delilah.ngrok-free.dev/";
+    private static final String BASE_URL = "https://gillian-semiluminous-blubberingly.ngrok-free.dev/";
     private static Retrofit retrofit;
     private static Context appContext; // para leer el token
 
