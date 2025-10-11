@@ -110,19 +110,7 @@ public class PerfilFragment extends Fragment {
 
         api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
 
-        // Cerrar sesión
-        binding.btnCerrarSesion.setOnClickListener(v -> {
-            TokenManager.clearAll(requireContext());
-            Intent i = new Intent(requireContext(), LoginActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            requireActivity().finish();
-        });
 
-        // Abrir selector (cámara/galería/eliminar)
-        if (binding.btnEditarFoto != null) {
-            binding.btnEditarFoto.setOnClickListener(v -> showPickerDialog());
-        }
         binding.icon.setOnClickListener(v -> showPickerDialog());
 
         // Cargar foto guardada (si existe)
@@ -270,20 +258,21 @@ public class PerfilFragment extends Fragment {
                 }
                 Estudiante e = resp.body();
 
-                binding.tvInstitucion.setText("Institución: " + safe(e.getNombreInstitucion()));
-                binding.tvNombre.setText("Nombre: " + safe(e.getNombreUsuario()) + " " + safe(e.getApellido()));
-                binding.tvDocumento.setText("Documento: " + safe(e.getNumeroDocumento()));
-                binding.tvTipoDoc.setText("Tipo doc.: " + safe(e.getTipoDocumento()));
-                binding.tvGrado.setText("Grado: " + safe(e.getGrado()));
-                binding.tvCurso.setText("Curso: " + safe(e.getCurso()));
-                binding.tvJornada.setText("Jornada: " + safe(e.getJornada()));
-                binding.tvCorreo.setText("Correo: " + safe(e.getCorreo()));
-                binding.tvTelefono.setText("Teléfono: " + safe(e.getTelefono()));
-                binding.tvDireccion.setText("Dirección: " + safe(e.getDireccion()));
+                // >>> SOLO VALORES (sin "Institución: ", etc.)
+                binding.tvInstitucion.setText(safe(e.getNombreInstitucion()));
+                binding.tvNombre.setText(safe(e.getNombreUsuario()) + " " + safe(e.getApellido()));
+                binding.tvDocumento.setText(safe(e.getNumeroDocumento()));
+                binding.tvTipoDoc.setText(safe(e.getTipoDocumento()));
+                binding.tvGrado.setText(safe(e.getGrado()));
+                binding.tvCurso.setText(safe(e.getCurso()));
+                binding.tvJornada.setText(safe(e.getJornada()));
+                binding.tvCorreo.setText(safe(e.getCorreo()));
+                binding.tvTelefono.setText(safe(e.getTelefono()));
+                binding.tvDireccion.setText(safe(e.getDireccion()));
                 String estado = (e.getIsActive() != null && e.getIsActive()) ? "Activo" : "Inactivo";
-                binding.tvEstado.setText("Estado: " + estado);
+                binding.tvEstado.setText(estado);
 
-                // Si no hay foto local guardada y el backend trae foto_url, úsala
+                // Foto: si no hay local, usa la del backend
                 String localPath = requireContext()
                         .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                         .getString(KEY_FOTO_PATH, null);
@@ -313,10 +302,12 @@ public class PerfilFragment extends Fragment {
                     return;
                 }
                 KolbResultado r = resp.body();
-                binding.tvEstilo.setText("Estilo: " + safe(r.getEstilo()));
-                binding.tvFechaKolb.setText("Fecha: " + formatearFechaFlexible(r.getFecha()));
-                binding.tvCaracteristicas.setText("Características: " + limpiarTexto(r.getCaracteristicas()));
-                binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(r.getRecomendaciones()));
+
+                // >>> SOLO VALORES (sin "Estilo: ", "Fecha: ", etc.)
+                binding.tvEstilo.setText(safe(r.getEstilo()));
+                binding.tvFechaKolb.setText(formatearFechaFlexible(r.getFecha()));
+                binding.tvCaracteristicas.setText(limpiarTexto(r.getCaracteristicas()));
+                binding.tvRecomendaciones.setText(limpiarTexto(r.getRecomendaciones()));
             }
 
             @Override
@@ -325,6 +316,7 @@ public class PerfilFragment extends Fragment {
             }
         });
     }
+
 
     // ===================== Helpers =====================
 

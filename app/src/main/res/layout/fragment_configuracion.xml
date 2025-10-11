@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_surface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Tarjeta SOLO para "Cambiar contraseña" -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E6EAF0"
+            android:background="@color/card_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/rowCambiarContrasena"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_lock_24" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:text="Cambiar contraseña"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/flechita" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Separación visual entre la tarjeta y el botón -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="12dp" />
+
+        <!-- Botón ‘Cerrar sesión’ fuera de la tarjeta -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarSesion"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_margin="0dp"
+            android:text="Cerrar sesión"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="14dp"
+            app:icon="@drawable/ic_logout_24"
+            app:iconPadding="8dp"
+            app:iconGravity="textStart"
+            app:iconTint="#DC2626"
+            android:textColor="#DC2626"
+            app:rippleColor="@android:color/transparent"
+            app:backgroundTint="#FFF1F2" />
+    </LinearLayout>
+</ScrollView>
