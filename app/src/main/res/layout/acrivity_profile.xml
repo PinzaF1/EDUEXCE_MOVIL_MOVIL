@@ -4,85 +4,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@android:color/white">
 
     <!-- APP BAR -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="Perfil"
         android:layout_marginTop="40dp"
+        app:title="Perfil"
         app:titleCentered="true"
-        app:titleTextColor="@color/black"
-        />
+        app:titleTextColor="@android:color/black" />
 
-    <!-- SEGMENTED CONTROL tipo píldora -->
-    <LinearLayout
+    <!-- TABS: texto + subrayado azul del ancho del texto -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingStart="16dp"
+        android:background="@android:color/transparent"
         android:paddingTop="10dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="10dp"
+        app:tabMode="fixed"
+        app:tabGravity="center"
+        app:tabInlineLabel="true"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabIndicatorColor="@color/azul"
+        app:tabIndicatorHeight="4dp"
+        app:tabIndicatorFullWidth="false"
+        app:tabTextColor="@android:color/black">
 
-        <com.google.android.material.card.MaterialCardView
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabPerfil"
             android:layout_width="wrap_content"
-            android:layout_height="55dp"
-            android:background="@drawable/bg_tabs_container"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#E6EAF0"
-            app:strokeWidth="1dp">
+            android:layout_height="wrap_content"
+            android:text="Perfil" />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/segmentedTabs"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:padding="4dp"
-                app:singleSelection="true"
-                app:selectionRequired="true"
-                app:checkedButton="@id/btnPerfil">
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configuración" />
+    </com.google.android.material.tabs.TabLayout>
 
-                <!-- PERFIL (activo: texto azul, fondo blanco) -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPerfil"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Perfil"
-                    android:textAllCaps="false"
-                    android:paddingHorizontal="22dp"
-                    android:paddingVertical="8dp"
-                    android:textColor="@drawable/seg_text_color"
-                    app:backgroundTint="@color/white"
-                    app:cornerRadius="12dp"
-                    app:strokeWidth="0dp" />
-
-                <!-- CONFIGURACIÓN (inactivo: texto gris, fondo blanco) -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnConfiguracion"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Configuración"
-                    android:textAllCaps="false"
-                    android:paddingHorizontal="22dp"
-                    android:paddingVertical="8dp"
-                    android:textColor="@drawable/seg_text_color"
-                    app:backgroundTint="@color/white"
-                    app:cornerRadius="12dp"
-                    app:rippleColor="@android:color/transparent"
-                    app:strokeWidth="0dp" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-        </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
-
-    <!-- Contenedor para el contenido -->
+    <!-- Contenedor de fragmentos -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 </LinearLayout>

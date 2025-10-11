@@ -172,10 +172,10 @@ public class ConfiguracionFragment extends Fragment {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> rLogin) {
                         if (rLogin.isSuccessful()) {
-                            showLong("Contraseña actualizada y login OK con la nueva clave");
+                            showLong("Contraseña actualizada correctamente");
                             dialogCambio.dismiss();
                         } else {
-                            String msg = "Cambio OK pero login con la nueva clave falló (" + rLogin.code() + ")";
+                            String msg = "Falló al actualizar la contraseña (" + rLogin.code() + ")";
                             try { if (rLogin.errorBody()!=null) msg += ": " + rLogin.errorBody().string(); } catch (Exception ignored) {}
                             showLong(msg + " → Revisa persistencia/hash en el backend.");
                         }
