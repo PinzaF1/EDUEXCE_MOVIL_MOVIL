@@ -56,6 +56,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -65,14 +66,17 @@ public interface ApiService {
     //Logue Estudiante
     @POST("estudiante/login")
     Call<ResponseBody> loginEstudiante(@Body LoginRequest request);
+
     @GET("estudiante/perfil")
     Call<Estudiante> getPerfilEstudiante();
 
     //Estilo de Kold
     @GET("kolb/preguntas")
     Call<List<PreguntasKolb>> getPreguntas();
+
     @POST("kolb/enviar")
     Call<KolbResponse> guardarRespuestas(@Body KolbRequest request);
+
     @GET("kolb/resultado")
     Call<KolbResultado> obtenerResultado();
 
@@ -82,6 +86,7 @@ public interface ApiService {
             @Header("Authorization") String bearerToken,
             @Body Map<String, Object> body
     );
+
     @POST("quiz-inicial/cerrar")
     Call<ResponseBody> cerrar(
             @Header("Authorization") String bearerToken,
@@ -92,6 +97,7 @@ public interface ApiService {
     @Multipart
     @POST("users/me/photo")
     Call<ResponseBody> subirFoto(@Part MultipartBody.Part foto);
+
     @DELETE("users/me/photo")
     Call<ResponseBody> eliminarFoto();
 
@@ -100,10 +106,9 @@ public interface ApiService {
     Call<ParadaResponse> crearParada(@Body ParadaRequest body);
 
 
-
-        // ---------- Progreso Móvil ----------
-        @GET("movil/progreso/resumen")
-        Call<ResumenGeneral> getResumen();
+    // ---------- Progreso Móvil ----------
+    @GET("movil/progreso/resumen")
+    Call<ResumenGeneral> getResumen();
 
     @GET("movil/progreso/materias")
     Call<MateriasResponse> getMaterias();
@@ -112,7 +117,7 @@ public interface ApiService {
     @GET("movil/progreso/historial")
     Call<HistorialResponse> getHistorial(
             @Query("page") int page,
-            @Query("limit") int limit  );
+            @Query("limit") int limit);
 
     @GET("movil/oponentes")
     Call<List<OpponentBackend>> listarOponentes();
@@ -142,6 +147,7 @@ public interface ApiService {
 
     @POST("movil/simulacro")
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
+
     @POST("movil/simulacro/cerrar")
     Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
 
@@ -167,4 +173,13 @@ public interface ApiService {
     @POST("movil/logros/otorgar-area")
     Call<OtorgarAreaResponse> otorgarInsigniaArea(@Body OtorgarAreaRequest body);
 
+    // AHORA (POST)
+    @POST("movil/password")
+    Call<BasicResponse> cambiarPasswordMovil(@Body com.example.zavira_movil.model.CambiarPassword body);
+
+    @PUT("movil/perfil/{id}")
+    Call<com.example.zavira_movil.Perfil.EditarPerfilResponse> editarPerfil(
+            @Path("id") int id,
+            @Body com.example.zavira_movil.Perfil.EditarPerfilRequest body
+    );
 }
