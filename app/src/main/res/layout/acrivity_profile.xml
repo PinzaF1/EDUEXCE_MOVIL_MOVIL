@@ -17,21 +17,23 @@
         app:titleTextColor="@android:color/black" />
 
     <!-- TABS: texto + subrayado azul del ancho del texto -->
+
+    <!-- Contenedor de fragmentos -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        android:layout_width="362dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:paddingTop="10dp"
+        android:paddingTop="1dp"
         android:paddingEnd="16dp"
         android:paddingBottom="10dp"
-        app:tabMode="fixed"
         app:tabGravity="center"
-        app:tabInlineLabel="true"
-        app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorColor="@color/azul"
-        app:tabIndicatorHeight="4dp"
         app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="4dp"
+        app:tabInlineLabel="true"
+        app:tabMode="fixed"
+        app:tabRippleColor="@android:color/transparent"
         app:tabTextColor="@android:color/black">
 
         <com.google.android.material.tabs.TabItem
@@ -47,7 +49,6 @@
             android:text="Configuración" />
     </com.google.android.material.tabs.TabLayout>
 
-    <!-- Contenedor de fragmentos -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
