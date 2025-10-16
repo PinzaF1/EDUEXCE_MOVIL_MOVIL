@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Lista de retos recibidos -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRecibidos"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:overScrollMode="never" />
+    <ProgressBar
+        android:id="@+id/progressRecibidos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
-    <!-- Mensaje vacío (lo busca el código con R.id.tvEmpty) -->
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No tienes retos recibidos."
         android:gravity="center"
-        android:text="No tienes retos recibidos"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:padding="20dp"
         android:visibility="gone"/>
-</FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRecibidos"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+</LinearLayout>

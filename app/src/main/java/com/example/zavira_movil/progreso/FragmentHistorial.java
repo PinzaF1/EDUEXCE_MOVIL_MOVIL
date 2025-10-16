@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.adapter.HistorialAdapter;
-import com.example.zavira_movil.model.HistorialItem;
-import com.example.zavira_movil.model.HistorialResponse;
+import com.example.zavira_movil.detalleprogreso.FragmentDetalleSimulacro;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 
@@ -49,9 +47,8 @@ public class FragmentHistorial extends Fragment {
         adapter = new HistorialAdapter();
         rv.setAdapter(adapter);
 
-        // >>> NUEVO: manejar click en items
+        // Click en item -> abrir detalle (Resumen)
         adapter.setOnItemClick(this::abrirDetalle);
-        // <<<
 
         cargarHistorial(currentPage, pageSize);
     }
@@ -100,16 +97,40 @@ public class FragmentHistorial extends Fragment {
         if (adapter != null) adapter.setData(Collections.emptyList());
     }
 
-    // >>> AQUÍ VA TU MÉTODO: navega al detalle con tabs
+    // -------- Navegación al detalle (ENVÍA id_sesion) --------
     private void abrirDetalle(HistorialItem it) {
         if (!isAdded()) return;
 
+        // Validar disponibilidad de detalle
+        if (it != null && !it.isDetalleDisponible()) {
+            android.widget.Toast.makeText(requireContext(),
+                    "Este intento no tiene detalle disponible",
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Parsear intentoId -> id_sesion (int)
+        int idSesion = safeParseInt(it != null ? it.getIntentoId() : null);
+        if (idSesion <= 0) {
+            android.widget.Toast.makeText(requireContext(),
+                    "id_sesion faltante", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Argumentos para el detalle
         Bundle b = new Bundle();
-        b.putString("materia", it.getMateria());
-        b.putInt("porcentaje", it.getPorcentaje());
-        b.putString("nivel", it.getNivel());
-        b.putString("fecha", it.getFecha());
-        b.putString("intentoId", it.getIntentoId());
+        b.putInt("id_sesion", idSesion);
+
+        // Opcionales: puedes mostrarlos de inmediato mientras carga
+        if (it != null) {
+            b.putString("materia", it.getMateria());
+            b.putInt("porcentaje", it.getPorcentaje());
+            b.putString("nivel", it.getNivel());
+            b.putString("fecha", it.getFecha());
+        }
+
+        // 👉 Forzar que el detalle abra en la pestaña "Resumen" (posición 0)
+        b.putInt("initial_tab", 0); // el FragmentDetalleSimulacro puede leerlo y hacer pager.setCurrentItem(0,false)
 
         Fragment f = new FragmentDetalleSimulacro();
         f.setArguments(b);
@@ -133,7 +154,11 @@ public class FragmentHistorial extends Fragment {
             return 0;
         }
     }
-    // <<<
+
+    // parseo seguro de String -> int
+    private int safeParseInt(String s) {
+        try { return Integer.parseInt(s); } catch (Exception e) { return -1; }
+    }
 
     @Override
     public void onDestroyView() {

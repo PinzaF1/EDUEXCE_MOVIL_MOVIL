@@ -10,7 +10,6 @@
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="80dp"
-        android:layout_marginTop="0dp"
         app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
         app:cardUseCompatPadding="true"
@@ -30,8 +29,8 @@
                 android:id="@+id/ivAppLogo"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_logo_z" />
+                android:src="@drawable/ic_logo_z"
+                android:contentDescription="@string/app_name"/>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -44,10 +43,10 @@
                     android:id="@+id/tvBrand"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Zavira"
+                    android:text="EduExce"
                     android:textColor="#1E293B"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/tvSubtitle"
@@ -55,28 +54,12 @@
                     android:layout_height="wrap_content"
                     android:text="Plataforma ICFES"
                     android:textColor="#6B7280"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"/>
             </LinearLayout>
-
-            <ImageButton
-                android:id="@+id/btnBell"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Notificaciones"
-                app:srcCompat="@drawable/ic_bell_24"
-                app:tint="#374151" />
         </LinearLayout>
-
-        <!-- (Opcional) Botón dentro del top bar -->
-        <Button
-            android:id="@+id/btnIslaSimulacro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Probar Isla Simulacro" />
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- RecyclerView (para el adaptador de materias) -->
+    <!-- RecyclerView ÚNICO (simulacro + materias con ConcatAdapter) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSubjects"
         android:layout_width="0dp"
@@ -88,17 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Divisor superior fino -->
-    <View
-        android:id="@+id/divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="#E5E7EB"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Contenedor de Fragments -->
+    <!-- Contenedor de Fragments (para otras pestañas) -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="0dp"

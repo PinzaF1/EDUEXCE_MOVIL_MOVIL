@@ -86,17 +86,35 @@
     <color name="subject_social">#EF4444</color>      <!-- rojo -->
     <color name="subject_english">#8B5CF6</color>     <!-- morado -->
 
-    <!-- Colores por área -->
-    <color name="area_matematicas">#2563EB</color>   <!-- azul -->
-    <color name="area_lenguaje">#9333EA</color>      <!-- violeta -->
-    <color name="area_ciencias">#16A34A</color>      <!-- verde -->
-    <color name="area_sociales">#F97316</color>      <!-- naranja -->
-    <color name="area_ingles">#06B6D4</color>        <!-- cian -->
+
     <color name="subject_language">#DB2777</color>
     <color name="subject_default">#9CA3AF</color>    <!-- Gris por defecto -->
 
     <color name="card_stroke_blue">#60A5E7</color>   <!-- azul claro del borde -->
     <color name="card_stroke_blue_pressed">#54A1E0</color> <!-- un poco más fuerte (opcional) -->
+
+
+    <!-- Materias -->
+    <color name="area_matematicas">#E53935</color>     <!-- rojo -->
+    <color name="area_sociales">#FB8C00</color>        <!-- naranja/amarillo -->
+    <color name="area_ingles">#8E24AA</color>          <!-- morado -->
+    <color name="area_lenguaje">#2C92EB</color>        <!-- azul -->
+    <color name="area_ciencias">#43A047</color>        <!-- verde -->
+
+    <!-- Chips de rendimiento -->
+    <color name="chip_experto">#1E88E5</color>       <!-- azul -->
+    <color name="chip_bueno">#43A047</color>         <!-- verde -->
+    <color name="chip_intermedio">#FBC02D</color>    <!-- amarillo -->
+    <color name="chip_bajo">#D32F2F</color>          <!-- rojo -->         <!-- rojo -->
+
+    <!-- Texto sobre fondos de color -->
+    <color name="on_dark">#FFFFFF</color>
+    <color name="on_light">#222222</color>
+
+    <color name="level_row_disabled">#9CA3AF</color>
+    <color name="level_row_title">#111827</color>
+    <color name="level_row_sub">#6B7280</color>
+    <color name="brand_blue">#2563EB</color>
 
 
 

@@ -4,16 +4,16 @@
     android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_page">
+    android:background="#F5F5F5">
 
     <!-- Header: tú / índice / oponente -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/card_bg"
         android:padding="12dp"
         android:layout_marginBottom="8dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:background="#FFFFFFFF">
 
         <TextView
             android:id="@+id/txtLeft"
@@ -22,7 +22,7 @@
             android:layout_weight="1"
             android:text="Tú"
             android:textStyle="bold"
-            android:textColor="@color/text_primary" />
+            android:textColor="#222222" />
 
         <TextView
             android:id="@+id/txtIndex"
@@ -30,8 +30,9 @@
             android:layout_height="wrap_content"
             android:text="Pregunta 1/25"
             android:textStyle="bold"
-            android:textColor="@color/text_primary" />
+            android:textColor="#222222" />
 
+        <!-- OJO: id corregido -->
         <TextView
             android:id="@+id/txtRight"
             android:layout_width="0dp"
@@ -40,7 +41,7 @@
             android:gravity="end"
             android:text="Oponente"
             android:textStyle="bold"
-            android:textColor="@color/text_primary" />
+            android:textColor="#222222" />
     </LinearLayout>
 
     <!-- Enunciado -->
@@ -50,7 +51,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/text_primary"
+        android:textColor="#222222"
         android:layout_marginBottom="8dp" />
 
     <!-- Opciones -->
@@ -60,15 +61,26 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Navegación (solo Siguiente / Finalizar) -->
-    <Button
-        android:id="@+id/btnNext"
+    <!-- Navegación: Anterior y Siguiente -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Siguiente"
-        android:enabled="false"
-        android:background="@drawable/bg_button_primary"
-        android:textColor="@android:color/white"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:weightSum="2">
+
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:backgroundTint="#3F51B5"
+            android:enabled="false"
+            android:gravity="center"
+            android:text="Siguiente"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
 </LinearLayout>

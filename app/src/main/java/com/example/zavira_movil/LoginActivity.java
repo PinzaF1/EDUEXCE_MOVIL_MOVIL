@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.zavira_movil.Home.HomeActivity;
 import com.example.zavira_movil.databinding.ActivityLoginBinding;
 import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.model.LoginRequest;
@@ -27,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private ApiService api;
 
-    // <<< NUEVO: destino después de validar >>>
+    // Destino después de validar
     private enum Destino { INFO_TEST, HOME }
     private Destino destinoPendiente = Destino.INFO_TEST;
 
@@ -35,26 +36,26 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ViewBinding
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         api = RetrofitClient.getInstance(this).create(ApiService.class);
 
-        // Si ya hay token, entra directo a InfoTest
+        // ✅ Si ya hay token => entra directo a HOME
         if (TokenManager.getToken(this) != null) {
-            goToInfoTest();
+            goToHome();
             return;
         }
 
-        // Ambos botones usan la misma validación; cambian SOLO el destino
+        // Botón que va a InfoTest tras login
         binding.btnLogin.setOnClickListener(v -> {
-            destinoPendiente = Destino.INFO_TEST; // después del login → InfoTest
+            destinoPendiente = Destino.INFO_TEST;
             doLogin();
         });
 
+        // Botón provisional que va a Home tras login
         binding.btnLoginprovicional.setOnClickListener(v -> {
-            destinoPendiente = Destino.HOME; // después del login → Home
+            destinoPendiente = Destino.HOME;
             doLogin();
         });
     }
@@ -90,11 +91,11 @@ public class LoginActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Guardar token
+                    // Guarda token
                     TokenManager.setToken(LoginActivity.this, loginResponse.getToken());
                     Log.d("TOKEN_GUARDADO", loginResponse.getToken());
 
-                    // Guardar userId extraído del JWT
+                    // Guarda userId desde el JWT (si tu TokenManager lo soporta)
                     int userId = TokenManager.extractUserIdFromJwt(loginResponse.getToken());
                     if (userId > 0) {
                         TokenManager.setUserId(LoginActivity.this, userId);
@@ -105,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(LoginActivity.this, "Bienvenido/a", Toast.LENGTH_SHORT).show();
 
-                    // <<< NUEVO: navegar según el botón que se pulsó >>>
+                    // Navega según el botón que se pulsó
                     if (destinoPendiente == Destino.HOME) {
                         goToHome();
                     } else {
@@ -129,13 +130,17 @@ public class LoginActivity extends AppCompatActivity {
     // Navegación → InfoTestActivity
     private void goToInfoTest() {
         Intent i = new Intent(this, InfoTestActivity.class);
+        // ✅ Limpia la pila para que Back no regrese al login
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
     }
 
     // Navegación → HomeActivity
-private void goToHome() {
+    private void goToHome() {
         Intent i = new Intent(this, HomeActivity.class);
+        // ✅ Limpia la pila para que Back no regrese al login
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
     }

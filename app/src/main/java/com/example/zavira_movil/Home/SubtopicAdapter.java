@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +22,7 @@ public class SubtopicAdapter extends RecyclerView.Adapter<SubtopicAdapter.VH> {
 
     private final List<Subject.Subtopic> data = new ArrayList<>();
     private final String area;
-    private final int nivel;
+    private final int nivel; // 1..5
 
     public SubtopicAdapter(List<Subject.Subtopic> data, String area, int nivel) {
         if (data != null) this.data.addAll(data);
@@ -40,13 +40,30 @@ public class SubtopicAdapter extends RecyclerView.Adapter<SubtopicAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH h, int position) {
         Subject.Subtopic s = data.get(position);
-        h.tvTitle.setText(s.title);
-        h.cbDone.setChecked(s.done);
+
+        // Campos mínimos (compatibles con tu modelo actual)
+        h.tvTitle.setText(s.title != null ? s.title : "Subtema");
+
+        // Estos dos son opcionales: si tu modelo aún no los tiene, mostramos por defecto.
+        String hint = (getFieldOrNull(s, "hint") != null) ? (String) getFieldOrNull(s, "hint")
+                : "Responde correctamente para desbloquear el siguiente";
+        String status = (getFieldOrNull(s, "statusText") != null) ? (String) getFieldOrNull(s, "statusText") : "";
+
+        h.tvHint.setText(hint);
+        h.tvRight.setText(status);
+
+        // (Opcional) Bloqueo por nivel: desbloquea los primeros `nivel`, bloquea el resto
+        boolean locked = position >= nivel; // cambia esta regla si tienes otra
+        applyLockedStyle(h, locked);
 
         h.itemView.setOnClickListener(v -> {
+            if (locked) {
+                Toast.makeText(v.getContext(), "Completa el subtema anterior para desbloquear este", Toast.LENGTH_SHORT).show();
+                return;
+            }
             try {
                 Context ctx = v.getContext();
-                Intent i = new Intent(ctx, QuizActivity.class); // directo
+                Intent i = new Intent(ctx, QuizActivity.class);
                 i.putExtra(QuizActivity.EXTRA_AREA, area);
                 i.putExtra(QuizActivity.EXTRA_SUBTEMA, s.title);
                 i.putExtra(QuizActivity.EXTRA_NIVEL, nivel);
@@ -61,11 +78,36 @@ public class SubtopicAdapter extends RecyclerView.Adapter<SubtopicAdapter.VH> {
     @Override public int getItemCount() { return data.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
-        CheckBox cbDone; TextView tvTitle;
+        TextView tvTitle, tvHint, tvRight;
+        ImageView ivChevron;
         VH(@NonNull View v) {
             super(v);
-            cbDone = v.findViewById(R.id.cbDone);
-            tvTitle = v.findViewById(R.id.tvSubtopicTitle);
+            tvTitle   = v.findViewById(R.id.tvSubtopicTitle);
+            tvHint    = v.findViewById(R.id.tvHint);
+            tvRight   = v.findViewById(R.id.tvRightStatus);
+            ivChevron = v.findViewById(R.id.ivChevron);
+        }
+    }
+
+    // ---------- Utils ----------
+
+    private static void applyLockedStyle(VH h, boolean locked) {
+        h.itemView.setEnabled(!locked);
+        h.itemView.setAlpha(locked ? 0.75f : 1f);
+        h.ivChevron.setAlpha(locked ? 0.35f : 1f);
+        h.tvTitle.setTextColor(locked ? 0xFF9CA3AF : 0xFF111827); // gris claro / gris oscuro
+        h.tvHint.setTextColor(locked ? 0xFF9CA3AF : 0xFF6B7280);  // gris claro / gris medio
+    }
+
+    /**
+     * Permite leer campos opcionales (hint / statusText) si extendiste Subject.Subtopic.
+     * Si no existen, devuelve null sin romper compilación.
+     */
+    private static Object getFieldOrNull(Object obj, String field) {
+        try {
+            return obj.getClass().getField(field).get(obj);
+        } catch (Exception ignored) {
+            return null;
         }
     }
 }

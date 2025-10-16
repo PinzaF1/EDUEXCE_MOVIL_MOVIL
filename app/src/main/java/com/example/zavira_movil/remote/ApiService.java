@@ -1,19 +1,18 @@
 package com.example.zavira_movil.remote;
 
-import com.example.zavira_movil.BasicResponse;
-import com.example.zavira_movil.PreguntaAcademica;
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
-import com.example.zavira_movil.model.AceptarRetoResponse;
-import com.example.zavira_movil.model.EstadoRetoResponse;
-import com.example.zavira_movil.model.HistorialResponse;
-import com.example.zavira_movil.QuizResponse;
+import com.example.zavira_movil.detalleprogreso.ProgresoDetalleResponse;
+import com.example.zavira_movil.retos1vs1.AceptarRetoResponse;
+import com.example.zavira_movil.retos1vs1.EstadoRetoResponse;
+import com.example.zavira_movil.progreso.HistorialResponse;
 import com.example.zavira_movil.model.CerrarRequest;
 import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
-import com.example.zavira_movil.model.OpponentRaw;
+import com.example.zavira_movil.oponente.OpponentBackend;
+import com.example.zavira_movil.retos1vs1.RetoListItem;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.model.SimulacroResponse;
 import com.example.zavira_movil.model.IslaCerrarRequest;
@@ -25,21 +24,19 @@ import com.example.zavira_movil.model.RankingResponse;
 import com.example.zavira_movil.model.LogrosResponse;
 import com.example.zavira_movil.model.OtorgarAreaRequest;
 import com.example.zavira_movil.model.OtorgarAreaResponse;
-import com.example.zavira_movil.model.LogrosTodosResponse;
 
 
 import com.example.zavira_movil.model.KolbRequest;
 import com.example.zavira_movil.model.KolbResponse;
-import com.example.zavira_movil.model.MateriasResponse;
+import com.example.zavira_movil.progreso.MateriasResponse;
 import com.example.zavira_movil.model.PreguntasKolb;
-import com.example.zavira_movil.model.ResumenGeneral;
-import com.example.zavira_movil.model.RetoCreadoResponse;
-import com.example.zavira_movil.model.RetoCreateRequest;
+import com.example.zavira_movil.progreso.ResumenGeneral;
+import com.example.zavira_movil.retos1vs1.RetoCreadoResponse;
+import com.example.zavira_movil.retos1vs1.RetoCreateRequest;
 import com.example.zavira_movil.model.RondaRequest;
 import com.example.zavira_movil.model.RondaResponse;
 import com.example.zavira_movil.model.ParadaRequest;
 import com.example.zavira_movil.model.ParadaResponse;
-import com.example.zavira_movil.model.PreguntasKolb;
 
 
 import java.util.List;
@@ -63,7 +60,7 @@ public interface ApiService {
     //Logue Estudiante
     @POST("estudiante/login")
     Call<ResponseBody> loginEstudiante(@Body LoginRequest request);
-    @GET("perfilEstudiante")
+    @GET("estudiante/perfil")
     Call<Estudiante> getPerfilEstudiante();
 
     //Estilo de Kold
@@ -74,7 +71,7 @@ public interface ApiService {
     @GET("kolb/resultado")
     Call<KolbResultado> obtenerResultado();
 
-    //Examen Inicial
+    //Examen Inicial l
     @POST("quizz/iniciar")
     Call<QuizInicialResponse> iniciar(
             @Header("Authorization") String bearerToken,
@@ -112,29 +109,39 @@ public interface ApiService {
             @Query("page") int page,
             @Query("limit") int limit  );
 
+    //resumendetalless
+    @GET("movil/sesion/{id}/detalle")
+    Call<ProgresoDetalleResponse> getDetalleSesion(@Path("id") int id);
+    @GET("movil/retos/oponentes")
+    Call<List<OpponentBackend>> listarOponentes();
 
 
-    // === 1 vs 1 (tus rutas actuales) ===
-
-    // Oponentes reales
-    @GET("movil/oponentes")
-    Call<List<OpponentRaw>> listarOponentes();
-
-    // Crear reto (usa RetoCreateRequest CON oponente_id)
+    // Crear reto
     @POST("movil/retos")
     Call<RetoCreadoResponse> crearReto(@Body RetoCreateRequest body);
 
-    // Aceptar reto
+    // Aceptar reto (SIN body)
     @POST("movil/retos/{id}/aceptar")
     Call<AceptarRetoResponse> aceptarReto(@Path("id") String idReto);
+
+    // Aceptar reto (CON body vacío) -> fallback cuando el server pide body
+    @POST("movil/retos/{id}/aceptar")
+    Call<AceptarRetoResponse> aceptarRetoConBody(@Path("id") String idReto, @Body Map<String, Object> empty);
 
     // Responder ronda
     @POST("movil/retos/ronda")
     Call<RondaResponse> responderRonda(@Body RondaRequest body);
 
-    // OJO: tu ruta real es /movil/retos/:id/estado
+    // Estado del reto
     @GET("movil/retos/{id}/estado")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
+
+    // Listar retos (recibidos/pendientes para el usuario autenticado)
+    @GET("movil/retos")
+    Call<List<RetoListItem>> listarRetos();
+
+
+
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);
 

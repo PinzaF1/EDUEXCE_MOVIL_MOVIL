@@ -8,7 +8,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.HomeActivity;  // ✅ importa HomeActivity
 import com.example.zavira_movil.model.IslaResumenResponse;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
