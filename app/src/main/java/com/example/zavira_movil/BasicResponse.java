@@ -3,9 +3,10 @@ package com.example.zavira_movil;
 import com.google.gson.annotations.SerializedName;
 
 public class BasicResponse {
-    @SerializedName("success") private Boolean success;
-    @SerializedName("message") private String message;
+    @SerializedName("ok")      public Boolean ok;
+    @SerializedName("success") public Boolean success;
+    @SerializedName("message") public String message;
 
-    public Boolean isSuccess() { return success != null && success; }
-    public String getMessage() { return message; }
+    public boolean isOk() { return Boolean.TRUE.equals(ok) || Boolean.TRUE.equals(success); }
+    public String  getMessage() { return message; }
 }

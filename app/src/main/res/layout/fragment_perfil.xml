@@ -3,93 +3,166 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#CDE8F6">
+    android:background="@color/bg_surface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp">
+        android:background="@color/white"
+        android:padding="16dp">
 
-        <!-- Avatar + botón editar superpuesto -->
-        <FrameLayout
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:layout_marginTop="8dp">
+        <!-- Avatar CENTRADO -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/icon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@drawable/ic_person"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_person" />
+                android:background="#EEF1F5"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay_Circular"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnEditarFoto"
-                android:layout_width="43dp"
-                android:layout_height="69dp"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="6dp"
-                android:contentDescription="Editar foto"
-                android:src="@drawable/ic_edit"
-                app:backgroundTint="@color/area_lenguaje"
-                app:tint="@android:color/white" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/tvTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Perfil del Estudiante"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#2C3E50"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Datos del estudiante -->
-        <TextView android:id="@+id/tvInstitucion"   android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Institución: -"   android:textSize="18sp"/>
-        <TextView android:id="@+id/tvNombre"        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nombre: -"        android:textSize="18sp"/>
-        <TextView android:id="@+id/tvDocumento"     android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Documento: -"     android:textSize="18sp"/>
-        <TextView android:id="@+id/tvTipoDoc"       android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tipo doc.: -"      android:textSize="18sp"/>
-        <TextView android:id="@+id/tvGrado"         android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Grado: -"         android:textSize="18sp"/>
-        <TextView android:id="@+id/tvCurso"         android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Curso: -"         android:textSize="18sp"/>
-        <TextView android:id="@+id/tvJornada"       android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jornada: -"       android:textSize="18sp"/>
-        <TextView android:id="@+id/tvCorreo"        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Correo: -"        android:textSize="18sp"/>
-        <TextView android:id="@+id/tvTelefono"      android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Teléfono: -"      android:textSize="18sp"/>
-        <TextView android:id="@+id/tvDireccion"     android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dirección: -"     android:textSize="18sp"/>
-        <TextView android:id="@+id/tvEstado"        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Estado: -"        android:textSize="18sp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#A0B8C6"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Kolb -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Estilo de Aprendizaje (Kolb)"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:textColor="#2C3E50"
-            android:layout_marginBottom="8dp" />
-
-        <TextView android:id="@+id/tvEstilo"           android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Estilo: -" />
-        <TextView android:id="@+id/tvFechaKolb"        android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Fecha: -" />
-        <TextView android:id="@+id/tvCaracteristicas"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Características: -" />
-        <TextView android:id="@+id/tvRecomendaciones"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Recomendaciones: -" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCerrarSesion"
+        <!-- Card: Información Personal -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cerrar sesión"
-            android:textAllCaps="false"
-            android:layout_marginTop="24dp"
-            android:padding="12dp" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E6EAF0"
+            android:background="@color/card_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Título + acción -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Información Personal"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <LinearLayout
+                        android:id="@+id/rowEditarPerfil"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_edit" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" Editar"
+                            android:textSize="14sp"
+                            android:textColor="@color/primary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Etiqueta arriba / valor abajo -->
+                <TextView android:text="Institución" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvInstitucion" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Nombre" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvNombre" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Documento" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvDocumento" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Tipo de documento" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvTipoDoc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Grado" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvGrado" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Curso" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvCurso" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Jornada" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvJornada" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Correo" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvCorreo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Teléfono" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvTelefono" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Dirección" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvDireccion" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Estado" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvEstado" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card: Estilo de Aprendizaje (Kolb) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardUseCompatPadding="true"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E6EAF0"
+            android:background="@color/card_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estilo de Aprendizaje (Kolb)"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+                <TextView android:text="Estilo" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvEstilo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Fecha" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvFechaKolb" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Características" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvCaracteristicas" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+
+                <TextView android:text="Recomendaciones" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/text_muted" android:paddingTop="8dp"/>
+                <TextView android:id="@+id/tvRecomendaciones" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textColor="@color/text_primary" android:paddingTop="2dp" android:paddingBottom="10dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </ScrollView>

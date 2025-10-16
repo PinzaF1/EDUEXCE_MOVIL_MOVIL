@@ -1,5 +1,7 @@
 package com.example.zavira_movil.remote;
 
+import com.example.zavira_movil.BasicResponse;
+import com.example.zavira_movil.PreguntaAcademica;
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
 import com.example.zavira_movil.detalleprogreso.ProgresoDetalleResponse;
@@ -11,8 +13,7 @@ import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
-import com.example.zavira_movil.oponente.OpponentBackend;
-import com.example.zavira_movil.retos1vs1.RetoListItem;
+import com.example.zavira_movil.oponente.OpponentRaw;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.model.SimulacroResponse;
 import com.example.zavira_movil.model.IslaCerrarRequest;
@@ -24,6 +25,9 @@ import com.example.zavira_movil.model.RankingResponse;
 import com.example.zavira_movil.model.LogrosResponse;
 import com.example.zavira_movil.model.OtorgarAreaRequest;
 import com.example.zavira_movil.model.OtorgarAreaResponse;
+import com.example.zavira_movil.model.LogrosTodosResponse;
+import com.example.zavira_movil.retos1vs1.RetoListItem;
+import com.example.zavira_movil.oponente.OpponentBackend;
 
 
 import com.example.zavira_movil.model.KolbRequest;
@@ -37,6 +41,7 @@ import com.example.zavira_movil.model.RondaRequest;
 import com.example.zavira_movil.model.RondaResponse;
 import com.example.zavira_movil.model.ParadaRequest;
 import com.example.zavira_movil.model.ParadaResponse;
+import com.example.zavira_movil.model.PreguntasKolb;
 
 
 import java.util.List;
@@ -51,6 +56,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -66,8 +72,10 @@ public interface ApiService {
     //Estilo de Kold
     @GET("kolb/preguntas")
     Call<List<PreguntasKolb>> getPreguntas();
+
     @POST("kolb/enviar")
     Call<KolbResponse> guardarRespuestas(@Body KolbRequest request);
+
     @GET("kolb/resultado")
     Call<KolbResultado> obtenerResultado();
 
@@ -77,6 +85,7 @@ public interface ApiService {
             @Header("Authorization") String bearerToken,
             @Body Map<String, Object> body
     );
+
     @POST("quiz-inicial/cerrar")
     Call<ResponseBody> cerrar(
             @Header("Authorization") String bearerToken,
@@ -87,6 +96,7 @@ public interface ApiService {
     @Multipart
     @POST("users/me/photo")
     Call<ResponseBody> subirFoto(@Part MultipartBody.Part foto);
+
     @DELETE("users/me/photo")
     Call<ResponseBody> eliminarFoto();
 
@@ -95,10 +105,9 @@ public interface ApiService {
     Call<ParadaResponse> crearParada(@Body ParadaRequest body);
 
 
-
-        // ---------- Progreso Móvil ----------
-        @GET("movil/progreso/resumen")
-        Call<ResumenGeneral> getResumen();
+    // ---------- Progreso Móvil ----------
+    @GET("movil/progreso/resumen")
+    Call<ResumenGeneral> getResumen();
 
     @GET("movil/progreso/materias")
     Call<MateriasResponse> getMaterias();
@@ -107,16 +116,15 @@ public interface ApiService {
     @GET("movil/progreso/historial")
     Call<HistorialResponse> getHistorial(
             @Query("page") int page,
-            @Query("limit") int limit  );
-
-    //resumendetalless
-    @GET("movil/sesion/{id}/detalle")
-    Call<ProgresoDetalleResponse> getDetalleSesion(@Path("id") int id);
-    @GET("movil/retos/oponentes")
-    Call<List<OpponentBackend>> listarOponentes();
+            @Query("limit") int limit);
 
 
-    // Crear reto
+
+    // === 1 vs 1 (tus rutas actuales) ===
+
+    // Oponentes reales
+
+    // Crear reto (usa RetoCreateRequest CON oponente_id)
     @POST("movil/retos")
     Call<RetoCreadoResponse> crearReto(@Body RetoCreateRequest body);
 
@@ -135,18 +143,12 @@ public interface ApiService {
     // Estado del reto
     @GET("movil/retos/{id}/estado")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
-
-    // Listar retos (recibidos/pendientes para el usuario autenticado)
-    @GET("movil/retos")
-    Call<List<RetoListItem>> listarRetos();
-
-
-
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);
 
     @POST("movil/simulacro")
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
+
     @POST("movil/simulacro/cerrar")
     Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
 
@@ -172,4 +174,18 @@ public interface ApiService {
     @POST("movil/logros/otorgar-area")
     Call<OtorgarAreaResponse> otorgarInsigniaArea(@Body OtorgarAreaRequest body);
 
+    // AHORA (POST)
+    @POST("movil/password")
+    Call<BasicResponse> cambiarPasswordMovil(@Body com.example.zavira_movil.model.CambiarPassword body);
+
+    @PUT("movil/perfil/{id}")
+    Call<com.example.zavira_movil.Perfil.EditarPerfilResponse> editarPerfil(
+            @Path("id") int id,
+            @Body com.example.zavira_movil.Perfil.EditarPerfilRequest body
+    );
+
+    @GET("movil/retos")
+    Call<List<RetoListItem>> listarRetos();
+    @GET("movil/retos/oponentes")
+    Call<List<OpponentBackend>> listarOponentes();
 }

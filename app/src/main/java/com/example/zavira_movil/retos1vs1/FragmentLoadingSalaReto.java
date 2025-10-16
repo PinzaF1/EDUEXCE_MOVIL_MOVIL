@@ -53,6 +53,36 @@ public class FragmentLoadingSalaReto extends Fragment {
     private boolean launching = false;
     private static final long POLL_MS = 1200L;
 
+    // ===== Flags locales para evitar carreras/duplicados =====
+    private String spName() { return "retos1v1"; }
+    private Integer myId() { try { return TokenManager.getUserId(requireContext()); } catch (Exception e) { return null; } }
+    private String keyAceptadoPorCreador() { return "aceptado_creador_" + (idReto==null?"":idReto); }
+    private boolean creadorYaLlamoAceptar() {
+        if (!isAdded()) return false;
+        return requireContext().getSharedPreferences(spName(), Context.MODE_PRIVATE)
+                .getBoolean(keyAceptadoPorCreador(), false);
+    }
+    private void marcarCreadorLlamoAceptar() {
+        if (!isAdded()) return;
+        requireContext().getSharedPreferences(spName(), Context.MODE_PRIVATE)
+                .edit().putBoolean(keyAceptadoPorCreador(), true).apply();
+    }
+
+    private String keyEntregada() {
+        Integer my = myId();
+        return "ronda_" + (idReto==null?"":idReto) + "_" + (my==null?"0":String.valueOf(my));
+    }
+    private void clearEntregadaFlag() {
+        if (!isAdded() || TextUtils.isEmpty(idReto)) return;
+        requireContext().getSharedPreferences(spName(), Context.MODE_PRIVATE)
+                .edit().putBoolean(keyEntregada(), false).apply();
+    }
+    private boolean yaEntregue() {
+        if (!isAdded() || TextUtils.isEmpty(idReto)) return false;
+        return requireContext().getSharedPreferences(spName(), Context.MODE_PRIVATE)
+                .getBoolean(keyEntregada(), false);
+    }
+
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
         super.onViewCreated(v, s);
@@ -73,16 +103,18 @@ public class FragmentLoadingSalaReto extends Fragment {
         tvArea.setText(area);
         tvOponente.setText(!TextUtils.isEmpty(opName) ? opName : "Oponente");
 
-        // MUY IMPORTANTE: cada vez que entras a la sala, limpia el banderín
+        // limpiar banderines por si venimos de atrás
         clearEntregadaFlag();
 
         handler = new Handler();
 
         if (esCreador) {
+            // creador NO muestra botón, espera en_curso y acepta una sola vez
             btnEntrar.setVisibility(View.GONE);
             pb.setVisibility(View.VISIBLE);
             pollEstado();
         } else {
+            // retado: presiona para aceptar y entrar
             btnEntrar.setVisibility(View.VISIBLE);
             btnEntrar.setOnClickListener(v1 -> aceptarYOEntrar());
             pb.setVisibility(View.VISIBLE);
@@ -90,22 +122,12 @@ public class FragmentLoadingSalaReto extends Fragment {
         }
     }
 
-    // ===== Helpers de preferencias (banderín por usuario y por reto) =====
-    private Integer myId() {
-        try { return TokenManager.getUserId(requireContext()); } catch (Exception e) { return null; }
+    @Override public void onDestroyView() {
+        if (handler != null) { handler.removeCallbacksAndMessages(null); handler = null; }
+        super.onDestroyView();
     }
-    private String flagKey() { return "ronda_" + (idReto==null?"":idReto) + "_" + (myId()==null?"0":String.valueOf(myId())); }
 
-    private void clearEntregadaFlag() {
-        if (!isAdded() || TextUtils.isEmpty(idReto)) return;
-        requireContext().getSharedPreferences("retos1v1", Context.MODE_PRIVATE)
-                .edit().putBoolean(flagKey(), false).apply();
-    }
-    private boolean yaEntregue() {
-        if (!isAdded() || TextUtils.isEmpty(idReto)) return false;
-        return requireContext().getSharedPreferences("retos1v1", Context.MODE_PRIVATE)
-                .getBoolean(flagKey(), false);
-    }
+    private void reintentar(Runnable r) { if (handler != null) handler.postDelayed(r, POLL_MS); }
 
     // ===== Polling a /estado =====
     private void pollEstado() {
@@ -121,17 +143,29 @@ public class FragmentLoadingSalaReto extends Fragment {
                     String st = e.estado != null ? e.estado.toLowerCase() : "";
 
                     if ("en_curso".equals(st)) {
-                        fetchSesionesYEntrar();
-                        return;
+                        if (esCreador) {
+                            // El creador espera a en_curso y llama aceptar UNA vez
+                            if (creadorYaLlamoAceptar()) {
+                                fetchSesionesSoloConAceptarUnaVez(false);
+                            } else {
+                                fetchSesionesSoloConAceptarUnaVez(true); // con jitter 1.2–2.0s
+                            }
+                            return;
+                        } else {
+                            // Si el retado llegó a en_curso sin tocar el botón, intentamos aceptar igual
+                            aceptarYOEntrar();
+                            return;
+                        }
                     }
 
                     if ("finalizado".equals(st)) {
-                        if (yaEntregue()) {
-                            irAResultado(e);
-                            return;
+                        if (yaEntregue()) { irAResultado(e); return; }
+                        // Si finalizado y yo no marqué entregado (caso borde), intento entrar a jugar
+                        if (esCreador) {
+                            if (!creadorYaLlamoAceptar()) fetchSesionesSoloConAceptarUnaVez(true);
+                        } else {
+                            aceptarYOEntrar();
                         }
-                        // Si marcó finalizado pero yo no he enviado, intento conseguir mi sesión y jugar
-                        fetchSesionesYEntrar();
                         return;
                     }
                 }
@@ -144,15 +178,12 @@ public class FragmentLoadingSalaReto extends Fragment {
         });
     }
 
-    private void reintentar(Runnable r) {
-        if (handler != null) handler.postDelayed(r, POLL_MS);
-    }
-
-    // ===== Retado acepta y entra =====
+    // ====== RETADO: aceptar y entrar ======
     private void aceptarYOEntrar() {
         if (!isAdded() || launching) return;
-        btnEntrar.setEnabled(false);
-        pb.setVisibility(View.VISIBLE);
+        if (esCreador) return; // creador no usa este flujo
+        if (btnEntrar != null) btnEntrar.setEnabled(false);
+        if (pb != null) pb.setVisibility(View.VISIBLE);
 
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.aceptarRetoConBody(idReto, new HashMap<>()).enqueue(new Callback<AceptarRetoResponse>() {
@@ -161,53 +192,70 @@ public class FragmentLoadingSalaReto extends Fragment {
                 if (resp.isSuccessful() && resp.body()!=null && tieneSesion(resp.body())) {
                     lanzarQuiz(resp.body());
                 } else {
-                    btnEntrar.setEnabled(true);
+                    if (btnEntrar != null) btnEntrar.setEnabled(true);
                     reintentar(FragmentLoadingSalaReto.this::pollEstado);
                 }
             }
             @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
                 if (!isAdded() || launching) return;
-                btnEntrar.setEnabled(true);
+                if (btnEntrar != null) btnEntrar.setEnabled(true);
                 Toast.makeText(requireContext(), "No se pudo aceptar. Intenta de nuevo.", Toast.LENGTH_SHORT).show();
+                reintentar(FragmentLoadingSalaReto.this::pollEstado);
             }
         });
     }
 
-    // ===== Conseguir sesiones/preguntas y entrar =====
-    private void fetchSesionesYEntrar() {
+    // ====== CREADOR: llamar aceptar SOLO una vez (con jitter opcional) ======
+    private void fetchSesionesSoloConAceptarUnaVez(boolean conJitter) {
         if (!isAdded() || launching) return;
 
-        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
-        api.aceptarRetoConBody(idReto, new HashMap<>()).enqueue(new Callback<AceptarRetoResponse>() {
-            @Override public void onResponse(Call<AceptarRetoResponse> call, Response<AceptarRetoResponse> resp) {
-                if (!isAdded() || launching) return;
-                if (resp.isSuccessful() && resp.body()!=null && tieneSesion(resp.body())) {
-                    lanzarQuiz(resp.body());
-                } else {
-                    reintentar(FragmentLoadingSalaReto.this::fetchSesionesYEntrar);
+        Runnable work = () -> {
+            if (!isAdded() || launching) return;
+
+            ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+            // Marcamos ANTES para no repetir si hay re-entradas
+            marcarCreadorLlamoAceptar();
+
+            api.aceptarRetoConBody(idReto, new HashMap<>()).enqueue(new Callback<AceptarRetoResponse>() {
+                @Override public void onResponse(Call<AceptarRetoResponse> call, Response<AceptarRetoResponse> resp) {
+                    if (!isAdded() || launching) return;
+                    if (resp.isSuccessful() && resp.body()!=null && tieneSesion(resp.body())) {
+                        lanzarQuiz(resp.body());
+                    } else {
+                        // Si aún no hay sesiones por alguna carrera, seguimos en polling
+                        reintentar(FragmentLoadingSalaReto.this::pollEstado);
+                    }
                 }
-            }
-            @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
-                if (!isAdded() || launching) return;
-                reintentar(FragmentLoadingSalaReto.this::fetchSesionesYEntrar);
-            }
-        });
+                @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
+                    if (!isAdded() || launching) return;
+                    // no desmarcamos: evitamos spamear aceptar; seguimos en polling
+                    reintentar(FragmentLoadingSalaReto.this::pollEstado);
+                }
+            });
+        };
+
+        if (conJitter) {
+            long delay = 1200 + (long)(Math.random() * 800); // 1.2–2.0s
+            if (handler != null) handler.postDelayed(work, delay);
+        } else {
+            work.run();
+        }
     }
 
+    // Busca la sesión del usuario actual en la respuesta de aceptar
     private boolean tieneSesion(AceptarRetoResponse a) {
-        return a != null && a.sesiones != null && !a.sesiones.isEmpty() && a.sesiones.get(0).id_sesion > 0;
+        if (a == null || a.sesiones == null || a.sesiones.isEmpty()) return false;
+        Integer my = myId();
+        int id = a.findSesionIdForUser(my);
+        return id > 0;
     }
 
     // ===== Navegación =====
     private void lanzarQuiz(AceptarRetoResponse aceptar) {
         if (!isAdded() || aceptar == null) return;
 
-        int idSesion = (aceptar.sesiones != null && !aceptar.sesiones.isEmpty())
-                ? aceptar.sesiones.get(0).id_sesion : -1;
-        if (idSesion <= 0) {
-            reintentar(FragmentLoadingSalaReto.this::fetchSesionesYEntrar);
-            return;
-        }
+        int idSesion = aceptar.findSesionIdForUser(myId());
+        if (idSesion <= 0) { reintentar(FragmentLoadingSalaReto.this::pollEstado); return; }
 
         launching = true;
 
@@ -249,11 +297,5 @@ public class FragmentLoadingSalaReto extends Fragment {
         if (overlay != null) { overlay.setVisibility(View.VISIBLE); return R.id.container; }
         View root = requireActivity().findViewById(R.id.fragmentContainer);
         return (root != null) ? R.id.fragmentContainer : android.R.id.content;
-    }
-
-    @Override
-    public void onDestroyView() {
-        if (handler != null) { handler.removeCallbacksAndMessages(null); handler = null; }
-        super.onDestroyView();
     }
 }
