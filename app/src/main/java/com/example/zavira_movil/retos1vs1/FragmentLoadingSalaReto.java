@@ -73,7 +73,7 @@ public class FragmentLoadingSalaReto extends Fragment {
         tvArea.setText(area);
         tvOponente.setText(!TextUtils.isEmpty(opName) ? opName : "Oponente");
 
-        // 🔑 MUY IMPORTANTE: cada vez que entras a la sala, limpia el banderín
+        // MUY IMPORTANTE: cada vez que entras a la sala, limpia el banderín
         clearEntregadaFlag();
 
         handler = new Handler();
