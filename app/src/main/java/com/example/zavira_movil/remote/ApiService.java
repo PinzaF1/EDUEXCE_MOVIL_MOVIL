@@ -33,7 +33,6 @@ import com.example.zavira_movil.model.PreguntasKolb;
 import com.example.zavira_movil.progreso.ResumenGeneral;
 import com.example.zavira_movil.retos1vs1.RetoCreadoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreateRequest;
-import com.example.zavira_movil.model.RondaRequest;
 import com.example.zavira_movil.model.RondaResponse;
 import com.example.zavira_movil.niveleshome.ParadaRequest;
 import com.example.zavira_movil.niveleshome.ParadaResponse;
@@ -42,11 +41,15 @@ import com.example.zavira_movil.niveleshome.ParadaResponse;
 import java.util.List;
 import java.util.Map;
 
+
+import java.util.List;
+import java.util.Map;
+
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.http.DELETE;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -96,26 +99,29 @@ public interface ApiService {
     @DELETE("users/me/photo")
     Call<ResponseBody> eliminarFoto();
 
-    // ---------- Niveles / Sesiones ----------
+    // ---------- Niveles / Sesiones por área ----------
     @POST("sesion/parada")
     Call<ParadaResponse> crearParada(@Body ParadaRequest body);
 
-    // NUEVO (objetos) → {"id_sesion":1396, "respuestas":[{"opcion":"A","orden":1},...]}
+    // Cierre NUEVO (objetos {opcion, orden})
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);
 
-    // LEGACY (arrays) → {"id_sesion":1396, "respuestas":[["A",1],["C",2],...]}
+    // Cierre LEGACY (fallback): {"id_sesion": N, "respuestas":[["A",1],["C",2], ...]}
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesionCompat(@Body Map<String, Object> bodyCompat);
 
-    // ---------- Simulacro (móvil) ----------
+    // ---------- Simulacro ----------
     @POST("movil/simulacro")
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
 
     @POST("movil/simulacro/cerrar")
     Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
 
-    // ---------- Isla (simulacro por islas) ----------
+    @POST("movil/simulacro/cerrar")
+    Call<CerrarResponse> cerrarSimulacroCompat(@Body Map<String, Object> bodyCompat);
+
+    // ---------- Isla ----------
     @POST("movil/isla/simulacro")
     Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest req);
 
@@ -133,10 +139,7 @@ public interface ApiService {
     Call<MateriasResponse> getMaterias();
 
     @GET("movil/progreso/historial")
-    Call<HistorialResponse> getHistorial(
-            @Query("page") int page,
-            @Query("limit") int limit
-    );
+    Call<HistorialResponse> getHistorial(@Query("page") int page, @Query("limit") int limit);
 
     // ---------- 1 vs 1 ----------
     @POST("movil/retos")
@@ -149,7 +152,7 @@ public interface ApiService {
     Call<AceptarRetoResponse> aceptarRetoConBody(@Path("id") String idReto, @Body Map<String, Object> empty);
 
     @POST("movil/retos/ronda")
-    Call<RondaResponse> responderRonda(@Body RondaRequest body);
+    Call<RondaResponse> responderRonda(@Body com.example.zavira_movil.model.RondaRequest body);
 
     @GET("movil/retos/{id}/estado")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
