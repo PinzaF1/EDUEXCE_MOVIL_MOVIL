@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.local.ProgressLockManager;
+import com.example.zavira_movil.niveleshome.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.Level;
 import com.example.zavira_movil.model.Subject;

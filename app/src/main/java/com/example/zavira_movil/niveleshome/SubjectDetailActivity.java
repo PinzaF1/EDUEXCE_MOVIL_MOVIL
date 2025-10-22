@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.databinding.ActivitySubjectDetailBinding;
-import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.Level;
 import com.example.zavira_movil.model.Subject;
@@ -48,7 +47,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && adapter != null) {
-                        adapter.notifyDataSetChanged(); // refresca niveles desbloqueados
+                        adapter.notifyDataSetChanged(); // refresca niveles y examen final
                     }
                 }
         );
@@ -110,7 +109,6 @@ public class SubjectDetailActivity extends AppCompatActivity {
                 h.btnStart.setOnClickListener(v -> {
                     if (!unlocked) return;
                     Intent i = new Intent(v.getContext(), QuizActivity.class);
-                    // Enviamos textos de UI tal cual (el mapping a API se hace en QuizActivity)
                     i.putExtra(QuizActivity.EXTRA_AREA, subject.title);
                     i.putExtra(QuizActivity.EXTRA_SUBTEMA, sub);
                     i.putExtra(QuizActivity.EXTRA_NIVEL, nivelNumero);
@@ -123,17 +121,16 @@ public class SubjectDetailActivity extends AppCompatActivity {
                 h.tvSubtopic.setText("Simulacro de " + subject.title);
 
                 String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
-                boolean unlocked = ProgressLockManager.getUnlockedLevel(
-                        h.itemView.getContext(), userId, subject.title) >= 5;
+                boolean unlockedExam = ProgressLockManager.isFinalExamUnlocked(
+                        h.itemView.getContext(), userId, subject.title);
 
-                h.btnStart.setEnabled(unlocked);
-                h.btnStart.setAlpha(unlocked ? 1f : 0.5f);
-                h.btnStart.setText(unlocked ? "Comenzar" : "Bloqueado");
+                h.btnStart.setEnabled(unlockedExam);
+                h.btnStart.setAlpha(unlockedExam ? 1f : 0.5f);
+                h.btnStart.setText(unlockedExam ? "Comenzar" : "Bloqueado");
 
                 h.btnStart.setOnClickListener(v -> {
-                    if (!unlocked) return;
+                    if (!unlockedExam) return;
 
-                    // Construye la lista real de subtemas desde DemoData/levels
                     ArrayList<String> subs = new ArrayList<>();
                     if (subject.levels != null) {
                         for (Level L : subject.levels) {
@@ -144,7 +141,6 @@ public class SubjectDetailActivity extends AppCompatActivity {
                     }
 
                     Intent i = new Intent(v.getContext(), SimulacroActivity.class);
-                    // Enviamos textos UI; mapping a API se hace en SimulacroActivity
                     i.putExtra("area", subject.title);
                     i.putStringArrayListExtra("subtemas", subs);
                     onStartActivity.launch(i);
@@ -153,7 +149,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
         }
 
         @Override public int getItemCount() {
-            return (levels == null ? 0 : levels.size()) + 1;
+            return (levels == null ? 0 : levels.size()) + 1; // + Examen Final
         }
 
         static class VH extends RecyclerView.ViewHolder {

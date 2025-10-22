@@ -25,27 +25,12 @@ public final class MapeadorArea {
     public static String toApiArea(String uiTitle) {
         String s = norm(uiTitle);
 
-        // Sociales / ciudadanas
-        if (s.contains("social") || s.contains("socia") || s.contains("ciudada"))
-            return SOCIALES;
+        if (s.contains("social") || s.contains("ciudada")) return SOCIALES;
+        if (s.startsWith("matem"))                          return MATEMATICAS;
+        if (s.startsWith("lengua") || s.contains("lectura"))return LENGUAJE;
+        if (s.contains("naturales") || s.equals("ciencias"))return CIENCIAS_NATURALES;
+        if (s.startsWith("ingl") || s.equals("english"))    return INGLES;
 
-        // Matemáticas
-        if (s.startsWith("matem"))
-            return MATEMATICAS;
-
-        // Lenguaje (lectura crítica / lenguaje)
-        if (s.startsWith("lengua") || s.startsWith("lenguaj") || s.contains("lectura"))
-            return LENGUAJE;
-
-        // Ciencias Naturales
-        if (s.contains("ciencias naturales") || s.contains("naturales") || s.equals("ciencias"))
-            return CIENCIAS_NATURALES;
-
-        // Inglés
-        if (s.startsWith("ingl") || s.equals("english"))
-            return INGLES;
-
-        // Fallback
         return uiTitle != null ? uiTitle.trim() : "";
     }
 
@@ -55,40 +40,42 @@ public final class MapeadorArea {
         String raw = sub.trim();
         String t = norm(raw);
 
-        // ---- Lenguaje / Lectura crítica ----
-        if (t.equals("comprension literal"))     return "Comprensión lectora";
-        if (t.equals("cohesion textual"))        return "Cohesión textual";
-        if (t.equals("relaciones semanticas"))   return "Relaciones semánticas";
-        if (t.equals("conectores logicos"))      return "Conectores lógicos";
-        if (t.equals("figuras retoricas"))       return "Figuras retóricas";
-        if (t.equals("proposito del autor"))     return "Propósito del autor";
-
         // ---- Matemáticas ----
-        if (t.equals("aritmetica"))              return "Aritmética";
-        if (t.equals("algebra"))                 return "Álgebra";
-        if (t.equals("geometria"))               return "Geometría";
-        if (t.equals("estadistica y probabilidad")) return "Estadística y Probabilidad";
-        if (t.equals("funciones y graficas"))    return "Funciones y Gráficas";
+        if (t.equals("operaciones con numeros enteros")) return "Operaciones con números enteros";
+        if (t.equals("razones y proporciones")) return "Razones y proporciones";
+        if (t.equals("regla de tres simple y compuesta")) return "Regla de tres simple y compuesta";
+        if (t.equals("porcentajes y tasas (aumento, descuento, interes simple)")
+                || t.equals("porcentajes y tasas (aumento, descuento, interes simple)")) // por si sin acento
+            return "Porcentajes y tasas (aumento, descuento, interés simple)";
+        if (t.equals("funciones y graficas")) return "Funciones y Gráficas";
+
+        // ---- Lenguaje / Lectura crítica ----
+        if (t.equals("comprension lectora (sentido global y local)")) return "Comprensión lectora (sentido global y local)";
+        if (t.equals("conectores logicos (causa, contraste, condicion, secuencia)")) return "Conectores lógicos (causa, contraste, condición, secuencia)";
+        if (t.equals("identificacion de argumentos y contraargumentos")) return "Identificación de argumentos y contraargumentos";
+        if (t.equals("idea principal y proposito comunicativo")) return "Idea principal y propósito comunicativo";
+        if (t.equals("hecho vs. opinion e inferencias")) return "Hecho vs. opinión e inferencias";
 
         // ---- Sociales ----
-        if (t.equals("constitucion de 1991 y organizacion del estado"))
-            return "Constitución de 1991 y organización del Estado";
-        if (t.equals("ciudadania"))              return "Ciudadanía";
-        if (t.equals("pensamiento social"))      return "Pensamiento social";
+        if (t.equals("constitucion de 1991 y organizacion del estado")) return "Constitución de 1991 y organización del Estado";
+        if (t.equals("historia de colombia - frente nacional")) return "Historia de Colombia - Frente Nacional";
+        if (t.equals("guerras mundiales y guerra fria")) return "Guerras Mundiales y Guerra Fría";
+        if (t.equals("geografia de colombia (mapas, territorio y ambiente)")) return "Geografía de Colombia (mapas, territorio y ambiente)";
+        if (t.equals("economia y ciudadania economica (globalizacion y desigualdad)")) return "Economía y ciudadanía económica (globalización y desigualdad)";
 
         // ---- Ciencias Naturales ----
-        if (t.equals("biologia"))                return "Biología";
-        if (t.equals("quimica"))                 return "Química";
-        if (t.equals("fisica"))                  return "Física";
-        if (t.equals("ciencias de la tierra"))   return "Ciencias de la Tierra";
-        if (t.equals("metodo cientifico"))       return "Método científico";
+        if (t.equals("indagacion cientifica (variables, control e interpretacion de datos)")) return "Indagación científica (variables, control e interpretación de datos)";
+        if (t.equals("fuerzas, movimiento y energia")) return "Fuerzas, movimiento y energía";
+        if (t.equals("materia y cambios (mezclas, reacciones y conservacion)")) return "Materia y cambios (mezclas, reacciones y conservación)";
+        if (t.equals("genetica y herencia")) return "Genética y herencia";
+        if (t.equals("ecosistemas y cambio climatico (cts)")) return "Ecosistemas y cambio climático (CTS)";
 
         // ---- Inglés ----
-        if (t.equals("reading basico"))          return "Reading básico";
-        if (t.equals("reading intermedio"))      return "Reading intermedio";
-        if (t.equals("grammar y uso"))           return "Grammar y uso";
-        if (t.equals("listening y contexto"))    return "Listening y contexto";
-        if (t.equals("writing"))                 return "Writing";
+        if (t.equals("verb to be (am, is, are)")) return "Verb to be (am, is, are)";
+        if (t.equals("present simple (afirmacion, negacion y preguntas)")) return "Present Simple (afirmación, negación y preguntas)";
+        if (t.equals("past simple (verbos regulares e irregulares)")) return "Past Simple (verbos regulares e irregulares)";
+        if (t.equals("comparatives and superlatives")) return "Comparatives and superlatives";
+        if (t.equals("subject/object pronouns & possessive adjectives")) return "Subject/Object pronouns & Possessive adjectives";
 
         // Sin regla: envía tal cual vino de la UI
         return raw;

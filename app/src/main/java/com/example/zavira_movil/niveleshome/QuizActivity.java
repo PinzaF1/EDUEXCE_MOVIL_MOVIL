@@ -7,12 +7,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.zavira_movil.Home.QuizQuestionsAdapter;
 import com.example.zavira_movil.databinding.ActivityQuizBinding;
-import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
-import com.example.zavira_movil.model.CerrarRequest;
-import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Question;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
@@ -24,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Crea sesión, carga máx 10 preguntas, envía y desbloquea siguiente nivel si aprueba. */
+/** Crea sesión, carga máx 10 preguntas, envía y avanza/retrocede según puntaje; libera examen final al aprobar nivel 5. */
 public class QuizActivity extends AppCompatActivity {
 
     public static final String EXTRA_AREA    = "extra_area";     // área visible
@@ -75,7 +71,6 @@ public class QuizActivity extends AppCompatActivity {
     private void crearParadaYMostrar() {
         setLoading(true);
 
-        // ÚNICO mapeo UI->API (área/subtema) antes del backend
         final String areaApi    = MapeadorArea.toApiArea(areaUi);
         final String subtemaApi = MapeadorArea.normalizeSubtema(subtemaUi);
 
@@ -113,7 +108,6 @@ public class QuizActivity extends AppCompatActivity {
                     idSesion = toIntOrNull(pr.sesion.idSesion);
                 }
 
-                // Recolecta ApiQuestion desde todos los campos posibles
                 ArrayList<ApiQuestion> apiQs = new ArrayList<>();
                 if (pr.preguntas != null) apiQs.addAll(pr.preguntas);
                 if (pr.preguntasPorSubtema != null) apiQs.addAll(pr.preguntasPorSubtema);
@@ -122,7 +116,6 @@ public class QuizActivity extends AppCompatActivity {
                     if (pr.sesion.preguntasPorSubtema != null) apiQs.addAll(pr.sesion.preguntasPorSubtema);
                 }
 
-                // Mapea a tu Question (con Option.key A/B/C/...)
                 ArrayList<Question> preguntas = ApiQuestionMapper.toAppList(apiQs);
 
                 if (preguntas.size() > 10) preguntas = new ArrayList<>(preguntas.subList(0, 10));
@@ -149,7 +142,7 @@ public class QuizActivity extends AppCompatActivity {
         });
     }
 
-    /** Envía respuestas a /sesion/cerrar y desbloquea siguiente nivel si aprueba. */
+    /** Envía respuestas a /sesion/cerrar y aplica reglas de avance/retroceso + examen final. */
     private void enviar() {
         if (adapter.getItemCount() == 0) {
             Toast.makeText(this, "No hay preguntas.", Toast.LENGTH_SHORT).show();
@@ -184,16 +177,37 @@ public class QuizActivity extends AppCompatActivity {
                     return;
                 }
                 CerrarResponse r = response.body();
-                Integer puntaje = r.puntaje;
-                Toast.makeText(QuizActivity.this,
-                        "Puntaje: " + (puntaje != null ? puntaje : 0) + "%",
-                        Toast.LENGTH_LONG).show();
 
-                if (Boolean.TRUE.equals(r.aprueba)) {
-                    String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
+                int puntaje = r.puntaje != null ? r.puntaje : 0;
+                Toast.makeText(QuizActivity.this,
+                        "Puntaje: " + puntaje + "%", Toast.LENGTH_LONG).show();
+
+                String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
+
+                if (puntaje >= 80) {
+                    // Aprueba: avanza nivel
                     ProgressLockManager.unlockNext(QuizActivity.this, userId, areaUi, nivel);
+
+                    // Si es nivel 5 y aprueba → desbloquea Examen Final
+                    if (nivel == 5) {
+                        ProgressLockManager.setFinalExamUnlocked(QuizActivity.this, userId, areaUi, true);
+                    }
+
                     setResult(RESULT_OK);
+                } else {
+                    // No aprueba: retrocede un nivel, excepto si está en 1
+                    if (nivel > 1) {
+                        int nuevo = ProgressLockManager.revertOneLevel(QuizActivity.this, userId, areaUi, nivel);
+                        Toast.makeText(QuizActivity.this,
+                                "No alcanzaste 80%. Retrocedes al nivel " + nuevo + ".", Toast.LENGTH_LONG).show();
+                        setResult(RESULT_OK);
+                    } else {
+                        // Nivel 1 nunca baja
+                        Toast.makeText(QuizActivity.this,
+                                "No alcanzaste 80%. Permanece en nivel 1.", Toast.LENGTH_LONG).show();
+                    }
                 }
+
                 finish();
             }
 

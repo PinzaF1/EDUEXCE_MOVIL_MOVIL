@@ -7,12 +7,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.zavira_movil.Home.QuizQuestionsAdapter;
 import com.example.zavira_movil.databinding.ActivitySimulacroBinding;
-import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
-import com.example.zavira_movil.model.CerrarRequest;
-import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Question;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.remote.ApiService;
