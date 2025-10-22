@@ -1,4 +1,4 @@
-package com.example.zavira_movil.Home;
+package com.example.zavira_movil.niveleshome;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,31 +7,25 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.zavira_movil.Home.QuizQuestionsAdapter;
 import com.example.zavira_movil.databinding.ActivitySimulacroBinding;
 import com.example.zavira_movil.local.ProgressLockManager;
-import com.example.zavira_movil.local.UserSession;  // ✅ Import agregado
+import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.CerrarRequest;
 import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Question;
 import com.example.zavira_movil.model.SimulacroRequest;
-import com.example.zavira_movil.model.SimulacroResponse;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Pantalla para ejecutar un simulacro completo:
- * - Crear simulacro con 25 preguntas
- * - Responder preguntas y enviar respuestas
- * - Recibir resultados de puntaje y correctas
- */
+/** Simulacro completo: 25 preguntas, envía respuestas y muestra puntaje. */
 public class SimulacroActivity extends AppCompatActivity {
 
     private ActivitySimulacroBinding binding;
@@ -39,11 +33,8 @@ public class SimulacroActivity extends AppCompatActivity {
     private Integer idSesion;
     private int intentosFallidos = 0;
 
-    // Por defecto, área y subtemas
-    private String area = "Sociales";
-    private List<String> subtemas = Arrays.asList(
-            "Geografía", "Historia", "Economía", "Ciudadanía", "Pensamiento social"
-    );
+    private String area;                // mapeada a API
+    private List<String> subtemas;      // normalizados
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +42,20 @@ public class SimulacroActivity extends AppCompatActivity {
         binding = ActivitySimulacroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Configurar RecyclerView
         binding.rvQuestions.setLayoutManager(new LinearLayoutManager(this));
         adapter = new QuizQuestionsAdapter(new ArrayList<>());
         binding.rvQuestions.setAdapter(adapter);
+
+        // Recibe desde UI
+        String areaIn = getIntent().getStringExtra("area");
+        ArrayList<String> subsIn = getIntent().getStringArrayListExtra("subtemas");
+        if (areaIn == null || areaIn.trim().isEmpty()) areaIn = "Sociales y ciudadanas";
+        if (subsIn == null) subsIn = new ArrayList<>();
+
+        // ÚNICO mapeo UI->API (área/subtema)
+        this.area = MapeadorArea.toApiArea(areaIn);
+        this.subtemas = new ArrayList<>();
+        for (String s : subsIn) this.subtemas.add(MapeadorArea.normalizeSubtema(s));
 
         binding.btnEnviar.setOnClickListener(v -> enviar());
 
@@ -64,6 +65,11 @@ public class SimulacroActivity extends AppCompatActivity {
     private void setLoading(boolean b) {
         binding.progress.setVisibility(b ? View.VISIBLE : View.GONE);
         binding.btnEnviar.setEnabled(!b);
+    }
+
+    private static Integer toIntOrNull(String s) {
+        try { return (s == null) ? null : Integer.parseInt(s); }
+        catch (Exception e) { return null; }
     }
 
     private void crearSimulacro() {
@@ -76,7 +82,8 @@ public class SimulacroActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SimulacroResponse> call, Response<SimulacroResponse> response) {
                 setLoading(false);
-                if (!response.isSuccessful() || response.body() == null) {
+
+                if (!response.isSuccessful()) {
                     Toast.makeText(SimulacroActivity.this,
                             "⚠️ Error al crear simulacro. Código: " + response.code(),
                             Toast.LENGTH_LONG).show();
@@ -84,10 +91,19 @@ public class SimulacroActivity extends AppCompatActivity {
                 }
 
                 SimulacroResponse sim = response.body();
-                idSesion = (sim.sesion != null) ? sim.sesion.idSesion : null;
+                if (sim == null) {
+                    Toast.makeText(SimulacroActivity.this,
+                            "Servidor respondió " + response.code() + " sin cuerpo JSON.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-                List<Question> preguntas = sim.preguntas;
-                if (preguntas == null || preguntas.isEmpty()) {
+                if (sim.sesion != null) {
+                    idSesion = toIntOrNull(sim.sesion.idSesion);
+                }
+
+                List<ApiQuestion> apiQs = sim.preguntas;
+                if (apiQs == null || apiQs.isEmpty()) {
                     Toast.makeText(SimulacroActivity.this,
                             "No hay preguntas disponibles",
                             Toast.LENGTH_LONG).show();
@@ -95,9 +111,8 @@ public class SimulacroActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (preguntas.size() > 25) {
-                    preguntas = preguntas.subList(0, 25);
-                }
+                ArrayList<Question> preguntas = ApiQuestionMapper.toAppList(apiQs);
+                if (preguntas.size() > 25) preguntas = new ArrayList<>(preguntas.subList(0, 25));
 
                 adapter = new QuizQuestionsAdapter(preguntas);
                 binding.rvQuestions.setAdapter(adapter);
@@ -140,7 +155,7 @@ public class SimulacroActivity extends AppCompatActivity {
             public void onResponse(Call<CerrarResponse> call, Response<CerrarResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) {
                     Toast.makeText(SimulacroActivity.this,
-                            "Error al cerrar simulacro",
+                            "Error al cerrar simulacro (HTTP " + response.code() + ")",
                             Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -157,7 +172,6 @@ public class SimulacroActivity extends AppCompatActivity {
                 } else {
                     intentosFallidos++;
                     if (intentosFallidos >= 3) {
-                        // ✅ Ahora se pasa userId también
                         String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
                         ProgressLockManager.retrocederNivel(SimulacroActivity.this, userId, area);
 

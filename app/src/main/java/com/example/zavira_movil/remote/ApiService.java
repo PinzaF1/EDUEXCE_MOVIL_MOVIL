@@ -1,10 +1,8 @@
 package com.example.zavira_movil.remote;
 
 import com.example.zavira_movil.BasicResponse;
-import com.example.zavira_movil.PreguntaAcademica;
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
-import com.example.zavira_movil.detalleprogreso.ProgresoDetalleResponse;
 import com.example.zavira_movil.retos1vs1.AceptarRetoResponse;
 import com.example.zavira_movil.retos1vs1.EstadoRetoResponse;
 import com.example.zavira_movil.progreso.HistorialResponse;
@@ -13,9 +11,8 @@ import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.KolbResultado;
 import com.example.zavira_movil.model.LoginRequest;
-import com.example.zavira_movil.oponente.OpponentRaw;
 import com.example.zavira_movil.model.SimulacroRequest;
-import com.example.zavira_movil.model.SimulacroResponse;
+import com.example.zavira_movil.niveleshome.SimulacroResponse;
 import com.example.zavira_movil.model.IslaCerrarRequest;
 import com.example.zavira_movil.model.IslaResumenResponse;
 import com.example.zavira_movil.model.IslaCerrarResponse;
@@ -25,7 +22,6 @@ import com.example.zavira_movil.model.RankingResponse;
 import com.example.zavira_movil.model.LogrosResponse;
 import com.example.zavira_movil.model.OtorgarAreaRequest;
 import com.example.zavira_movil.model.OtorgarAreaResponse;
-import com.example.zavira_movil.model.LogrosTodosResponse;
 import com.example.zavira_movil.retos1vs1.RetoListItem;
 import com.example.zavira_movil.oponente.OpponentBackend;
 
@@ -39,9 +35,8 @@ import com.example.zavira_movil.retos1vs1.RetoCreadoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreateRequest;
 import com.example.zavira_movil.model.RondaRequest;
 import com.example.zavira_movil.model.RondaResponse;
-import com.example.zavira_movil.model.ParadaRequest;
-import com.example.zavira_movil.model.ParadaResponse;
-import com.example.zavira_movil.model.PreguntasKolb;
+import com.example.zavira_movil.niveleshome.ParadaRequest;
+import com.example.zavira_movil.niveleshome.ParadaResponse;
 
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.zavira_movil.Home;
+package com.example.zavira_movil.niveleshome;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,10 +18,10 @@ import com.example.zavira_movil.R;
 import com.example.zavira_movil.databinding.ActivitySubjectDetailBinding;
 import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
-import com.example.zavira_movil.model.Level;   // ✅ ahora usamos el modelo externo
+import com.example.zavira_movil.model.Level;
 import com.example.zavira_movil.model.Subject;
-import com.google.android.material.button.MaterialButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectDetailActivity extends AppCompatActivity {
@@ -44,17 +44,15 @@ public class SubjectDetailActivity extends AppCompatActivity {
         binding.tvSubjectTitle.setText(subject.title);
         binding.rvLevels.setLayoutManager(new LinearLayoutManager(this));
 
-        // ✅ Registrar primero el launcher
         launcher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && adapter != null) {
-                        adapter.notifyDataSetChanged(); // 🔄 refresca niveles desbloqueados
+                        adapter.notifyDataSetChanged(); // refresca niveles desbloqueados
                     }
                 }
         );
 
-        // ✅ Después crear el adapter y pasarlo al RecyclerView
         adapter = new LevelAdapter(subject.levels, subject, intent -> launcher.launch(intent));
         binding.rvLevels.setAdapter(adapter);
     }
@@ -62,12 +60,12 @@ public class SubjectDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (adapter != null) adapter.notifyDataSetChanged(); // seguridad extra
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 
     /** Lista de niveles 1..5 + Examen Final */
     static class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.VH> {
-        private final List<Level> levels;   // ✅ ahora usamos Level externo
+        private final List<Level> levels;
         private final Subject subject;
         private final OnStartActivity onStartActivity;
 
@@ -91,7 +89,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull VH h, int pos) {
             if (pos < levels.size()) {
-                // ---------------- Niveles normales ----------------
+                // ---------------- Niveles 1..5 ----------------
                 Level l = levels.get(pos);
                 int nivelNumero = pos + 1;
 
@@ -101,7 +99,6 @@ public class SubjectDetailActivity extends AppCompatActivity {
                         : "—";
                 h.tvSubtopic.setText(sub);
 
-                // ✅ usar también userId en ProgressLockManager
                 String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
                 boolean unlocked = ProgressLockManager.isLevelUnlocked(
                         h.itemView.getContext(), userId, subject.title, nivelNumero);
@@ -113,6 +110,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
                 h.btnStart.setOnClickListener(v -> {
                     if (!unlocked) return;
                     Intent i = new Intent(v.getContext(), QuizActivity.class);
+                    // Enviamos textos de UI tal cual (el mapping a API se hace en QuizActivity)
                     i.putExtra(QuizActivity.EXTRA_AREA, subject.title);
                     i.putExtra(QuizActivity.EXTRA_SUBTEMA, sub);
                     i.putExtra(QuizActivity.EXTRA_NIVEL, nivelNumero);
@@ -120,7 +118,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
                 });
 
             } else {
-                // ---------------- Examen Final ----------------
+                // ---------------- Examen Final (Simulacro) ----------------
                 h.tvName.setText("Examen Final");
                 h.tvSubtopic.setText("Simulacro de " + subject.title);
 
@@ -134,8 +132,21 @@ public class SubjectDetailActivity extends AppCompatActivity {
 
                 h.btnStart.setOnClickListener(v -> {
                     if (!unlocked) return;
+
+                    // Construye la lista real de subtemas desde DemoData/levels
+                    ArrayList<String> subs = new ArrayList<>();
+                    if (subject.levels != null) {
+                        for (Level L : subject.levels) {
+                            String st = (L.subtopics != null && !L.subtopics.isEmpty())
+                                    ? L.subtopics.get(0).title : null;
+                            if (st != null && !st.trim().isEmpty()) subs.add(st);
+                        }
+                    }
+
                     Intent i = new Intent(v.getContext(), SimulacroActivity.class);
+                    // Enviamos textos UI; mapping a API se hace en SimulacroActivity
                     i.putExtra("area", subject.title);
+                    i.putStringArrayListExtra("subtemas", subs);
                     onStartActivity.launch(i);
                 });
             }
@@ -147,7 +158,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
 
         static class VH extends RecyclerView.ViewHolder {
             TextView tvName, tvSubtopic;
-            MaterialButton btnStart;
+            com.google.android.material.button.MaterialButton btnStart;
             VH(@NonNull View v) {
                 super(v);
                 tvName = v.findViewById(R.id.tvLevelName);

@@ -14,6 +14,9 @@ import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.Level;
 import com.example.zavira_movil.model.Subject;
+import com.example.zavira_movil.niveleshome.QuizActivity;
+import com.example.zavira_movil.niveleshome.SimulacroActivity;
+import com.example.zavira_movil.niveleshome.SubjectAdapter;
 
 import java.util.List;
 

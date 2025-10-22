@@ -1,6 +1,9 @@
-package com.example.zavira_movil.model;
+package com.example.zavira_movil.niveleshome;
 
 import com.example.zavira_movil.R;
+import com.example.zavira_movil.model.Level;
+import com.example.zavira_movil.model.Subject;
+
 import java.util.*;
 
 public class DemoData {
@@ -33,7 +36,7 @@ public class DemoData {
         // ========================= SOCIALES
         Subject soc = subjectBase("Sociales y ciudadanas", R.drawable.ic_social_24, R.drawable.bg_header_social);
         soc.levels = Arrays.asList(
-                level("Nivel 1", "Geografía"),
+                level("Nivel 1", "Constitución de 1991 y organización del Estado"),
                 level("Nivel 2", "Historia"),
                 level("Nivel 3", "Economía"),
                 level("Nivel 4", "Ciudadanía"),
@@ -77,7 +80,7 @@ public class DemoData {
         return s;
     }
 
-    // ✅ Ahora usamos Level externo, no Subject.Level
+    // Usamos Level externo, no Subject.Level
     private static Level level(String name, String subtopic) {
         Level l = new Level(name);
         l.subtopics.add(new Subject.Subtopic(subtopic));

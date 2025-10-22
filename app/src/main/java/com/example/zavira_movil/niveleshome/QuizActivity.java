@@ -1,4 +1,4 @@
-package com.example.zavira_movil.Home;
+package com.example.zavira_movil.niveleshome;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,13 +7,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.zavira_movil.Home.QuizQuestionsAdapter;
 import com.example.zavira_movil.databinding.ActivityQuizBinding;
 import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.CerrarRequest;
 import com.example.zavira_movil.model.CerrarResponse;
-import com.example.zavira_movil.model.ParadaRequest;
-import com.example.zavira_movil.model.ParadaResponse;
 import com.example.zavira_movil.model.Question;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
@@ -34,7 +33,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private ActivityQuizBinding binding;
     private QuizQuestionsAdapter adapter;
-    private Integer idSesion;
+    private Integer idSesion; // para cerrar
 
     private String areaUi, subtemaUi;
     private int nivel;
@@ -67,12 +66,18 @@ public class QuizActivity extends AppCompatActivity {
         binding.btnEnviar.setEnabled(!b);
     }
 
+    private static Integer toIntOrNull(String s) {
+        try { return (s == null) ? null : Integer.parseInt(s); }
+        catch (Exception e) { return null; }
+    }
+
     /** Crea sesión y pinta preguntas aquí mismo (máximo 10). */
     private void crearParadaYMostrar() {
         setLoading(true);
 
-        final String areaApi    = AreaMapper.toApiArea(areaUi);
-        final String subtemaApi = AreaMapper.normalizeSubtema(subtemaUi);
+        // ÚNICO mapeo UI->API (área/subtema) antes del backend
+        final String areaApi    = MapeadorArea.toApiArea(areaUi);
+        final String subtemaApi = MapeadorArea.normalizeSubtema(subtemaUi);
 
         ApiService api = RetrofitClient.getInstance(this).create(ApiService.class);
         ParadaRequest req = new ParadaRequest(
@@ -86,18 +91,39 @@ public class QuizActivity extends AppCompatActivity {
         api.crearParada(req).enqueue(new Callback<ParadaResponse>() {
             @Override public void onResponse(Call<ParadaResponse> call, Response<ParadaResponse> resp) {
                 setLoading(false);
-                if (!resp.isSuccessful() || resp.body() == null) {
+
+                if (!resp.isSuccessful()) {
                     Toast.makeText(QuizActivity.this,
                             "No se pudo crear la sesión (HTTP " + resp.code() + ")",
                             Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
-                ParadaResponse pr = resp.body();
-                idSesion = (pr.sesion != null) ? pr.sesion.id_sesion : null;
 
-                ArrayList<Question> preguntas = new ArrayList<>();
-                if (pr.preguntas != null) preguntas.addAll(pr.preguntas);
+                ParadaResponse pr = resp.body();
+                if (pr == null) {
+                    Toast.makeText(QuizActivity.this,
+                            "Servidor respondió " + resp.code() + " sin cuerpo JSON.",
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+
+                if (pr.sesion != null) {
+                    idSesion = toIntOrNull(pr.sesion.idSesion);
+                }
+
+                // Recolecta ApiQuestion desde todos los campos posibles
+                ArrayList<ApiQuestion> apiQs = new ArrayList<>();
+                if (pr.preguntas != null) apiQs.addAll(pr.preguntas);
+                if (pr.preguntasPorSubtema != null) apiQs.addAll(pr.preguntasPorSubtema);
+                if (pr.sesion != null) {
+                    if (pr.sesion.preguntas != null) apiQs.addAll(pr.sesion.preguntas);
+                    if (pr.sesion.preguntasPorSubtema != null) apiQs.addAll(pr.sesion.preguntasPorSubtema);
+                }
+
+                // Mapea a tu Question (con Option.key A/B/C/...)
+                ArrayList<Question> preguntas = ApiQuestionMapper.toAppList(apiQs);
 
                 if (preguntas.size() > 10) preguntas = new ArrayList<>(preguntas.subList(0, 10));
                 if (preguntas.isEmpty()) {
@@ -114,8 +140,9 @@ public class QuizActivity extends AppCompatActivity {
 
             @Override public void onFailure(Call<ParadaResponse> call, Throwable t) {
                 setLoading(false);
+                android.util.Log.e("QUIZ", "crearParada error", t);
                 Toast.makeText(QuizActivity.this,
-                        "Error de red: " + t.getMessage(),
+                        "Error de red: " + t.getClass().getSimpleName() + ": " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -152,7 +179,7 @@ public class QuizActivity extends AppCompatActivity {
                 setLoading(false);
                 if (!response.isSuccessful() || response.body() == null) {
                     Toast.makeText(QuizActivity.this,
-                            "No se pudo cerrar la sesión.",
+                            "No se pudo cerrar la sesión (HTTP " + response.code() + ").",
                             Toast.LENGTH_LONG).show();
                     return;
                 }

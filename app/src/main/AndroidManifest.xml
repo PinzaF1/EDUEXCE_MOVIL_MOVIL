@@ -37,13 +37,13 @@
             android:name=".Home.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".Home.SubjectDetailActivity"
+            android:name=".niveleshome.SubjectDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".Home.QuizActivity"
+            android:name=".niveleshome.QuizActivity"
             android:exported="false" />
         <activity
-            android:name=".Home.SimulacroActivity"
+            android:name=".niveleshome.SimulacroActivity"
             android:exported="false" />
 
         <!-- Perfil -->
