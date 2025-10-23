@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.databinding.ActivitySubjectDetailBinding;
-import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.Level;
 import com.example.zavira_movil.model.Subject;
@@ -88,7 +87,7 @@ public class SubjectDetailActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull VH h, int pos) {
-            if (pos < levels.size()) {
+            if (pos < (levels == null ? 0 : levels.size())) {
                 // ---------------- Niveles 1..5 ----------------
                 Level l = levels.get(pos);
                 int nivelNumero = pos + 1;
@@ -123,8 +122,9 @@ public class SubjectDetailActivity extends AppCompatActivity {
                 h.tvSubtopic.setText("Simulacro de " + subject.title);
 
                 String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
+                // IMPORTANTE: ahora sólo se habilita si unlockedLevel >= 6 (aprobó Nivel 5)
                 boolean unlocked = ProgressLockManager.getUnlockedLevel(
-                        h.itemView.getContext(), userId, subject.title) >= 5;
+                        h.itemView.getContext(), userId, subject.title) >= 6;
 
                 h.btnStart.setEnabled(unlocked);
                 h.btnStart.setAlpha(unlocked ? 1f : 0.5f);

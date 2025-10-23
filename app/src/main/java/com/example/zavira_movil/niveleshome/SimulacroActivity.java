@@ -7,12 +7,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.zavira_movil.Home.QuizQuestionsAdapter;
+import com.example.zavira_movil.QuizQuestionsAdapter; // <- TU adapter en el paquete raíz
 import com.example.zavira_movil.databinding.ActivitySimulacroBinding;
-import com.example.zavira_movil.local.ProgressLockManager;
 import com.example.zavira_movil.local.UserSession;
-import com.example.zavira_movil.model.CerrarRequest;
-import com.example.zavira_movil.model.CerrarResponse;
 import com.example.zavira_movil.model.Question;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.remote.ApiService;
@@ -33,8 +30,10 @@ public class SimulacroActivity extends AppCompatActivity {
     private Integer idSesion;
     private int intentosFallidos = 0;
 
-    private String area;                // mapeada a API
-    private List<String> subtemas;      // normalizados
+    // Mantén separadas: UI vs API
+    private String areaUi;              // NOMBRE VISIBLE del área (clave para ProgressLockManager)
+    private String areaApi;             // nombre mapeado a API
+    private List<String> subtemasApi;   // subtemas normalizados para API
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +46,15 @@ public class SimulacroActivity extends AppCompatActivity {
         binding.rvQuestions.setAdapter(adapter);
 
         // Recibe desde UI
-        String areaIn = getIntent().getStringExtra("area");
+        areaUi = getIntent().getStringExtra("area");
         ArrayList<String> subsIn = getIntent().getStringArrayListExtra("subtemas");
-        if (areaIn == null || areaIn.trim().isEmpty()) areaIn = "Sociales y ciudadanas";
+        if (areaUi == null || areaUi.trim().isEmpty()) areaUi = "Sociales y ciudadanas";
         if (subsIn == null) subsIn = new ArrayList<>();
 
         // ÚNICO mapeo UI->API (área/subtema)
-        this.area = MapeadorArea.toApiArea(areaIn);
-        this.subtemas = new ArrayList<>();
-        for (String s : subsIn) this.subtemas.add(MapeadorArea.normalizeSubtema(s));
+        this.areaApi = MapeadorArea.toApiArea(areaUi);
+        this.subtemasApi = new ArrayList<>();
+        for (String s : subsIn) this.subtemasApi.add(MapeadorArea.normalizeSubtema(s));
 
         binding.btnEnviar.setOnClickListener(v -> enviar());
 
@@ -75,7 +74,7 @@ public class SimulacroActivity extends AppCompatActivity {
     private void crearSimulacro() {
         setLoading(true);
 
-        SimulacroRequest req = new SimulacroRequest(area, subtemas);
+        SimulacroRequest req = new SimulacroRequest(areaApi, subtemasApi);
 
         ApiService api = RetrofitClient.getInstance(this).create(ApiService.class);
         api.crearSimulacro(req).enqueue(new Callback<SimulacroResponse>() {
@@ -173,11 +172,13 @@ public class SimulacroActivity extends AppCompatActivity {
                     intentosFallidos++;
                     if (intentosFallidos >= 3) {
                         String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
-                        ProgressLockManager.retrocederNivel(SimulacroActivity.this, userId, area);
+
+                        // Usamos el NOMBRE UI del área para la clave del progreso
+                        ProgressLockManager.retrocederNivel(SimulacroActivity.this, userId, areaUi);
 
                         intentosFallidos = 0;
                         int nivelActual = ProgressLockManager.getUnlockedLevel(
-                                SimulacroActivity.this, userId, area
+                                SimulacroActivity.this, userId, areaUi
                         );
                         Toast.makeText(SimulacroActivity.this,
                                 "⚠️ Retrocedes un nivel. Nivel actual: " + nivelActual,
