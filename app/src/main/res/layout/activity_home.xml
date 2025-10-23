@@ -5,33 +5,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Top bar -->
+    <!-- BACKDROP SOLO EN EL HEADER (recortado al área visible de EduExce) -->
+    <FrameLayout
+        android:id="@+id/backdropHost"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/topbar_mask"
+        android:clipToOutline="true"
+        app:layout_constraintBottom_toBottomOf="@id/topBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Imagen tenue que se “asoma” SOLO dentro del header -->
+        <ImageView
+            android:id="@+id/ivParallax"
+            android:layout_width="427dp"
+            android:layout_height="match_parent"
+            android:alpha="0.08"
+            android:scaleType="centerCrop"
+            android:src="@drawable/fondoconocimiento" />
+
+        <!-- Degradado MUY sutil pegado al borde inferior del header -->
+        <View
+            android:id="@+id/overlayFade"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            android:alpha="0"
+            android:background="@drawable/fade_header_overlay" />
+    </FrameLayout>
+
+    <!-- Top bar (misma estructura, con campana a la derecha) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="80dp"
         app:cardCornerRadius="18dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:strokeWidth="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- ancho ajustado para que quepa la campana -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
-            android:paddingEnd="12dp">
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:id="@+id/ivAppLogo"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_logo_z"
-                android:contentDescription="@string/app_name"/>
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/iconoeduexce" />
 
+            <!-- El texto ocupa el espacio disponible -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -46,20 +81,46 @@
                     android:text="EduExce"
                     android:textColor="#1E293B"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/tvSubtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Plataforma ICFES"
-                    android:textColor="#6B7280"
-                    android:textSize="13sp"/>
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <!-- Campana de notificación -->
+            <FrameLayout
+                android:id="@+id/btnBell"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/ivBell"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/bell"/>
+
+                <!-- Badge opcional (oculto por defecto) -->
+                <TextView
+                    android:id="@+id/badgeBell"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/bg_badge_dot"
+                    android:gravity="center"
+                    android:text="3"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:visibility="gone"/>
+            </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- RecyclerView ÚNICO (simulacro + materias con ConcatAdapter) -->
+    <!-- RecyclerView ÚNICO (simulacro + materias) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSubjects"
         android:layout_width="0dp"
