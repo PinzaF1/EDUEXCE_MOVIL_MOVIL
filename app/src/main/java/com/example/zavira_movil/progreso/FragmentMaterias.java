@@ -13,9 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
-import com.example.zavira_movil.adapter.ProgresoAdapter;
-import com.example.zavira_movil.model.MateriaDetalle;
-import com.example.zavira_movil.model.MateriasResponse;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 

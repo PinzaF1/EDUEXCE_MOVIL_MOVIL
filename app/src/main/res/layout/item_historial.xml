@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Fila principal: materia + botón + % -->
+    <!-- Fila principal: materia + botón + % + flecha -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,15 +24,7 @@
             android:textColor="@color/text_primary" />
 
         <!-- Botón para ver detalle -->
-        <Button
-            android:id="@+id/btnDetalle"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:minWidth="0dp"
-            android:paddingLeft="14dp"
-            android:paddingRight="14dp"
-            android:text="Detalle"
-            android:textColor="@android:color/white" />
+
 
         <!-- Porcentaje al lado -->
         <TextView
@@ -42,7 +35,17 @@
             android:text="40%"
             android:textStyle="bold"
             android:textSize="14sp"
-            android:textColor="@color/text_primary"/>
+            android:textColor="@color/text_primary" />
+
+        <!-- Flecha (vector compatible) -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivFlecha"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="10dp"
+            android:contentDescription="@string/ver_detalle"
+            app:srcCompat="@drawable/ic_chevron_right_24"
+            android:tint="?attr/colorOnSurface" />
     </LinearLayout>
 
     <!-- Nivel -->
@@ -52,7 +55,7 @@
         android:layout_height="wrap_content"
         android:text="Básico"
         android:textColor="@color/text_secondary"
-        android:layout_marginTop="6dp"/>
+        android:layout_marginTop="6dp" />
 
     <!-- Fecha -->
     <TextView

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.zavira_movil.databinding.ActivityLevelDetailBinding;
 import com.example.zavira_movil.model.Level;   // ✅ Importar el modelo externo
 import com.example.zavira_movil.model.Subject;
+import com.example.zavira_movil.niveleshome.SubtopicAdapter;
 
 /**
  * Muestra el detalle de un nivel (progreso + lista de subtemas).

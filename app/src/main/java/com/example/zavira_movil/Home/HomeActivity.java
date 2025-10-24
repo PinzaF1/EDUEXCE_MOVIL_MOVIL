@@ -1,19 +1,24 @@
 package com.example.zavira_movil.Home;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.Perfil.ProfileActivity;
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.databinding.ActivityHomeBinding;
-import com.example.zavira_movil.model.DemoData;
+import com.example.zavira_movil.niveleshome.DemoData;
+import com.example.zavira_movil.niveleshome.SubjectAdapter;
 import com.example.zavira_movil.ui.ranking.RankingLogrosFragment;
 import com.example.zavira_movil.ui.ranking.progreso.ProgresoFragment;
 import com.example.zavira_movil.ui.ranking.progreso.RetosFragment;
@@ -23,6 +28,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActivityHomeBinding binding;
     private SubjectAdapter adapter;
+    private ImageView ivBackdrop; // lo mantengo como lo tenías
+    private LinearLayoutManager lm;
 
     private final ActivityResultLauncher<Intent> launcher =
             registerForActivityResult(
@@ -46,6 +53,98 @@ public class HomeActivity extends AppCompatActivity {
         binding.rvSubjects.setLayoutManager(new LinearLayoutManager(this));
         adapter = new SubjectAdapter(DemoData.getSubjects(), intent -> launcher.launch(intent));
         binding.rvSubjects.setAdapter(adapter);
+
+        // ---------- Fondo del header dinámico SOLO en el encabezado ----------
+        final ImageView ivParallax = findViewById(R.id.ivParallax);
+        final View overlayFade     = findViewById(R.id.overlayFade);
+        final View topBar          = findViewById(R.id.topBar);
+        final RecyclerView rv      = findViewById(R.id.rvSubjects);
+
+        // Imagen inicial: conocimiento (queda lista, pero oculta hasta que una tarjeta toque el header)
+        ivParallax.setImageResource(R.drawable.fondoconocimiento);
+        ivParallax.setAlpha(0f);
+        overlayFade.setAlpha(0f);
+
+        // Blur leve (Android 12+)
+        if (android.os.Build.VERSION.SDK_INT >= 31) {
+            ivParallax.setRenderEffect(
+                    android.graphics.RenderEffect.createBlurEffect(12f, 12f,
+                            android.graphics.Shader.TileMode.CLAMP)
+            );
+        }
+
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            Drawable lastDrawable = null;
+
+            @Override public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
+                super.onScrolled(rv, dx, dy);
+
+                RecyclerView.LayoutManager _lm = rv.getLayoutManager();
+                if (!(_lm instanceof LinearLayoutManager)) return;
+
+                int firstPos = ((LinearLayoutManager) _lm).findFirstVisibleItemPosition();
+                View first = ((LinearLayoutManager) _lm).findViewByPosition(firstPos);
+                if (first == null) {
+                    // Nada visible si no hay tarjeta visible
+                    ivParallax.setAlpha(0f);
+                    overlayFade.setAlpha(0f);
+                    return;
+                }
+
+                // ¿La tarjeta ya "tocó" el borde inferior del header?
+                int[] vLoc = new int[2];
+                int[] bLoc = new int[2];
+                first.getLocationOnScreen(vLoc);
+                topBar.getLocationOnScreen(bLoc);
+
+                int barBottom = bLoc[1] + topBar.getHeight();
+                int overlap   = barBottom - vLoc[1]; // > 0 cuando cruzó el header
+
+                if (overlap <= 0) {
+                    // Mientras no toque el header, no se ve nada
+                    ivParallax.setAlpha(0f);
+                    overlayFade.setAlpha(0f);
+                    return;
+                }
+
+                // Se nota un poquito más:
+                // - Fondo (imagen de la tarjeta) hasta 0.42
+                // - Velo blanco hasta 0.72
+                int maxPx = dp(56);
+                float imgA  = Math.min(1f, overlap / (float) maxPx) * 0.42f;
+                float veloA = Math.min(1f, overlap / (float) maxPx) * 0.72f;
+                ivParallax.setAlpha(imgA);
+                overlayFade.setAlpha(veloA);
+
+                // Tomar la imagen del header (flHeader) de la tarjeta que está tocando
+                View flHeader = first.findViewById(R.id.flHeader);
+                Drawable d = null;
+                if (flHeader != null) {
+                    // Si el header tiene un ImageView (tu SubjectAdapter lo añade como child 0)
+                    if (flHeader instanceof android.widget.FrameLayout
+                            && ((android.widget.FrameLayout) flHeader).getChildCount() > 0) {
+                        View child0 = ((android.widget.FrameLayout) flHeader).getChildAt(0);
+                        if (child0 instanceof ImageView) {
+                            d = ((ImageView) child0).getDrawable();
+                        }
+                    }
+                    // O intenta con el background del header si no hay hijo ImageView
+                    if (d == null) d = flHeader.getBackground();
+                }
+
+                // Fallback para el item 0 (Conocimiento)
+                if (d == null && firstPos == 0) {
+                    d = getDrawable(R.drawable.fondoconocimiento);
+                }
+
+                // Evita reasignar si es el mismo drawable (previene flicker)
+                if (d != null && d != lastDrawable) {
+                    ivParallax.setImageDrawable(d);
+                    lastDrawable = d;
+                }
+            }
+        });
+        // --------------------------------------------------------------------
 
         // Bottom navigation
         setupBottomNav(binding.bottomNav);
@@ -71,7 +170,6 @@ public class HomeActivity extends AppCompatActivity {
             // PERFIL es una Activity (no Fragment)
             if (id == R.id.nav_perfil) {
                 startActivity(new Intent(this, ProfileActivity.class));
-                // devuelve false para no cambiar la selección del bottom nav
                 return false;
             }
 
@@ -94,8 +192,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private void applyTabVisibility(boolean isIslas) {
         binding.rvSubjects.setVisibility(isIslas ? View.VISIBLE : View.GONE);
-        // 👇 ya NO existe btnIslaSimulacro: no lo toques aquí
-        // binding.btnIslaSimulacro.setVisibility(...);
     }
 
     private void show(Fragment f) {
@@ -104,5 +200,9 @@ public class HomeActivity extends AppCompatActivity {
                 .setReorderingAllowed(true)
                 .replace(R.id.fragmentContainer, f)
                 .commit();
+    }
+
+    private int dp(int v) {
+        return (int) (getResources().getDisplayMetrics().density * v);
     }
 }

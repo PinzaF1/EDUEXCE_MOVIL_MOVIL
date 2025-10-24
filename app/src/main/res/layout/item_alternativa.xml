@@ -1,0 +1,16 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:padding="12dp"
+    android:background="@drawable/bg_alt_neutro"
+    android:layout_marginTop="6dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tvTexto"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <ImageView
+        android:id="@+id/ivCheck"
+        android:src="@drawable/ic_check" android:visibility="gone"
+        android:layout_width="20dp" android:layout_height="20dp"/>
+</LinearLayout>

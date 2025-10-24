@@ -2,35 +2,63 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardSimulacro"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:layout_marginBottom="12dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="18dp"
+    app:cardCornerRadius="16dp"
     app:cardUseCompatPadding="true"
-    app:cardElevation="2dp">
+    app:cardElevation="3dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeWidth="2dp"
+    app:strokeColor="#E0E3EA"
+    app:rippleColor="@android:color/transparent">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_simulacro_purple_light"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- HEADER = SOLO IMAGEN (igual que las materias) -->
+        <FrameLayout
+            android:id="@+id/flHeader"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_height="120dp">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                app:srcCompat="@drawable/ic_exam"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/fondoconocimiento"
                 android:contentDescription="@string/app_name"/>
+        </FrameLayout>
+
+        <!-- CONTENIDO ABAJO: icono + título -->
+        <LinearLayout
+            android:id="@+id/rowInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:gravity="center_vertical"
+            android:background="@android:color/white"
+            android:foreground="?attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@+id/ivIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/conocimientop"/>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -40,27 +68,38 @@
                 android:paddingStart="10dp">
 
                 <TextView
+                    android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Isla del Conocimiento"
+                    android:text="Prueba de Conocimiento"
                     android:textStyle="bold"
                     android:textSize="16sp"
-                    android:textColor="#1F1147"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Simulacro (2 modos)"
-                    android:textSize="12sp"
-                    android:textColor="#EDE7F6"/>
+                    android:textColor="#1F2937"/>
             </LinearLayout>
 
+            <!--
             <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                app:srcCompat="@drawable/ic_chevron_right_dark"
-                android:tint="#1F1147"
+                android:id="@+id/ivArrow"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chevron_right_dark"
                 android:contentDescription="@string/app_name"/>
+            -->
         </LinearLayout>
-    </FrameLayout>
+
+        <!-- (Opcional) barra de progreso -->
+        <!--
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="#6C5CE7"
+            android:backgroundTint="#E0E0E0"/>
+        -->
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">EduExce</string>
     <string name="expandir">Expandir</string>
+    <string name="back">Atrás</string>
+    <string name="ver_detalle">Ver detalle</string>
+    <item name="tag_header_image" type="id"/>
 </resources>

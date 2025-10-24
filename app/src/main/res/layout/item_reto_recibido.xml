@@ -23,12 +23,32 @@
         android:textColor="@color/text_muted"
         android:layout_marginTop="2dp"/>
 
-    <Button
-        android:id="@+id/btnAceptar"
+    <!-- Botones lado a lado -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
-        android:text="Aceptar reto"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_button_primary"
-        android:textColor="@android:color/white"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <!-- RECHAZAR (outline) -->
+        <Button
+            android:id="@+id/btnRechazar"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:text="Rechazar"
+            android:background="@drawable/bg_button_rechazar"
+            android:textColor="@color/text_primary" />
+
+        <!-- ACEPTAR (tu botón existente) -->
+        <Button
+            android:id="@+id/btnAceptar"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:text="Aceptar reto"
+            android:background="@drawable/bg_button_primary"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
 </LinearLayout>
