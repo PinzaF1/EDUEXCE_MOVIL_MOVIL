@@ -45,7 +45,9 @@
         <activity
             android:name=".niveleshome.SimulacroActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".HislaConocimiento.IslasActivity"
+            android:exported="false" />
         <!-- Perfil -->
         <activity
             android:name=".Perfil.ProfileActivity"
@@ -53,15 +55,15 @@
 
         <!-- Islas / Simulacros -->
         <activity
-            android:name=".Home.IslaSimulacroActivity"
+            android:name=".HislaConocimiento.IslaSimulacroActivity"
             android:exported="false"
             android:label="Simulacro Isla" />
         <activity
-            android:name=".Home.IslaPreguntasActivity"
+            android:name=".HislaConocimiento.IslaPreguntasActivity"
             android:exported="false"
             android:label="Preguntas Simulacro" />
         <activity
-            android:name=".Home.IslaResultadoActivity"
+            android:name=".HislaConocimiento.IslaResultadoActivity"
             android:exported="false"
             android:label="Resultados Simulacro" />
         <activity
@@ -86,6 +88,8 @@
         <activity
             android:name=".ResultActivity"
             android:exported="false" />
+
+        <activity android:name=".HislaConocimiento.IslaModalityActivity" android:exported="false" />
 
         <!-- FileProvider para guardar la foto tomada en cache/ -->
         <provider

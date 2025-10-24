@@ -1,35 +1,50 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:gravity="center_horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/white"
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvGlobal"
-        android:text="Puntaje Global"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tvDetalle"
-        android:text="Resultados por área"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:text="¡Simulacro Completado!"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-    <Button
-        android:id="@+id/btnRepetir"
-        android:text="Repetir Simulacro"
-        android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tvModo"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:textColor="#666"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-    <Button
-        android:id="@+id/btnFinalizar"
-        android:text="Finalizar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+        <TextView
+            android:text="Puntuación Global"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tvGlobal"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1E88E5"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="Resultados por Área"
+            android:layout_marginTop="20dp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/contAreas"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>

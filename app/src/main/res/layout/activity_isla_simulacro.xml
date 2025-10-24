@@ -1,35 +1,36 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="20dp"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-    <TextView
-        android:text="Isla del Conocimiento"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <RadioButton
-        android:id="@+id/rbFacil"
-        android:text="Modalidad Fácil (sin límite de tiempo)"
-        android:checked="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <RadioButton
-        android:id="@+id/rbDificil"
-        android:text="Modalidad Difícil (1 minuto por pregunta)"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <Button
-        android:id="@+id/btnIniciar"
-        android:text="Iniciar Simulacro"
-        android:layout_marginTop="30dp"
+    <!-- Lista de preguntas -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:clipToPadding="false" />
+
+    <!-- Mensaje vacío / errores (401, sin datos, etc.) -->
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Cargando…"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:padding="24dp"
+        android:visibility="gone" />
+
+    <!-- Indicador de carga -->
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</FrameLayout>
