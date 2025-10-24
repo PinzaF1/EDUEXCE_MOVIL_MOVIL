@@ -32,10 +32,10 @@ public class PreguntasAdapter extends RecyclerView.Adapter<PreguntasAdapter.VH> 
         return new VH(v);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         AceptarRetoResponse.Pregunta p = data.get(pos);
-
         h.tvEnunciado.setText(p.enunciado != null ? p.enunciado : "Pregunta sin texto");
 
         StringBuilder meta = new StringBuilder();
@@ -44,6 +44,7 @@ public class PreguntasAdapter extends RecyclerView.Adapter<PreguntasAdapter.VH> 
         if (p.dificultad != null) meta.append(" • ").append(p.dificultad);
         h.tvMeta.setText(meta.toString());
 
+        // ⬇️ ahora son strings
         h.optionsAdapter.submit(p.opciones, null);
     }
 

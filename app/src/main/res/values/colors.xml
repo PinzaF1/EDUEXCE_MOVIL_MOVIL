@@ -115,6 +115,11 @@
     <color name="level_row_title">#111827</color>
     <color name="level_row_sub">#6B7280</color>
     <color name="brand_blue">#2563EB</color>
+    <color name="primaryyy">#004AAD</color>
+
+    <color name="asimilador_bg">#C0DBEF</color>     <!-- Fondo celeste claro -->
+    <color name="asimilador_border">#B1D1E7</color> <!-- Borde celeste más intenso -->
+
 
 
 

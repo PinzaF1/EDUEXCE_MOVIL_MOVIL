@@ -101,7 +101,8 @@ public class FragmentQuiz extends Fragment {
         tvIndex.setText("Pregunta " + (index + 1) + "/" + data.preguntas.size());
         tvPregunta.setText(p.enunciado != null ? p.enunciado : "Pregunta sin texto");
 
-        List<AceptarRetoResponse.Opcion> opciones = new ArrayList<>();
+        // ⬇️ ahora p.opciones es List<String>
+        List<String> opciones = new ArrayList<>();
         if (p.opciones != null) opciones.addAll(p.opciones);
 
         String sel = marcadas.get(index);

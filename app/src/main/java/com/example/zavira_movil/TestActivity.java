@@ -1,15 +1,21 @@
 package com.example.zavira_movil;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.example.zavira_movil.Home.HomeActivity;
 import com.example.zavira_movil.model.KolbRequest;
@@ -29,6 +35,8 @@ public class TestActivity extends AppCompatActivity {
 
     private LinearLayout container;
     private Button btnEnviar;
+    private ProgressBar progressBar;
+    private TextView tvProgresoBloque;
 
     private final List<PreguntasKolb> preguntas = new ArrayList<>();
     private final android.util.SparseIntArray respuestas = new android.util.SparseIntArray();
@@ -39,7 +47,13 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         container = findViewById(R.id.questionsContainer);
-        btnEnviar  = findViewById(R.id.btnEnviar);
+        btnEnviar = findViewById(R.id.btnEnviar);
+        progressBar = findViewById(R.id.progressBloque);
+        tvProgresoBloque = findViewById(R.id.tvProgresoBloque);
+
+        // Barra de progreso vacía
+        progressBar.setProgress(0);
+        tvProgresoBloque.setText("Progreso: 0 / 25");
 
         btnEnviar.setOnClickListener(v -> enviar());
         cargar();
@@ -55,7 +69,8 @@ public class TestActivity extends AppCompatActivity {
 
         ApiService api = RetrofitClient.getInstance(this).create(ApiService.class);
         api.getPreguntas().enqueue(new Callback<List<PreguntasKolb>>() {
-            @Override public void onResponse(Call<List<PreguntasKolb>> c, Response<List<PreguntasKolb>> r) {
+            @Override
+            public void onResponse(Call<List<PreguntasKolb>> c, Response<List<PreguntasKolb>> r) {
                 btnEnviar.setText("Enviar respuestas");
                 if (!r.isSuccessful() || r.body() == null) {
                     toast("No se pudieron cargar las preguntas (" + r.code() + ")");
@@ -67,7 +82,8 @@ public class TestActivity extends AppCompatActivity {
                 btnEnviar.setEnabled(true);
             }
 
-            @Override public void onFailure(Call<List<PreguntasKolb>> c, Throwable t) {
+            @Override
+            public void onFailure(Call<List<PreguntasKolb>> c, Throwable t) {
                 btnEnviar.setText("Enviar respuestas");
                 toast("Error al cargar: " + t.getMessage());
             }
@@ -76,41 +92,89 @@ public class TestActivity extends AppCompatActivity {
 
     private void render() {
         container.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
 
         for (int i = 0; i < preguntas.size(); i++) {
             PreguntasKolb p = preguntas.get(i);
 
+            // CARD por cada pregunta
+            CardView card = new CardView(this);
+            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            cardParams.setMargins(0, 16, 0, 16);
+            card.setLayoutParams(cardParams);
+            card.setRadius(18f);
+            card.setCardElevation(6f);
+            card.setUseCompatPadding(true);
+            card.setCardBackgroundColor(getResources().getColor(android.R.color.white));
+
+            LinearLayout inner = new LinearLayout(this);
+            inner.setOrientation(LinearLayout.VERTICAL);
+            inner.setPadding(24, 24, 24, 24);
+
             TextView titulo = new TextView(this);
             titulo.setText(p.getTitulo() != null ? p.getTitulo() : p.getTipo_pregunta());
-            titulo.setTextSize(15);
+            titulo.setTextSize(16);
+            titulo.setTextColor(getResources().getColor(R.color.primaryyy));
+            titulo.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 
             TextView enunciado = new TextView(this);
             enunciado.setText(p.getPregunta());
-            enunciado.setTextSize(14);
+            enunciado.setTextSize(15);
+            enunciado.setTextColor(getResources().getColor(android.R.color.black));
+            enunciado.setPadding(0, 8, 0, 16);
 
             RadioGroup group = new RadioGroup(this);
             group.setOrientation(RadioGroup.VERTICAL);
+
             for (int v = 1; v <= 4; v++) {
                 RadioButton rb = new RadioButton(this);
-                rb.setText(String.valueOf(v));
+                rb.setText("Opción " + v);
                 rb.setTag(v);
+                rb.setTextColor(getResources().getColor(R.color.primaryyy));
                 group.addView(rb);
             }
 
             final int idx = i;
             group.setOnCheckedChangeListener((gr, id) -> {
                 RadioButton rb = gr.findViewById(id);
-                if (rb != null) respuestas.put(idx, (int) rb.getTag());
+                if (rb != null) {
+                    respuestas.put(idx, (int) rb.getTag());
+                    actualizarProgreso();
+                }
             });
 
-            container.addView(titulo);
-            container.addView(enunciado);
-            container.addView(group);
+            inner.addView(titulo);
+            inner.addView(enunciado);
+            inner.addView(group);
+            card.addView(inner);
+            container.addView(card);
+
+            card.startAnimation(anim);
         }
     }
 
+    private void actualizarProgreso() {
+        int respondidas = 0;
+        for (int i = 0; i < preguntas.size(); i++) {
+            if (respuestas.get(i, 0) != 0) respondidas++;
+        }
+
+        int total = 25;
+        int porcentaje = (int) ((respondidas / (float) total) * 100);
+
+        ObjectAnimator anim = ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), porcentaje);
+        anim.setDuration(500);
+        anim.start();
+
+        tvProgresoBloque.setText("Progreso: " + respondidas + " / " + total);
+    }
+
     private void enviar() {
-        int total = preguntas.size(); // normalmente 36
+        int total = preguntas.size();
         for (int i = 0; i < total; i++) {
             if (respuestas.get(i, 0) == 0) {
                 toast("Responde todas antes de enviar");
@@ -118,12 +182,11 @@ public class TestActivity extends AppCompatActivity {
             }
         }
 
-        // Armamos { respuestas: [{ id_item, valor }, ...] }
         List<KolbRequest.Item> items = new ArrayList<>(total);
         for (int i = 0; i < total; i++) {
             PreguntasKolb p = preguntas.get(i);
-            int idPregunta = p.getId_pregunta_estilo_aprendizajes(); // <-- asegúrate que tu modelo tenga este getter
-            int valorElegido = respuestas.get(i);                    // 1..4
+            int idPregunta = p.getId_pregunta_estilo_aprendizajes();
+            int valorElegido = respuestas.get(i);
             items.add(new KolbRequest.Item(idPregunta, valorElegido));
         }
 
@@ -134,7 +197,8 @@ public class TestActivity extends AppCompatActivity {
         KolbRequest body = new KolbRequest(items);
 
         api.guardarRespuestas(body).enqueue(new Callback<KolbResponse>() {
-            @Override public void onResponse(Call<KolbResponse> c, Response<KolbResponse> r) {
+            @Override
+            public void onResponse(Call<KolbResponse> c, Response<KolbResponse> r) {
                 btnEnviar.setEnabled(true);
                 btnEnviar.setText("Enviar respuestas");
 
@@ -144,15 +208,15 @@ public class TestActivity extends AppCompatActivity {
                 }
 
                 KolbResponse k = r.body();
-                // Lanza tu pantalla de resultados
                 Intent i = new Intent(TestActivity.this, ResultActivity.class);
-                i.putExtra("estilo",          k.getEstiloDominante());
+                i.putExtra("estilo", k.getEstiloDominante());
                 i.putExtra("caracteristicas", k.getCaracteristicas());
                 i.putExtra("recomendaciones", k.getRecomendaciones());
                 startActivity(i);
             }
 
-            @Override public void onFailure(Call<KolbResponse> c, Throwable t) {
+            @Override
+            public void onFailure(Call<KolbResponse> c, Throwable t) {
                 btnEnviar.setEnabled(true);
                 btnEnviar.setText("Enviar respuestas");
                 toast("Fallo: " + t.getMessage());
@@ -160,7 +224,6 @@ public class TestActivity extends AppCompatActivity {
         });
     }
 
-    // Por si quieres navegar a Home luego
     private void goToHome() {
         Intent i = new Intent(this, HomeActivity.class);
         startActivity(i);
