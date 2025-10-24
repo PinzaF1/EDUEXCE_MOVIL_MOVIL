@@ -3,6 +3,8 @@ package com.example.zavira_movil.Perfil;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
@@ -15,9 +17,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.zavira_movil.R;
@@ -58,7 +61,7 @@ public class PerfilFragment extends Fragment {
     private FragmentPerfilBinding binding;
     private ApiService api;
 
-    // ID del usuario (PUT /movil/perfil/{id} y para foto por usuario)
+    // ID del usuario
     private Integer perfilUserId = null;
 
     // Cámara/Galería
@@ -71,7 +74,7 @@ public class PerfilFragment extends Fragment {
     private static final String PREFS_NAME = "perfil_prefs";
     private static final String KEY_FOTO_PATH_BASE = "foto_path";
     private static final String TMP_KEY = KEY_FOTO_PATH_BASE + "_tmp";
-    private static final String AVATAR_FILE_BASE = "avatar"; // avatar_<id>.jpg
+    private static final String AVATAR_FILE_BASE = "avatar";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,14 +111,12 @@ public class PerfilFragment extends Fragment {
 
         api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
 
-        // 1) Intentar obtener el id desde el JWT
+        // Intentar obtener id del JWT
         perfilUserId = getUserIdFromToken();
 
-        // Foto: picker
+        // Foto
         binding.icon.setOnClickListener(v -> showPickerDialog());
-
-        // Cargar lo que haya (si no hay id aún, usa clave y archivo temporales)
-        cargarFotoPreferida(/*remoteUrl=*/null);
+        cargarFotoPreferida(null);
 
         // Editar info personal
         binding.rowEditarPerfil.setOnClickListener(v -> {
@@ -128,10 +129,38 @@ public class PerfilFragment extends Fragment {
 
         cargarPerfil();
         cargarKolb();
+
+        // Fila "Estilo de aprendizaje" -> diálogo con borde azul
+        binding.rowKolbTrigger.setOnClickListener(v -> showKolbDialog());
+    }
+
+    // ===================== Diálogo de Estilo de Aprendizaje (cuadro azul) =====================
+    private void showKolbDialog() {
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_kolb, null, false);
+
+        // Pasa los datos ya cargados en la pantalla
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvEstiloSheet))
+                .setText(binding.tvEstilo.getText());
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvFechaSheet))
+                .setText(binding.tvFechaKolb.getText());
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvCaracteristicasSheet))
+                .setText(binding.tvCaracteristicas.getText());
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvRecomendacionesSheet))
+                .setText(binding.tvRecomendaciones.getText());
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setView(dialogView);
+        final AlertDialog dialog = builder.create();
+
+        // Fondo transparente para que se vea el bg con borde azul del layout
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        dialog.show();
     }
 
     // ===================== ID =====================
-
     @Nullable
     private Integer getUserIdFromToken() {
         try {
@@ -172,22 +201,7 @@ public class PerfilFragment extends Fragment {
         return null;
     }
 
-    // ===================== Helpers foto por usuario =====================
-
-    private String prefsKeyForUser() {
-        return (perfilUserId == null) ? TMP_KEY : KEY_FOTO_PATH_BASE + "_" + perfilUserId;
-    }
-
-    private String fileNameForUser() {
-        return (perfilUserId == null) ? AVATAR_FILE_BASE + "_tmp.jpg" : AVATAR_FILE_BASE + "_" + perfilUserId + ".jpg";
-    }
-
-    private File absoluteFileForUser() {
-        return new File(requireContext().getFilesDir(), fileNameForUser());
-    }
-
     // ===================== Cámara / Galería =====================
-
     private void showPickerDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Foto de perfil")
@@ -224,13 +238,11 @@ public class PerfilFragment extends Fragment {
     }
 
     private void setPhoto(@NonNull Uri uri) {
-        // Mostrar de inmediato
         Glide.with(requireContext())
                 .load(uri)
                 .placeholder(R.drawable.usuario)
                 .into(binding.icon);
 
-        // Guardar archivo por-usuario y persistir ruta
         File saved = copyUriToInternalFile(uri, fileNameForUser());
         if (saved != null) guardarPathFoto(saved.getAbsolutePath());
     }
@@ -252,20 +264,11 @@ public class PerfilFragment extends Fragment {
         }
     }
 
-    /**
-     * Orden de carga:
-     * 1) Buscar ruta en SharedPrefs por-usuario (o tmp).
-     * 2) Si no hay o no existe el archivo, buscar directamente el archivo avatar_<id>.jpg;
-     *    si existe, mostrarlo y reconstruir la preferencia.
-     * 3) Si tampoco, usar remoteUrl (si viene).
-     * 4) Si nada, robot.
-     */
     private void cargarFotoPreferida(@Nullable String remoteUrl) {
-        var sp   = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String k = prefsKeyForUser();
         String path = sp.getString(k, null);
 
-        // 1) Preferencia existente
         if (path != null) {
             File f = new File(path);
             if (f.exists()) {
@@ -276,23 +279,31 @@ public class PerfilFragment extends Fragment {
             }
         }
 
-        // 2) Archivo por convención (por si borraron las prefs al cerrar sesión)
         File byName = absoluteFileForUser();
         if (byName.exists()) {
             Glide.with(this).load(byName).placeholder(R.drawable.usuario).into(binding.icon);
-            // reconstruir preferencia
             sp.edit().putString(k, byName.getAbsolutePath()).apply();
             return;
         }
 
-        // 3) URL remota del backend
         if (remoteUrl != null && !remoteUrl.trim().isEmpty() && !"null".equalsIgnoreCase(remoteUrl.trim())) {
             Glide.with(this).load(remoteUrl.trim()).placeholder(R.drawable.usuario).into(binding.icon);
             return;
         }
 
-        // 4) Placeholder
         binding.icon.setImageResource(R.drawable.usuario);
+    }
+
+    private String prefsKeyForUser() {
+        return (perfilUserId == null) ? TMP_KEY : KEY_FOTO_PATH_BASE + "_" + perfilUserId;
+    }
+
+    private String fileNameForUser() {
+        return (perfilUserId == null) ? AVATAR_FILE_BASE + "_tmp.jpg" : AVATAR_FILE_BASE + "_" + perfilUserId + ".jpg";
+    }
+
+    private File absoluteFileForUser() {
+        return new File(requireContext().getFilesDir(), fileNameForUser());
     }
 
     private void guardarPathFoto(@NonNull String absolutePath) {
@@ -303,7 +314,7 @@ public class PerfilFragment extends Fragment {
     }
 
     private void eliminarFotoLocal() {
-        var sp   = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String k = prefsKeyForUser();
         String path = sp.getString(k, null);
 
@@ -315,33 +326,33 @@ public class PerfilFragment extends Fragment {
     }
 
     // ===================== Perfil / Kolb =====================
-
     private void cargarPerfil() {
         api.getPerfilEstudiante().enqueue(new Callback<Estudiante>() {
             @Override public void onResponse(Call<Estudiante> call, Response<Estudiante> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) { logHttpError("PROFILE_PERFIL", resp); return; }
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    logHttpError("PROFILE_PERFIL", resp);
+                    return;
+                }
                 Estudiante e = resp.body();
 
-                // Migración TMP -> id real si acabamos de conocer el id
+                // Asegurar id para la foto local
                 Integer oldId = perfilUserId;
                 if (perfilUserId == null) perfilUserId = guessIdFromPerfil(e);
                 if (oldId == null && perfilUserId != null) {
                     var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                     String tmpPath = sp.getString(TMP_KEY, null);
                     if (tmpPath != null) {
-                        // mueve la preferencia a la key por usuario (el archivo ya está en /files)
-                        sp.edit()
-                                .remove(TMP_KEY)
-                                .putString(prefsKeyForUser(), tmpPath)
-                                .apply();
+                        sp.edit().remove(TMP_KEY).putString(prefsKeyForUser(), tmpPath).apply();
                     }
                 }
 
-                // Decide foto (local por-usuario > archivo por nombre > remota > robot)
+                // Foto remota/local
                 cargarFotoPreferida(e.getFotoUrl());
 
+                // Habilitar edición si hay id
                 binding.rowEditarPerfil.setEnabled(perfilUserId != null);
 
+                // Campos en pantalla
                 binding.tvInstitucion.setText(safe(e.getNombreInstitucion()));
                 binding.tvNombre.setText(safe(e.getNombreUsuario()) + " " + safe(e.getApellido()));
                 binding.tvDocumento.setText(safe(e.getNumeroDocumento()));
@@ -352,29 +363,35 @@ public class PerfilFragment extends Fragment {
                 binding.tvCorreo.setText(safe(e.getCorreo()));
                 binding.tvTelefono.setText(safe(e.getTelefono()));
                 binding.tvDireccion.setText(safe(e.getDireccion()));
-                String estado = (e.getIsActive() != null && e.getIsActive()) ? "Activo" : "Inactivo";
-                binding.tvEstado.setText(estado);
+                // Si necesitas mostrar estado: (no hay TextView en el layout actual)
+                // String estado = (e.getIsActive() != null && e.getIsActive()) ? "Activo" : "Inactivo";
             }
-            @Override public void onFailure(Call<Estudiante> call, Throwable t) { Log.e("PROFILE_PERFIL_FAIL", "onFailure", t); }
+            @Override public void onFailure(Call<Estudiante> call, Throwable t) {
+                Log.e("PROFILE_PERFIL_FAIL", "onFailure", t);
+            }
         });
     }
 
     private void cargarKolb() {
         api.obtenerResultado().enqueue(new Callback<KolbResultado>() {
             @Override public void onResponse(Call<KolbResultado> call, Response<KolbResultado> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) { logHttpError("PROFILE_KOLB", resp); return; }
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    logHttpError("PROFILE_KOLB", resp);
+                    return;
+                }
                 KolbResultado r = resp.body();
                 binding.tvEstilo.setText(safe(r.getEstilo()));
                 binding.tvFechaKolb.setText(formatearFechaFlexible(r.getFecha()));
                 binding.tvCaracteristicas.setText(limpiarTexto(r.getCaracteristicas()));
                 binding.tvRecomendaciones.setText(limpiarTexto(r.getRecomendaciones()));
             }
-            @Override public void onFailure(Call<KolbResultado> call, Throwable t) { Log.e("PROFILE_KOLB_FAIL", "onFailure", t); }
+            @Override public void onFailure(Call<KolbResultado> call, Throwable t) {
+                Log.e("PROFILE_KOLB_FAIL", "onFailure", t);
+            }
         });
     }
 
     // ===================== Editar contacto =====================
-
     private void abrirEditorContacto() {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View content = LayoutInflater.from(requireContext()).inflate(R.layout.editar_infopersonal, null, false);
@@ -446,7 +463,6 @@ public class PerfilFragment extends Fragment {
     }
 
     // ===================== Utilidades =====================
-
     private static void logHttpError(String tag, Response<?> response) {
         try {
             ResponseBody err = response.errorBody();
@@ -458,7 +474,8 @@ public class PerfilFragment extends Fragment {
 
     private static String limpiarTexto(String s) {
         if (s == null) return "-";
-        String out = s.replace("\\t", " ").replace("\t", " ").replace("\\n", "\n").replace("\r", "");
+        String out = s.replace("\\t", " ").replace("\t", " ")
+                .replace("\\n", "\n").replace("\r", "");
         out = out.trim();
         return out.isEmpty() ? "-" : out;
     }
