@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Contenido principal: header + métricas + tabs + pager -->
+    <!-- Contenido principal -->
     <LinearLayout
         android:id="@+id/mainContent"
         android:orientation="vertical"
@@ -12,46 +12,69 @@
         android:layout_height="match_parent"
         android:background="@color/bg_page">
 
-
-
-        <!-- Métricas -->
+        <!-- Sección Métricas (solo 2) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:layout_margin="12dp"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="12dp"
+            android:background="@drawable/bg_orange_pink"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
 
-            android:background="@drawable/bg_card"
-            android:orientation="horizontal">
-
+            <!-- Victorias -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:orientation="horizontal"
                 android:gravity="center">
-                <TextView style="@style/MetricNumber" android:text="12" />
-                <TextView style="@style/MetricLabel" android:text="Victorias" />
+
+                <TextView
+                    android:id="@+id/tvVictorias"
+                    style="@style/MetricNumber"
+                    android:text="0" />
+
+                <TextView
+                    style="@style/MetricLabel"
+                    android:layout_marginStart="4dp"
+                    android:text="Victorias"
+                    android:textColor="@color/black" />
             </LinearLayout>
 
+            <!-- Ícono Espadas -->
+            <ImageView
+                android:id="@+id/iconSwords"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginHorizontal="12dp"
+                android:src="@drawable/espadaa" />
+
+            <!-- Derrotas -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:orientation="horizontal"
                 android:gravity="center">
-                <TextView style="@style/MetricNumber" android:text="3" />
-                <TextView style="@style/MetricLabel" android:text="Derrotas" />
+
+                <TextView
+                    android:id="@+id/tvDerrotas"
+                    style="@style/MetricNumber"
+                    android:text="0" />
+
+                <TextView
+                    style="@style/MetricLabel"
+                    android:layout_marginStart="4dp"
+                    android:text="Derrotas"
+                    android:textColor="@color/black" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-                <TextView style="@style/MetricNumber" android:text="80%" />
-                <TextView style="@style/MetricLabel" android:text="Precisión" />
-            </LinearLayout>
         </LinearLayout>
 
+        <!-- TabLayout -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
@@ -62,14 +85,16 @@
             app:tabIndicatorHeight="3dp"
             android:layout_marginHorizontal="12dp" />
 
+        <!-- ViewPager -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
+
     </LinearLayout>
 
-    <!-- Overlay de navegación para Quiz/Resultados -->
+    <!-- Overlay Quiz / Resultados -->
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"

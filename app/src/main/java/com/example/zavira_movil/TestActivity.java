@@ -53,7 +53,7 @@ public class TestActivity extends AppCompatActivity {
 
         // Barra de progreso vacía
         progressBar.setProgress(0);
-        tvProgresoBloque.setText("Progreso: 0 / 25");
+        tvProgresoBloque.setText("Progreso: 0 / 36");
 
         btnEnviar.setOnClickListener(v -> enviar());
         cargar();

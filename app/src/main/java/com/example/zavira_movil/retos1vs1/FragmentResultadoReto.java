@@ -11,7 +11,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.zavira_movil.R;
+import com.example.zavira_movil.remote.ApiService;
+import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.gson.Gson;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FragmentResultadoReto extends Fragment {
 
@@ -85,7 +91,50 @@ public class FragmentResultadoReto extends Fragment {
         tvYouPoints.setText(String.valueOf(youPts));
         tvOppPoints.setText(String.valueOf(oppPts));
 
-        btnVolver.setOnClickListener(view -> volverARetos());
+        // 🔔 Refresca el banner apenas abren resultados
+        actualizarMarcadorEnBanner(null);
+
+        btnVolver.setOnClickListener(view -> {
+            // 🔔 Y también al cerrar
+            actualizarMarcadorEnBanner(null);
+            volverARetos();
+        });
+    }
+
+    private void actualizarMarcadorEnBanner(@Nullable Integer idSesion) {
+        if (!isAdded()) return;
+
+        final TextView tvVictorias = findMetricViewSafely(R.id.tvVictorias);
+        final TextView tvDerrotas  = findMetricViewSafely(R.id.tvDerrotas);
+        if (tvVictorias == null && tvDerrotas == null) return;
+
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+        Call<MarcadorResponse> call = (idSesion != null)
+                ? api.marcadorPorSesion(idSesion)
+                : api.marcador();
+
+        call.enqueue(new Callback<MarcadorResponse>() {
+            @Override public void onResponse(Call<MarcadorResponse> c, Response<MarcadorResponse> r) {
+                if (!isAdded() || r.body() == null || !r.isSuccessful()) return;
+                if (tvVictorias != null) tvVictorias.setText(String.valueOf(r.body().victorias));
+                if (tvDerrotas  != null) tvDerrotas.setText(String.valueOf(r.body().derrotas));
+            }
+            @Override public void onFailure(Call<MarcadorResponse> c, Throwable t) { }
+        });
+    }
+
+    @Nullable
+    private TextView findMetricViewSafely(int id) {
+        Fragment parent = getParentFragment();
+        if (parent != null && parent.getView() != null) {
+            View v = parent.getView().findViewById(id);
+            if (v instanceof TextView) return (TextView) v;
+        }
+        if (getActivity() != null) {
+            View v = getActivity().findViewById(id);
+            if (v instanceof TextView) return (TextView) v;
+        }
+        return null;
     }
 
     private void volverARetos() {

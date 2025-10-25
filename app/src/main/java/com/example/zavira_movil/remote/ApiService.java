@@ -22,6 +22,7 @@ import com.example.zavira_movil.model.RankingResponse;
 import com.example.zavira_movil.model.LogrosResponse;
 import com.example.zavira_movil.model.OtorgarAreaRequest;
 import com.example.zavira_movil.model.OtorgarAreaResponse;
+import com.example.zavira_movil.retos1vs1.MarcadorResponse;
 import com.example.zavira_movil.retos1vs1.RetoListItem;
 import com.example.zavira_movil.oponente.OpponentBackend;
 
@@ -51,6 +52,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -162,6 +164,18 @@ public interface ApiService {
 
     @GET("movil/retos/oponentes")
     Call<List<OpponentBackend>> listarOponentes();
+
+
+    // Marcador por usuario (token)
+    @GET("movil/retos/marcador")
+    Call<MarcadorResponse> marcador();
+
+    // Marcador por sesión (si el backend lo soporta como query param; si no, simplemente lo ignorará)
+    @GET("movil/retos/marcador")
+    Call<MarcadorResponse> marcadorPorSesion(@Query("id_sesion") Integer idSesion);
+
+
+
 
     // ---------- Ranking / Logros ----------
     @GET("movil/ranking")

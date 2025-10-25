@@ -1,6 +1,6 @@
+// app/src/main/java/com/example/zavira_movil/retos1vs1/FragmentQuiz.java
 package com.example.zavira_movil.retos1vs1;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -43,11 +43,15 @@ public class FragmentQuiz extends Fragment {
     private int index = 0;
     private final Map<Integer, String> marcadas = new HashMap<>();
 
-    private TextView tvIndex, tvPregunta;
-    private Button btnPrev, btnNext;
+    private TextView tvLeft, tvIndex, tvRight, tvPregunta;
+    private Button btnNext;
     private OptionAdapter optionsAdapter;
 
-    @Nullable @Override
+    private long startMillis;
+    private int tiempoTotalSeg;
+
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_quiz, container, false);
     }
@@ -56,14 +60,22 @@ public class FragmentQuiz extends Fragment {
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
+        // IDs EXACTOS de tu XML
+        tvLeft     = v.findViewById(R.id.txtLeft);
         tvIndex    = v.findViewById(R.id.txtIndex);
+        tvRight    = v.findViewById(R.id.txtRight);
         tvPregunta = v.findViewById(R.id.txtPregunta);
         btnNext    = v.findViewById(R.id.btnNext);
 
+        if (tvLeft != null)  tvLeft.setText("Tú");
+        if (tvRight != null) tvRight.setText("Oponente");
+
         RecyclerView rv = v.findViewById(R.id.optionsList);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.setHasFixedSize(true);
+
         optionsAdapter = new OptionAdapter(key -> {
-            marcadas.put(index, key);
+            marcadas.put(index, key);          // key = "A","B","C","D" según posición
             if (btnNext != null) btnNext.setEnabled(true);
         });
         rv.setAdapter(optionsAdapter);
@@ -83,36 +95,67 @@ public class FragmentQuiz extends Fragment {
         data = new Gson().fromJson(aceptarJson, AceptarRetoResponse.class);
         render();
 
-        if (btnPrev != null) btnPrev.setOnClickListener(v1 -> { if (index > 0) { index--; render(); } });
-        if (btnNext != null) btnNext.setOnClickListener(v12 -> {
-            if (!marcadas.containsKey(index)) {
-                Toast.makeText(getContext(), "Selecciona una opción", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (index < data.preguntas.size() - 1) { index++; render(); }
-            else { enviarRonda(); }
-        });
+        startMillis = System.currentTimeMillis();
+
+        if (btnNext != null) {
+            btnNext.setOnClickListener(v12 -> {
+                if (!marcadas.containsKey(index)) {
+                    Toast.makeText(getContext(), "Selecciona una opción", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (index < data.preguntas.size() - 1) {
+                    index++;
+                    render();
+                } else {
+                    enviarRonda();
+                }
+            });
+        }
     }
 
     private void render() {
         if (data == null || data.preguntas == null || data.preguntas.isEmpty()) return;
 
         AceptarRetoResponse.Pregunta p = data.preguntas.get(index);
-        tvIndex.setText("Pregunta " + (index + 1) + "/" + data.preguntas.size());
-        tvPregunta.setText(p.enunciado != null ? p.enunciado : "Pregunta sin texto");
 
-        // ⬇️ ahora p.opciones es List<String>
-        List<String> opciones = new ArrayList<>();
-        if (p.opciones != null) opciones.addAll(p.opciones);
+        if (tvIndex != null) {
+            tvIndex.setText("Pregunta " + (index + 1) + "/" + data.preguntas.size());
+        }
+        if (tvPregunta != null) {
+            tvPregunta.setText(p.enunciado != null ? p.enunciado : "Pregunta sin texto");
+        }
 
-        String sel = marcadas.get(index);
-        optionsAdapter.submit(opciones, sel);
+        // --- Construir SIEMPRE List<String> para tu OptionAdapter ---
+        List<String> opTexts = buildOptionTexts(p);
 
-        if (btnPrev != null) btnPrev.setEnabled(index > 0);
+        String sel = marcadas.get(index);            // "A", "B", ...
+        optionsAdapter.submit(opTexts, sel);         // <-- ahora coincide con tu adapter
+
         if (btnNext != null) {
             btnNext.setText(index == data.preguntas.size() - 1 ? "Finalizar" : "Siguiente");
             btnNext.setEnabled(sel != null);
         }
+    }
+
+    /** Convierte p.opciones (strings u objetos) en List<String> de textos visibles */
+    private List<String> buildOptionTexts(AceptarRetoResponse.Pregunta p) {
+        List<String> list = new ArrayList<>();
+        if (p == null || p.opciones == null) return list;
+
+        // p.opciones puede ser List<AceptarRetoResponse.Opcion> (con .text/.key) o ya ser strings si usaste el TypeAdapter
+        List<?> raw = (List<?>) (Object) p.opciones; // cast ancho por si la deserialización varía
+        for (Object any : raw) {
+            if (any instanceof AceptarRetoResponse.Opcion) {
+                AceptarRetoResponse.Opcion o = (AceptarRetoResponse.Opcion) any;
+                String text = (o.text != null) ? o.text : (o.key != null ? o.key : "");
+                list.add(text);
+            } else if (any instanceof String) {
+                list.add((String) any);
+            } else {
+                list.add(String.valueOf(any));
+            }
+        }
+        return list;
     }
 
     private String flagKey() {
@@ -122,11 +165,14 @@ public class FragmentQuiz extends Fragment {
 
     private void marcarEntregada() {
         if (!isAdded() || TextUtils.isEmpty(idReto)) return;
-        requireContext().getSharedPreferences("retos1v1", Context.MODE_PRIVATE)
+        requireContext().getSharedPreferences("retos1v1", android.content.Context.MODE_PRIVATE)
                 .edit().putBoolean(flagKey(), true).apply();
     }
 
     private void enviarRonda() {
+        tiempoTotalSeg = (int) ((System.currentTimeMillis() - startMillis) / 1000L);
+
+        // El backend espera la opción marcada por clave (A/B/C/D...), que guarda tu OptionAdapter
         List<RondaRequest.Item> items = new ArrayList<>();
         for (int i = 0; i < data.preguntas.size(); i++) {
             String key = marcadas.get(i);
@@ -134,17 +180,19 @@ public class FragmentQuiz extends Fragment {
         }
 
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
-        api.responderRonda(new RondaRequest(idSesion, items))
-                .enqueue(new Callback<RondaResponse>() {
-                    @Override public void onResponse(Call<RondaResponse> call, Response<RondaResponse> resp) {
-                        marcarEntregada();
-                        consultarEstado();
-                    }
-                    @Override public void onFailure(Call<RondaResponse> call, Throwable t) {
-                        marcarEntregada();
-                        consultarEstado();
-                    }
-                });
+        RondaRequest payload = new RondaRequest(idSesion, items);
+        payload.tiempoTotalSeg = tiempoTotalSeg;
+
+        api.responderRonda(payload).enqueue(new Callback<RondaResponse>() {
+            @Override public void onResponse(Call<RondaResponse> call, Response<RondaResponse> resp) {
+                marcarEntregada();
+                consultarEstado();
+            }
+            @Override public void onFailure(Call<RondaResponse> call, Throwable t) {
+                marcarEntregada();
+                consultarEstado();
+            }
+        });
     }
 
     private void consultarEstado() {
@@ -157,7 +205,10 @@ public class FragmentQuiz extends Fragment {
 
                     Bundle b = new Bundle();
                     b.putString("estadoJson", new Gson().toJson(e));
-                    b.putInt("totalPreguntas", (data != null && data.preguntas != null) ? data.preguntas.size() : 25);
+                    b.putInt("totalPreguntas",
+                            (data != null && data.preguntas != null) ? data.preguntas.size() : 25);
+                    b.putInt("idSesion", idSesion);
+                    b.putInt("tiempoTotalSeg", tiempoTotalSeg);
 
                     FragmentResultadoReto f = new FragmentResultadoReto();
                     f.setArguments(b);

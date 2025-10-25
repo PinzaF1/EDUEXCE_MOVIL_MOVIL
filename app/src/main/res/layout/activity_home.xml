@@ -86,15 +86,6 @@
 
             <!-- Campana de notificación -->
 
-            <ImageView
-                android:id="@+id/ivBell"
-                android:layout_width="51dp"
-                android:layout_height="47dp"
-                android:contentDescription="@string/app_name"
-                android:padding="10dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/bell" />
-
             <FrameLayout
                 android:id="@+id/btnBell"
                 android:layout_width="40dp"
@@ -117,6 +108,15 @@
                     android:textColor="@android:color/white"
                     android:textSize="10sp"
                     android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/ivBell"
+                    android:layout_width="51dp"
+                    android:layout_height="47dp"
+                    android:contentDescription="@string/app_name"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/notif" />
             </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

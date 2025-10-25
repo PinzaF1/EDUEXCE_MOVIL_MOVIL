@@ -32,7 +32,6 @@
             android:textStyle="bold"
             android:textColor="#222222" />
 
-        <!-- OJO: id corregido -->
         <TextView
             android:id="@+id/txtRight"
             android:layout_width="0dp"
@@ -59,7 +58,8 @@
         android:id="@+id/optionsList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:overScrollMode="ifContentScrolls" />
 
     <!-- Navegación: Anterior y Siguiente -->
     <LinearLayout
@@ -70,17 +70,26 @@
         android:layout_marginBottom="10dp"
         android:weightSum="2">
 
+        <Button
+            android:id="@+id/btnPrev"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:backgroundTint="#9E9E9E"
+            android:text="Anterior"
+            android:textColor="@android:color/white"
+            android:enabled="false" />
 
         <Button
             android:id="@+id/btnNext"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginStart="6dp"
             android:layout_weight="1"
+            android:layout_marginStart="6dp"
             android:backgroundTint="#3F51B5"
-            android:enabled="false"
-            android:gravity="center"
             android:text="Siguiente"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:enabled="false" />
     </LinearLayout>
 </LinearLayout>
