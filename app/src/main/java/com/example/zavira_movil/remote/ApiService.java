@@ -182,4 +182,14 @@ public interface ApiService {
             @Path("id") int id,
             @Body com.example.zavira_movil.Perfil.EditarPerfilRequest body
     );
+
+    // ---------- Recuperación de Contraseña ----------
+    @POST("estudiante/recuperar/solicitar")
+    Call<BasicResponse> solicitarCodigoRecuperacion(@Body com.example.zavira_movil.resetpassword.SolicitarCodigoRequest body);
+
+    @POST("estudiante/recuperar/verificar")
+    Call<BasicResponse> verificarCodigoRecuperacion(@Body com.example.zavira_movil.resetpassword.VerificarCodigoRequest body);
+
+    @POST("estudiante/recuperar/restablecer")
+    Call<BasicResponse> restablecerPassword(@Body com.example.zavira_movil.resetpassword.RestablecerPasswordRequest body);
 }
