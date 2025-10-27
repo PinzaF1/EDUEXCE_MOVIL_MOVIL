@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -9,25 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:paddingBottom="500dp">
+        android:padding="16dp">
 
-        <!-- ====== Tarjeta encabezado ====== -->
+        <!-- Cabecera centrada -->
         <LinearLayout
             android:id="@+id/headerCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_header_card"
-            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:padding="16dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
                 <TextView
                     android:id="@+id/tvTitle"
@@ -36,94 +35,87 @@
                     android:text="🏆 Ranking y Logros"
                     android:textColor="#1F2937"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:layout_marginTop="3dp"/>
 
                 <TextView
                     android:id="@+id/tvSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:text="Compite, aprende y consigue insignias"
                     android:textColor="#6B7280"
                     android:textSize="13sp"
-                    android:layout_marginTop="2dp"/>
+                    android:gravity="center"
+                    android:textAlignment="center" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ====== Tabs (con selectors) ====== -->
-        <LinearLayout
-            android:id="@+id/tabs"
+        <!-- Tabs + Indicador -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:padding="6dp"
             android:layout_marginBottom="12dp">
 
-            <TextView
-                android:id="@+id/tabRanking"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Ranking"
-                android:textStyle="bold"
-                android:background="@drawable/tab_bg_selector"
-                android:textColor="@color/black"/>
+                android:orientation="horizontal"
+                android:padding="6dp">
 
-            <Space
-                android:layout_width="8dp"
-                android:layout_height="match_parent" />
+                <TextView
+                    android:id="@+id/tabRanking"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Ranking"
+                    android:textStyle="bold"
+                    android:background="@drawable/tab_bg_selector"
+                    android:textColor="@color/black"/>
 
-            <TextView
-                android:id="@+id/tabLogros"
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/tabLogros"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Logros"
+                    android:textStyle="bold"
+                    android:background="@drawable/tab_bg_selector"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <View
+                android:id="@+id/tabIndicator"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Logros"
-                android:textStyle="bold"
-                android:background="@drawable/tab_bg_selector"
-                android:textColor="@color/black"/>
-        </LinearLayout>
+                android:layout_height="3dp"
+                android:layout_gravity="bottom"
+                android:background="#2563EB"/>
+        </FrameLayout>
 
-        <!-- ======= Vista Ranking ======= -->
+        <!-- Vista Ranking -->
         <LinearLayout
             android:id="@+id/viewRanking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Top 5 Mejores Estudiantes"
-                android:layout_marginTop="10dp"
-                android:textColor="#1F2937"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/bg_top_card"
-                android:padding="4dp">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTop"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:nestedScrollingEnabled="false" />
-            </LinearLayout>
-
-            <!-- Tu Posición -->
+            <!-- Tu Posición (PRIMERO) -->
             <LinearLayout
                 android:id="@+id/cardActual"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="14dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_edittext">
 
                 <TextView
@@ -141,12 +133,20 @@
                     android:gravity="center_vertical"
                     android:paddingTop="10dp">
 
+                    <!-- FOTO (opcional) -->
+                    <ImageView
+                        android:id="@+id/ivUserPhoto"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:visibility="gone" />
+
+                    <!-- Iniciales (fallback) -->
                     <TextView
                         android:id="@+id/tvUserInitials"
                         android:layout_width="44dp"
                         android:layout_height="44dp"
                         android:gravity="center"
-                        android:background="@drawable/bg_estilo2"
+                        android:background="@drawable/azul"
                         android:text="JP"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
@@ -194,9 +194,36 @@
                         android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- Título Top 5 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Top 5 Mejores Estudiantes"
+                android:layout_marginTop="16dp"
+                android:textColor="#1F2937"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Lista Top 5 (DESPUÉS) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/posiciones"
+                android:padding="4dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTop"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- ======= Vista Mis Logros ======= -->
+
+        <!-- Vista Logros -->
         <LinearLayout
             android:id="@+id/viewLogros"
             android:layout_width="match_parent"
@@ -225,6 +252,3 @@
 
     </LinearLayout>
 </ScrollView>
-
-
-

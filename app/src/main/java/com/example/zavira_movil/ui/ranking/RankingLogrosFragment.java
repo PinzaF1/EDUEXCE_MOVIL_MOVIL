@@ -34,6 +34,9 @@ public class RankingLogrosFragment extends Fragment {
     private RecyclerView rvTop, rvBadges;
     private TextView tvUserInitials, tvUserName, tvUserRank, tvUserPoints;
 
+    // Barra indicadora
+    private View tabIndicator;
+
     private final List<RankingResponse.Item> top = new ArrayList<>();
     private TopAdapter adapter;
 
@@ -50,26 +53,32 @@ public class RankingLogrosFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
+        // IMPORTANTE: usa la versión con contexto (consistente con tu otro código)
         RetrofitClient.init(requireContext());
-        api = RetrofitClient.getInstance().create(ApiService.class);
+        api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
 
         bindViews(v);
         setupRecycler();
         setupTabs();
 
-        // Estado inicial: Ranking activo
+        // Estado inicial
         setActiveTab(true);
+
+        // Inicializar la barra cuando ya están medidos los tabs
+        v.post(() -> initIndicator(tabRanking, false));
 
         loadRanking();
     }
 
     private void bindViews(View root) {
-        tabRanking = root.findViewById(R.id.tabRanking);
-        tabLogros  = root.findViewById(R.id.tabLogros);
+        tabRanking   = root.findViewById(R.id.tabRanking);
+        tabLogros    = root.findViewById(R.id.tabLogros);
+        tabIndicator = root.findViewById(R.id.tabIndicator);
+
         viewRanking = root.findViewById(R.id.viewRanking);
         viewLogros  = root.findViewById(R.id.viewLogros);
 
-        rvTop = root.findViewById(R.id.rvTop);
+        rvTop    = root.findViewById(R.id.rvTop);
         rvBadges = root.findViewById(R.id.rvBadges);
 
         tvUserInitials = root.findViewById(R.id.tvUserInitials);
@@ -79,19 +88,25 @@ public class RankingLogrosFragment extends Fragment {
     }
 
     private void setupTabs() {
-        tabRanking.setOnClickListener(v -> setActiveTab(true));
+        tabRanking.setOnClickListener(v -> {
+            setActiveTab(true);
+            updateIndicator(tabRanking, true);
+        });
         tabLogros.setOnClickListener(v -> {
             setActiveTab(false);
+            updateIndicator(tabLogros, true);
             if (!badgesLoaded) { loadBadges(); badgesLoaded = true; }
         });
     }
 
-    /** Alterna vistas y estados visuales de los tabs (usa drawable selectors). */
+    /** Alterna vistas y estados visuales de los tabs */
     private void setActiveTab(boolean rankingActive) {
         viewRanking.setVisibility(rankingActive ? View.VISIBLE : View.GONE);
         viewLogros.setVisibility(rankingActive ? View.GONE : View.VISIBLE);
         tabRanking.setSelected(rankingActive);
         tabLogros.setSelected(!rankingActive);
+
+        updateIndicator(rankingActive ? tabRanking : tabLogros, false);
     }
 
     private void setupRecycler() {
@@ -105,31 +120,27 @@ public class RankingLogrosFragment extends Fragment {
         rvBadges.setAdapter(badgesAdapter);
     }
 
-    /** Carga ranking y asegura que el usuario actual aparezca en el cuadro blanco. */
+    /** Carga ranking y pinta la tarjeta del usuario */
     private void loadRanking() {
         api.getRanking().enqueue(new Callback<RankingResponse>() {
             @Override
-            public void onResponse(@NonNull Call<RankingResponse> call,
-                                   @NonNull Response<RankingResponse> resp) {
+            public void onResponse(@NonNull Call<RankingResponse> call, @NonNull Response<RankingResponse> resp) {
                 if (!resp.isSuccessful() || resp.body() == null) {
                     Toast.makeText(requireContext(), "No se pudo cargar ranking", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 RankingResponse data = resp.body();
 
-                // ----- 1) Top del servidor -----
+                // 1) Top del servidor
                 top.clear();
-                if (data.getTop5() != null) {
-                    top.addAll(data.getTop5());   // puede venir 4 o 5
-                }
+                if (data.getTop5() != null) top.addAll(data.getTop5());
 
-                // ----- 2) Encontrar "yo" en posiciones -----
+                // 2) Encontrar "yo"
                 RankingResponse.Item me = null;
                 if (data.getPosiciones() != null) {
                     for (RankingResponse.Item it : data.getPosiciones()) {
                         if (it.getPosicion() != null && it.getPosicion().equals(data.getPosicion())) {
-                            me = it;
-                            break;
+                            me = it; break;
                         }
                     }
                 }
@@ -137,25 +148,21 @@ public class RankingLogrosFragment extends Fragment {
                     me = data.getPosiciones().get(0); // fallback
                 }
 
-                // ----- 3) Si "yo" no estoy en el Top y hay espacio, agregar como #5 -----
+                // 3) Asegurar "yo" en top5 si no está
                 if (me != null) {
                     boolean yaEsta = false;
                     for (RankingResponse.Item it : top) {
-                        if (equalsIgnoreCaseSafe(it.getNombre(), me.getNombre())) {
-                            yaEsta = true;
-                            break;
-                        }
+                        if (equalsIgnoreCaseSafe(it.getNombre(), me.getNombre())) { yaEsta = true; break; }
                     }
                     if (!yaEsta) {
-                        // Asegura que como máximo quedemos en 5: si ya hay 5, recorta a 4 y agrega "yo".
                         while (top.size() > 4) top.remove(top.size() - 1);
-                        if (top.size() < 5) top.add(me); // ahora "yo" quedo como último (#5)
+                        if (top.size() < 5) top.add(me);
                     }
                 }
 
                 adapter.notifyDataSetChanged();
 
-                // ----- 4) Pintar tarjeta "Tu Posición Actual" -----
+                // 4) Pintar tarjeta usuario
                 if (me != null) {
                     String nombre = me.getNombre() == null ? "Estudiante" : me.getNombre();
                     tvUserName.setText(nombre);
@@ -182,13 +189,11 @@ public class RankingLogrosFragment extends Fragment {
         });
     }
 
-    // Utilidad para comparar nombres con null-safety
     private static boolean equalsIgnoreCaseSafe(String a, String b) {
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
         return a.trim().equalsIgnoreCase(b.trim());
     }
-
 
     private void loadBadges() {
         api.getMisLogros().enqueue(new Callback<LogrosResponse>() {
@@ -203,15 +208,11 @@ public class RankingLogrosFragment extends Fragment {
                 List<BadgesAdapter.Row> rows = new ArrayList<>();
                 if (data.getObtenidas() != null && !data.getObtenidas().isEmpty()) {
                     rows.add(BadgesAdapter.Row.header("Obtenidas"));
-                    for (LogrosResponse.Badge b : data.getObtenidas()) {
-                        rows.add(BadgesAdapter.Row.item(b, true));
-                    }
+                    for (LogrosResponse.Badge b : data.getObtenidas()) rows.add(BadgesAdapter.Row.item(b, true));
                 }
                 rows.add(BadgesAdapter.Row.header("Pendientes"));
                 if (data.getPendientes() != null) {
-                    for (LogrosResponse.Badge b : data.getPendientes()) {
-                        rows.add(BadgesAdapter.Row.item(b, false));
-                    }
+                    for (LogrosResponse.Badge b : data.getPendientes()) rows.add(BadgesAdapter.Row.item(b, false));
                 }
                 badgesAdapter.setData(rows);
             }
@@ -223,8 +224,36 @@ public class RankingLogrosFragment extends Fragment {
         });
     }
 
-    /** =================== Top 5 Adapter (fila azul clara) =================== */
+    /* ======= Helpers barra indicadora ======= */
+    private void initIndicator(TextView selectedTab, boolean animate) {
+        if (tabIndicator == null || selectedTab == null) return;
+        ViewGroup.LayoutParams lp = tabIndicator.getLayoutParams();
+        lp.width = selectedTab.getWidth();
+        tabIndicator.setLayoutParams(lp);
+        if (animate) {
+            tabIndicator.animate().translationX(selectedTab.getX()).setDuration(200).start();
+        } else {
+            tabIndicator.setTranslationX(selectedTab.getX());
+        }
+    }
+
+    private void updateIndicator(TextView targetTab, boolean animate) {
+        if (tabIndicator == null || targetTab == null) return;
+        ViewGroup.LayoutParams lp = tabIndicator.getLayoutParams();
+        if (lp.width != targetTab.getWidth()) {
+            lp.width = targetTab.getWidth();
+            tabIndicator.setLayoutParams(lp);
+        }
+        if (animate) {
+            tabIndicator.animate().translationX(targetTab.getX()).setDuration(200).start();
+        } else {
+            tabIndicator.setTranslationX(targetTab.getX());
+        }
+    }
+
+    /** =================== Top 5 Adapter =================== */
     private static class TopAdapter extends RecyclerView.Adapter<TopAdapter.VH> {
+
         private final List<RankingResponse.Item> data;
         TopAdapter(List<RankingResponse.Item> d) { this.data = d; }
 
@@ -239,7 +268,8 @@ public class RankingLogrosFragment extends Fragment {
             }
         }
 
-        @NonNull @Override
+        @NonNull
+        @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_top_student, parent, false);
@@ -247,19 +277,25 @@ public class RankingLogrosFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull VH h, int pos) {
-            RankingResponse.Item it = data.get(pos);
-            h.tvRank.setText("#" + (pos + 1));
+        public void onBindViewHolder(@NonNull VH h, int position) {
+            RankingResponse.Item it = data.get(position);
+
+            int rank = position + 1;
+            h.tvRank.setText(String.valueOf(rank));
 
             String nombre = (it.getNombre() == null || it.getNombre().trim().isEmpty()) ? "—" : it.getNombre();
             h.tvName.setText(nombre);
 
-            int puntos = it.getPromedio(); // si es Integer, cámbialo a Integer y maneja null
-            h.tvPointsSmall.setText(puntos + " pts");
+            int puntos = it.getPromedio();
             h.tvPointsRight.setText(String.valueOf(puntos));
+            if (h.tvPointsSmall != null) {
+                h.tvPointsSmall.setText("Puntos");
+            }
         }
 
         @Override
-        public int getItemCount() { return data == null ? 0 : data.size(); }
+        public int getItemCount() {
+            return (data == null) ? 0 : data.size();
+        }
     }
 }

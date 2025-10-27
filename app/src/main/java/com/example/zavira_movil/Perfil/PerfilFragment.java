@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,9 +19,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.zavira_movil.R;
@@ -38,9 +39,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,8 +61,6 @@ public class PerfilFragment extends Fragment {
 
     private FragmentPerfilBinding binding;
     private ApiService api;
-
-    // ID del usuario
     private Integer perfilUserId = null;
 
     // Cámara/Galería
@@ -70,7 +69,6 @@ public class PerfilFragment extends Fragment {
     private ActivityResultLauncher<Uri> takePictureLauncher;
     private ActivityResultLauncher<String> pickImageLauncher;
 
-    // Persistencia de foto
     private static final String PREFS_NAME = "perfil_prefs";
     private static final String KEY_FOTO_PATH_BASE = "foto_path";
     private static final String TMP_KEY = KEY_FOTO_PATH_BASE + "_tmp";
@@ -110,15 +108,11 @@ public class PerfilFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
-
-        // Intentar obtener id del JWT
         perfilUserId = getUserIdFromToken();
 
-        // Foto
         binding.icon.setOnClickListener(v -> showPickerDialog());
         cargarFotoPreferida(null);
 
-        // Editar info personal
         binding.rowEditarPerfil.setOnClickListener(v -> {
             if (perfilUserId == null) {
                 android.widget.Toast.makeText(requireContext(), "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
@@ -130,16 +124,16 @@ public class PerfilFragment extends Fragment {
         cargarPerfil();
         cargarKolb();
 
-        // Fila "Estilo de aprendizaje" -> diálogo con borde azul
         binding.rowKolbTrigger.setOnClickListener(v -> showKolbDialog());
     }
 
-    // ===================== Diálogo de Estilo de Aprendizaje (cuadro azul) =====================
+    // ---------------- Diálogo Kolb ----------------
     private void showKolbDialog() {
+        // Inflar el layout del diálogo
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialog_kolb, null, false);
 
-        // Pasa los datos ya cargados en la pantalla
+        // Pasar datos al layout
         ((android.widget.TextView) dialogView.findViewById(R.id.tvEstiloSheet))
                 .setText(binding.tvEstilo.getText());
         ((android.widget.TextView) dialogView.findViewById(R.id.tvFechaSheet))
@@ -149,18 +143,34 @@ public class PerfilFragment extends Fragment {
         ((android.widget.TextView) dialogView.findViewById(R.id.tvRecomendacionesSheet))
                 .setText(binding.tvRecomendaciones.getText());
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
-        builder.setView(dialogView);
-        final AlertDialog dialog = builder.create();
+        // Construir sin botones del builder (el botón está en el XML)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogView)
+                .create();
 
-        // Fondo transparente para que se vea el bg con borde azul del layout
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
+        // Click en "Cerrar" (definido en el XML)
+        View btnCerrar = dialogView.findViewById(R.id.btnCerrarSheet);
+        if (btnCerrar != null) btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+        // Fullscreen como una página
+        dialog.setOnShowListener(dlg -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setLayout(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                );
+                // Fondo blanco de página
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            }
+        });
+
+        dialog.setCanceledOnTouchOutside(true);
         dialog.show();
     }
 
-    // ===================== ID =====================
+
+
+    // ---------------- Util para ID ----------------
     @Nullable
     private Integer getUserIdFromToken() {
         try {
@@ -201,7 +211,7 @@ public class PerfilFragment extends Fragment {
         return null;
     }
 
-    // ===================== Cámara / Galería =====================
+    // ---------------- Cámara/Galería ----------------
     private void showPickerDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Foto de perfil")
@@ -325,7 +335,7 @@ public class PerfilFragment extends Fragment {
         binding.icon.setImageResource(R.drawable.usuario);
     }
 
-    // ===================== Perfil / Kolb =====================
+    // ---------------- Perfil / Kolb ----------------
     private void cargarPerfil() {
         api.getPerfilEstudiante().enqueue(new Callback<Estudiante>() {
             @Override public void onResponse(Call<Estudiante> call, Response<Estudiante> resp) {
@@ -335,36 +345,48 @@ public class PerfilFragment extends Fragment {
                 }
                 Estudiante e = resp.body();
 
-                // Asegurar id para la foto local
-                Integer oldId = perfilUserId;
+                // Asegurar id
                 if (perfilUserId == null) perfilUserId = guessIdFromPerfil(e);
-                if (oldId == null && perfilUserId != null) {
-                    var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                    String tmpPath = sp.getString(TMP_KEY, null);
-                    if (tmpPath != null) {
-                        sp.edit().remove(TMP_KEY).putString(prefsKeyForUser(), tmpPath).apply();
-                    }
-                }
 
-                // Foto remota/local
                 cargarFotoPreferida(e.getFotoUrl());
-
-                // Habilitar edición si hay id
                 binding.rowEditarPerfil.setEnabled(perfilUserId != null);
 
-                // Campos en pantalla
+                // Encabezado: nombre al lado del avatar
+                String nombreCompleto = safe(e.getNombreUsuario()) + " " + safe(e.getApellido());
+                binding.tvNombreHeader.setText(nombreCompleto);
+
+                // Subtítulo opcional “Estudiante de Grado X”
+                String gradoSolo = safe(e.getGrado());
+                if (!"-".equals(gradoSolo)) {
+                } else {
+                }
+
+                // Grado combinado con curso -> “11 - C”
+                String cursoSolo = safe(e.getCurso());
+                String gradoCurso;
+                if (!"-".equals(gradoSolo) && !"-".equals(cursoSolo)) {
+                    gradoCurso = gradoSolo + " - " + cursoSolo;
+                } else if (!"-".equals(gradoSolo)) {
+                    gradoCurso = gradoSolo;
+                } else if (!"-".equals(cursoSolo)) {
+                    gradoCurso = cursoSolo;
+                } else {
+                    gradoCurso = "-";
+                }
+                binding.tvGrado.setText(gradoCurso);
+
+                // Esconder el bloque de curso si estuviera en el layout
+                View rowCurso = getView() != null ? getView().findViewById(R.id.rowCurso) : null;
+                if (rowCurso != null) rowCurso.setVisibility(View.GONE);
+
+                // Resto de campos de la tarjeta
                 binding.tvInstitucion.setText(safe(e.getNombreInstitucion()));
-                binding.tvNombre.setText(safe(e.getNombreUsuario()) + " " + safe(e.getApellido()));
-                binding.tvDocumento.setText(safe(e.getNumeroDocumento()));
                 binding.tvTipoDoc.setText(safe(e.getTipoDocumento()));
-                binding.tvGrado.setText(safe(e.getGrado()));
-                binding.tvCurso.setText(safe(e.getCurso()));
+                binding.tvDocumento.setText(safe(e.getNumeroDocumento()));
                 binding.tvJornada.setText(safe(e.getJornada()));
                 binding.tvCorreo.setText(safe(e.getCorreo()));
                 binding.tvTelefono.setText(safe(e.getTelefono()));
                 binding.tvDireccion.setText(safe(e.getDireccion()));
-                // Si necesitas mostrar estado: (no hay TextView en el layout actual)
-                // String estado = (e.getIsActive() != null && e.getIsActive()) ? "Activo" : "Inactivo";
             }
             @Override public void onFailure(Call<Estudiante> call, Throwable t) {
                 Log.e("PROFILE_PERFIL_FAIL", "onFailure", t);
@@ -391,44 +413,136 @@ public class PerfilFragment extends Fragment {
         });
     }
 
-    // ===================== Editar contacto =====================
+    // ---------------- Editor de contacto ----------------
     private void abrirEditorContacto() {
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        View content = LayoutInflater.from(requireContext()).inflate(R.layout.editar_infopersonal, null, false);
-        dialog.setContentView(content);
+        View content = LayoutInflater.from(requireContext())
+                .inflate(R.layout.editar_infopersonal, null, false);
 
         TextInputEditText etCorreo    = content.findViewById(R.id.etCorreo);
         TextInputEditText etTelefono  = content.findViewById(R.id.etTelefono);
         TextInputEditText etDireccion = content.findViewById(R.id.etDireccion);
         MaterialButton btnGuardar     = content.findViewById(R.id.btnGuardar);
+        MaterialButton btnCancelar    = content.findViewById(R.id.btnCancelar);
 
+        // Prefill
         etCorreo.setText(textOrEmpty(binding.tvCorreo));
         etTelefono.setText(textOrEmpty(binding.tvTelefono));
         etDireccion.setText(textOrEmpty(binding.tvDireccion));
 
+        // Diálogo centrado
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(content)
+                .create();
+        dialog.setOnShowListener(dlg -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setDimAmount(0.6f);
+                int w = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+                dialog.getWindow().setLayout(w, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        });
+
+        // --- Habilitar/Deshabilitar Guardar según vacíos ---
+        btnGuardar.setEnabled(false);
+        btnGuardar.setAlpha(0.5f);
+
+        TextWatcher watcher = new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
+                boolean ok = !isEmpty(str(etCorreo))
+                        && !isEmpty(str(etTelefono))
+                        && !isEmpty(str(etDireccion));
+                btnGuardar.setEnabled(ok);
+                btnGuardar.setAlpha(ok ? 1f : 0.5f);
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        };
+        etCorreo.addTextChangedListener(watcher);
+        etTelefono.addTextChangedListener(watcher);
+        etDireccion.addTextChangedListener(watcher);
+
+        // Cancelar
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        // Guardar
         btnGuardar.setOnClickListener(v -> {
             String correo    = str(etCorreo);
             String telefono  = str(etTelefono);
             String direccion = str(etDireccion);
 
-            if (!isEmpty(correo) && !android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
+            // Requeridos
+            if (isEmpty(correo) || isEmpty(telefono) || isEmpty(direccion)) {
+                if (isEmpty(correo))    etCorreo.setError("Requerido");
+                if (isEmpty(telefono))  etTelefono.setError("Requerido");
+                if (isEmpty(direccion)) etDireccion.setError("Requerido");
+                android.widget.Toast.makeText(requireContext(),
+                        "Completa todos los campos", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validaciones de formato
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
                 etCorreo.setError("Correo inválido"); return;
             }
-            if (!isEmpty(telefono) && !Pattern.compile("^\\+?[0-9\\s\\-()]{7,20}$").matcher(telefono).matches()) {
+            if (!java.util.regex.Pattern.compile("^\\+?[0-9\\s\\-()]{7,20}$")
+                    .matcher(telefono).matches()) {
                 etTelefono.setError("Teléfono inválido"); return;
             }
-            if (!isEmpty(direccion) && direccion.length() > 255) {
+            if (direccion.length() > 255) {
                 etDireccion.setError("Dirección demasiado larga"); return;
             }
             if (perfilUserId == null) {
-                android.widget.Toast.makeText(requireContext(), "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(requireContext(),
+                        "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Llamada a API; el diálogo se cierra al finalizar
             enviarEdicionContacto(perfilUserId, correo, direccion, telefono, dialog);
         });
 
         dialog.show();
     }
+
+
+    private void enviarEdicionContacto(int userId,
+                                       String correo,
+                                       String direccion,
+                                       String telefono,
+                                       @Nullable android.app.Dialog dialogToClose) {
+
+        EditarPerfilRequest body = new EditarPerfilRequest(correo, direccion, telefono);
+        api.editarPerfil(userId, body).enqueue(new Callback<EditarPerfilResponse>() {
+            @Override
+            public void onResponse(Call<EditarPerfilResponse> call, Response<EditarPerfilResponse> response) {
+                if (!response.isSuccessful()) {
+                    logHttpError("PROFILE_EDIT", response);
+                    android.widget.Toast.makeText(requireContext(),
+                            "Error guardando cambios", android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // Actualiza los valores visibles en el perfil
+                binding.tvCorreo.setText(isEmpty(correo) ? "-" : correo.trim());
+                binding.tvTelefono.setText(isEmpty(telefono) ? "-" : telefono.trim());
+                binding.tvDireccion.setText(isEmpty(direccion) ? "-" : direccion.trim());
+
+                String msg = (response.body() != null && response.body().getMessage() != null)
+                        ? response.body().getMessage() : "Actualizado";
+                android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show();
+
+                if (dialogToClose != null && dialogToClose.isShowing()) dialogToClose.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<EditarPerfilResponse> call, Throwable t) {
+                Log.e("PROFILE_EDIT_FAIL", "onFailure", t);
+                android.widget.Toast.makeText(requireContext(),
+                        "Error de red: " + t.getLocalizedMessage(), android.widget.Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     private void enviarEdicionContacto(int userId, String correo, String direccion, String telefono, BottomSheetDialog dialog) {
         EditarPerfilRequest body = new EditarPerfilRequest(correo, direccion, telefono);
@@ -462,7 +576,7 @@ public class PerfilFragment extends Fragment {
         });
     }
 
-    // ===================== Utilidades =====================
+    // ---------------- Utilidades ----------------
     private static void logHttpError(String tag, Response<?> response) {
         try {
             ResponseBody err = response.errorBody();

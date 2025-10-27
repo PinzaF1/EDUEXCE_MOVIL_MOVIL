@@ -98,11 +98,11 @@ public class BadgesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             // Asigna iconos por área
             String area = b.getArea() != null ? b.getArea().toLowerCase() : "";
-            if (area.contains("leng")) ivIcon.setImageResource(R.drawable.lenguaje);
+            if (area.contains("leng")) ivIcon.setImageResource(R.drawable.lenguajee);
             else if (area.contains("ciencia")) ivIcon.setImageResource(R.drawable.naturales);
-            else if (area.contains("social")) ivIcon.setImageResource(R.drawable.sociales);
-            else if (area.contains("matem")) ivIcon.setImageResource(R.drawable.matematicas);
-            else if (area.contains("ingl")) ivIcon.setImageResource(R.drawable.ingles);
+            else if (area.contains("social")) ivIcon.setImageResource(R.drawable.socialess);
+            else if (area.contains("matem")) ivIcon.setImageResource(R.drawable.matematicass);
+            else if (area.contains("ingl")) ivIcon.setImageResource(R.drawable.ingless);
             else ivIcon.setVisibility(View.GONE);
 
             // Colores de fondo

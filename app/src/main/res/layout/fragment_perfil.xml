@@ -12,38 +12,57 @@
         android:background="@android:color/white"
         android:padding="12dp">
 
-        <!-- Avatar + punto verde -->
+        <!-- CABECERA: avatar IZQUIERDA + nombre a la DERECHA -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="14dp">
 
+            <!-- Punto verde sobre el avatar -->
+
+            <!-- Nombre al lado derecho del avatar -->
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/icon"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@drawable/ic_person"
-                android:scaleType="centerCrop"
                 android:adjustViewBounds="true"
                 android:background="#EEF1F5"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay_Circular"
-                app:layout_constraintTop_toTopOf="parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_person"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay_Circular" />
 
-            <!-- Punto verde dentro del avatar -->
             <View
                 android:id="@+id/statusDot"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="11dp"
                 android:background="@drawable/bg_status_dot_green"
+                android:elevation="8dp"
                 app:layout_constraintBottom_toBottomOf="@id/icon"
-                app:layout_constraintEnd_toEndOf="@id/icon"
-                android:translationX="-8dp"
-                android:translationY="-8dp"
-                android:elevation="8dp" />
+                app:layout_constraintEnd_toEndOf="@id/icon" />
+
+            <TextView
+                android:id="@+id/tvNombreHeader"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text=""
+                android:layout_marginTop="25dp"
+                android:textStyle="bold"
+                android:textSize="22sp"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@id/icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/icon" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Card: Información Personal (dos columnas) -->
@@ -54,17 +73,11 @@
             app:cardCornerRadius="14dp"
             app:cardUseCompatPadding="true"
             app:strokeWidth="2dp"
-            app:strokeColor="#2196F3"
-            android:background="#F8F6FF">
+            android:background="#F8F6FF"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@android:color/white"
-                android:padding="12dp">
 
-                <!-- Cabecera -->
+
+                <!-- Cabecera de la card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -83,11 +96,11 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/rowEditarPerfil"
-                        style="@style/Widget.Material3.Button.TonalButton"
-                        android:textColor="@color/blue"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:text="Editar Perfil"
+                        android:textColor="@color/blue"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_edit"
                         app:iconSize="16dp"
@@ -101,7 +114,7 @@
                     android:columnCount="2"
                     android:rowOrderPreserved="false">
 
-                    <!-- Institución -->
+                    <!-- Col 1: Institución -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -110,14 +123,12 @@
                         android:orientation="vertical"
                         android:padding="14dp"
                         android:minHeight="72dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Institución"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
                             android:id="@+id/tvInstitucion"
                             android:layout_width="match_parent"
@@ -129,7 +140,7 @@
                             android:ellipsize="end" />
                     </LinearLayout>
 
-                    <!-- Nombre -->
+                    <!-- Col 2: Grado (combinado con curso) -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -138,26 +149,22 @@
                         android:orientation="vertical"
                         android:padding="14dp"
                         android:minHeight="72dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nombre"
+                            android:text="Grado"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
-                            android:id="@+id/tvNombre"
+                            android:id="@+id/tvGrado"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="-"
                             android:textSize="15sp"
-                            android:textColor="@color/text_primary"
-                            android:maxLines="2"
-                            android:ellipsize="end" />
+                            android:textColor="@color/text_primary" />
                     </LinearLayout>
 
-                    <!-- Documento -->
+                    <!-- Col 1: Tipo de Documento -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -166,14 +173,36 @@
                         android:orientation="vertical"
                         android:padding="14dp"
                         android:minHeight="72dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tipo de Documento"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted" />
+                        <TextView
+                            android:id="@+id/tvTipoDoc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textSize="15sp"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
 
+                    <!-- Col 2: Documento -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="6dp"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:minHeight="72dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Documento"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
                             android:id="@+id/tvDocumento"
                             android:layout_width="match_parent"
@@ -185,33 +214,35 @@
                             android:ellipsize="end" />
                     </LinearLayout>
 
-                    <!-- Tipo de Documento -->
+                    <!-- Col 2: Correo -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="6dp"
                         android:orientation="vertical"
-                        android:padding="14dp"
-                        android:minHeight="72dp">
-
+                        android:padding="14dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tipo de Documento"
+                            android:text="Correo"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
-                            android:id="@+id/tvTipoDoc"
+                            android:id="@+id/tvCorreo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="-"
-                            android:textSize="15sp"
-                            android:textColor="@color/text_primary" />
+                            android:textSize="13sp"
+                            android:textColor="@color/black"
+                            android:autoLink="none"
+                            android:linksClickable="false"
+                            android:ellipsize="end"
+                            android:singleLine="true" />
+
                     </LinearLayout>
 
-                    <!-- Grado -->
+                    <!-- Col 1: Jornada -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -220,66 +251,12 @@
                         android:orientation="vertical"
                         android:padding="14dp"
                         android:minHeight="72dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Grado"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:id="@+id/tvGrado"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textSize="15sp"
-                            android:textColor="@color/text_primary" />
-                    </LinearLayout>
-
-                    <!-- Curso -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:orientation="vertical"
-                        android:padding="14dp"
-                        android:minHeight="72dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Curso"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:id="@+id/tvCurso"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="-"
-                            android:textSize="15sp"
-                            android:textColor="@color/text_primary" />
-                    </LinearLayout>
-
-                    <!-- Jornada -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:orientation="vertical"
-                        android:padding="14dp"
-                        android:minHeight="72dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Jornada"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
                             android:id="@+id/tvJornada"
                             android:layout_width="match_parent"
@@ -289,35 +266,7 @@
                             android:textColor="@color/text_primary" />
                     </LinearLayout>
 
-                    <!-- Correo -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="6dp"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Correo"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:id="@+id/tvCorreo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:autoLink="email"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:text="-"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_primary" />
-                    </LinearLayout>
-
-                    <!-- Teléfono -->
+                    <!-- Col 2: Teléfono -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -326,25 +275,25 @@
                         android:orientation="vertical"
                         android:padding="14dp"
                         android:minHeight="72dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Teléfono"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
                             android:id="@+id/tvTelefono"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autoLink="phone"
                             android:text="-"
                             android:textSize="15sp"
-                            android:textColor="@color/text_primary" />
+                            android:textColor="@color/black"
+                            android:autoLink="none"
+                            android:linksClickable="false" />
+
                     </LinearLayout>
 
-                    <!-- Dirección -->
+                    <!-- Col 1: Dirección -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -353,14 +302,12 @@
                         android:orientation="vertical"
                         android:padding="14dp"
                         android:minHeight="72dp">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Dirección"
                             android:textSize="12sp"
                             android:textColor="@color/text_muted" />
-
                         <TextView
                             android:id="@+id/tvDireccion"
                             android:layout_width="match_parent"
@@ -374,6 +321,31 @@
 
                 </GridLayout>
 
+                    <!-- (OCULTO) Curso - solo para mantener id si lo necesitas -->
+                    <LinearLayout
+                        android:id="@+id/rowCurso"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="6dp"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:minHeight="72dp"
+                        android:visibility="gone">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Curso"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted" />
+                        <TextView
+                            android:id="@+id/tvCurso"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textSize="15sp"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
 
                 <!-- Fila clickeable: Estilo de aprendizaje -->
                 <LinearLayout
@@ -382,7 +354,7 @@
                     android:layout_height="48dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="1dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackgroundBorderless">
@@ -392,9 +364,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Estilo de aprendizaje"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary" />
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/ivKolbChevron"
@@ -404,7 +376,7 @@
                         android:contentDescription="@string/app_name" />
                 </LinearLayout>
 
-                <!-- Campos ocultos para tu lógica -->
+                <!-- Campos ocultos (para el diálogo Kolb) -->
                 <LinearLayout
                     android:id="@+id/kolbHiddenFields"
                     android:layout_width="match_parent"
@@ -419,7 +391,4 @@
                 </LinearLayout>
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-    </LinearLayout>
 </ScrollView>
