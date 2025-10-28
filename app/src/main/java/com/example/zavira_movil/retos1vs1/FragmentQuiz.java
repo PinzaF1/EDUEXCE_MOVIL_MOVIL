@@ -19,8 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.local.TokenManager;
-import com.example.zavira_movil.model.RondaRequest;
-import com.example.zavira_movil.model.RondaResponse;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.gson.Gson;

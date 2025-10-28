@@ -163,7 +163,7 @@ public class TestActivity extends AppCompatActivity {
             if (respuestas.get(i, 0) != 0) respondidas++;
         }
 
-        int total = 25;
+        int total = 36;
         int porcentaje = (int) ((respondidas / (float) total) * 100);
 
         ObjectAnimator anim = ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), porcentaje);

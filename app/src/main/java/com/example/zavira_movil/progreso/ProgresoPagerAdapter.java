@@ -11,7 +11,6 @@ public class ProgresoPagerAdapter extends FragmentStateAdapter {
         super(fragmentActivity);
     }
 
-    // NUEVO: para usar desde ProgresoFragment
     public ProgresoPagerAdapter(@NonNull Fragment fragment) {
         super(fragment);
     }
@@ -20,13 +19,23 @@ public class ProgresoPagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
-            case 0: return new FragmentGeneral();
-            case 1: return new FragmentMaterias();
-            case 2: return new FragmentHistorial();
+            case 0: return new FragmentGeneral();   // Resumen
+            case 1: return new FragmentMaterias();  // Diagnóstico inicial
+            case 2: return new FragmentHistorial(); // Historial
             default: return new FragmentGeneral();
         }
     }
 
     @Override
     public int getItemCount() { return 3; }
+
+    // Títulos para TabLayoutMediator
+    public CharSequence getPageTitle(int position) {
+        switch (position) {
+            case 0: return "Resumen";
+            case 1: return "Diagnóstico inicial";
+            case 2: return "Historial";
+            default: return "";
+        }
+    }
 }
