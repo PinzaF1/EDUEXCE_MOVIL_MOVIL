@@ -36,6 +36,10 @@
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
+            android:name=".resetpassword.ResetPasswordActivity"
+            android:exported="false"
+            android:label="Recuperar Contraseña" />
+        <activity
             android:name=".Home.HomeActivity"
             android:exported="false" />
         <activity
