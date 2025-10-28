@@ -130,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
     // Navegación → InfoTestActivity
     private void goToInfoTest() {
         Intent i = new Intent(this, InfoTestActivity.class);
-        // ✅ Limpia la pila para que Back no regrese al login
+
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
@@ -138,8 +138,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Navegación → HomeActivity
     private void goToHome() {
-        Intent i = new Intent(this, HomeActivity.class);
-        // ✅ Limpia la pila para que Back no regrese al login
+        Intent i = new Intent(this, InfoAcademico.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();

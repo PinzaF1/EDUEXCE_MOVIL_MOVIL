@@ -11,20 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="0dp"
         android:background="@color/bg_surface">
 
-        <!-- CARD: Progreso Global -->
+        <!-- CARD: Progreso Global (igual que tenías) -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_margin="16dp"
             app:cardCornerRadius="18dp"
             app:cardUseCompatPadding="true"
             app:cardElevation="6dp"
             app:cardBackgroundColor="@color/card_surface"
             app:strokeWidth="1dp"
-            app:strokeColor="@color/card_stroke_blue">  <!-- o @color/card_stroke_selector -->
+            app:strokeColor="@color/card_stroke_blue">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,7 +41,6 @@
                     android:textColor="@color/text_primary"
                     android:layout_marginBottom="8dp"/>
 
-                <!-- Anillo + % centrados -->
                 <RelativeLayout
                     android:layout_width="200dp"
                     android:layout_height="200dp"
@@ -107,43 +106,34 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- CARD: Línea de Niveles -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
+        <!-- Título "Materias" (sin card contenedor) -->
+        <TextView
+            android:id="@+id/tvTituloMateriasResumen"
+            android:layout_width="96dp"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="18dp"
-            app:cardUseCompatPadding="true"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="@color/card_surface"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/card_stroke_blue">  <!-- o @color/card_stroke_selector -->
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="6dp"
+            android:text="Materias"
+            android:textColor="@color/text_primary"
+            android:textSize="19sp"
+            android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+        <!-- Lista a ancho completo; cada ítem ya tiene sus propios márgenes -->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Línea de Niveles"
-                    android:textStyle="bold"
-                    android:textSize="19sp"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="10dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerNiveles"
+            android:layout_width="339dp"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:layout_gravity="center_horizontal"
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerNiveles"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:clipToPadding="false"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="68dp"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:paddingTop="0dp"
+            android:paddingBottom="12dp" />
 
         <Space
             android:layout_width="match_parent"
