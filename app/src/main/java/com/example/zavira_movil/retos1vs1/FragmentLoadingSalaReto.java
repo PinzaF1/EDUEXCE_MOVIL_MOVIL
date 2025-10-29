@@ -53,7 +53,6 @@ public class FragmentLoadingSalaReto extends Fragment {
     private boolean launching = false;
     private static final long POLL_MS = 1200L;
 
-    // ===== Flags locales para evitar carreras/duplicados =====
     private String spName() { return "retos1v1"; }
     private Integer myId() { try { return TokenManager.getUserId(requireContext()); } catch (Exception e) { return null; } }
     private String keyAceptadoPorCreador() { return "aceptado_creador_" + (idReto==null?"":idReto); }
@@ -103,18 +102,14 @@ public class FragmentLoadingSalaReto extends Fragment {
         tvArea.setText(area);
         tvOponente.setText(!TextUtils.isEmpty(opName) ? opName : "Oponente");
 
-        // limpiar banderines por si venimos de atrás
         clearEntregadaFlag();
-
         handler = new Handler();
 
         if (esCreador) {
-            // creador NO muestra botón, espera en_curso y acepta una sola vez
             btnEntrar.setVisibility(View.GONE);
             pb.setVisibility(View.VISIBLE);
             pollEstado();
         } else {
-            // retado: presiona para aceptar y entrar
             btnEntrar.setVisibility(View.VISIBLE);
             btnEntrar.setOnClickListener(v1 -> aceptarYOEntrar());
             pb.setVisibility(View.VISIBLE);
@@ -129,7 +124,6 @@ public class FragmentLoadingSalaReto extends Fragment {
 
     private void reintentar(Runnable r) { if (handler != null) handler.postDelayed(r, POLL_MS); }
 
-    // ===== Polling a /estado =====
     private void pollEstado() {
         if (!isAdded() || launching || TextUtils.isEmpty(idReto)) return;
 
@@ -144,15 +138,13 @@ public class FragmentLoadingSalaReto extends Fragment {
 
                     if ("en_curso".equals(st)) {
                         if (esCreador) {
-                            // El creador espera a en_curso y llama aceptar UNA vez
                             if (creadorYaLlamoAceptar()) {
                                 fetchSesionesSoloConAceptarUnaVez(false);
                             } else {
-                                fetchSesionesSoloConAceptarUnaVez(true); // con jitter 1.2–2.0s
+                                fetchSesionesSoloConAceptarUnaVez(true);
                             }
                             return;
                         } else {
-                            // Si el retado llegó a en_curso sin tocar el botón, intentamos aceptar igual
                             aceptarYOEntrar();
                             return;
                         }
@@ -160,7 +152,6 @@ public class FragmentLoadingSalaReto extends Fragment {
 
                     if ("finalizado".equals(st)) {
                         if (yaEntregue()) { irAResultado(e); return; }
-                        // Si finalizado y yo no marqué entregado (caso borde), intento entrar a jugar
                         if (esCreador) {
                             if (!creadorYaLlamoAceptar()) fetchSesionesSoloConAceptarUnaVez(true);
                         } else {
@@ -178,10 +169,9 @@ public class FragmentLoadingSalaReto extends Fragment {
         });
     }
 
-    // ====== RETADO: aceptar y entrar ======
     private void aceptarYOEntrar() {
         if (!isAdded() || launching) return;
-        if (esCreador) return; // creador no usa este flujo
+        if (esCreador) return;
         if (btnEntrar != null) btnEntrar.setEnabled(false);
         if (pb != null) pb.setVisibility(View.VISIBLE);
 
@@ -205,7 +195,6 @@ public class FragmentLoadingSalaReto extends Fragment {
         });
     }
 
-    // ====== CREADOR: llamar aceptar SOLO una vez (con jitter opcional) ======
     private void fetchSesionesSoloConAceptarUnaVez(boolean conJitter) {
         if (!isAdded() || launching) return;
 
@@ -213,7 +202,6 @@ public class FragmentLoadingSalaReto extends Fragment {
             if (!isAdded() || launching) return;
 
             ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
-            // Marcamos ANTES para no repetir si hay re-entradas
             marcarCreadorLlamoAceptar();
 
             api.aceptarRetoConBody(idReto, new HashMap<>()).enqueue(new Callback<AceptarRetoResponse>() {
@@ -222,27 +210,24 @@ public class FragmentLoadingSalaReto extends Fragment {
                     if (resp.isSuccessful() && resp.body()!=null && tieneSesion(resp.body())) {
                         lanzarQuiz(resp.body());
                     } else {
-                        // Si aún no hay sesiones por alguna carrera, seguimos en polling
                         reintentar(FragmentLoadingSalaReto.this::pollEstado);
                     }
                 }
                 @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
                     if (!isAdded() || launching) return;
-                    // no desmarcamos: evitamos spamear aceptar; seguimos en polling
                     reintentar(FragmentLoadingSalaReto.this::pollEstado);
                 }
             });
         };
 
         if (conJitter) {
-            long delay = 1200 + (long)(Math.random() * 800); // 1.2–2.0s
+            long delay = 1200 + (long)(Math.random() * 800);
             if (handler != null) handler.postDelayed(work, delay);
         } else {
             work.run();
         }
     }
 
-    // Busca la sesión del usuario actual en la respuesta de aceptar
     private boolean tieneSesion(AceptarRetoResponse a) {
         if (a == null || a.sesiones == null || a.sesiones.isEmpty()) return false;
         Integer my = myId();
@@ -250,7 +235,6 @@ public class FragmentLoadingSalaReto extends Fragment {
         return id > 0;
     }
 
-    // ===== Navegación =====
     private void lanzarQuiz(AceptarRetoResponse aceptar) {
         if (!isAdded() || aceptar == null) return;
 
@@ -280,6 +264,8 @@ public class FragmentLoadingSalaReto extends Fragment {
         Bundle b = new Bundle();
         b.putString("estadoJson", new Gson().toJson(e));
         b.putInt("totalPreguntas", 25);
+        // Si conoces la sesión aquí, puedes pasarla:
+        // b.putInt("idSesion", <miIdSesion>);
 
         FragmentResultadoReto f = new FragmentResultadoReto();
         f.setArguments(b);
