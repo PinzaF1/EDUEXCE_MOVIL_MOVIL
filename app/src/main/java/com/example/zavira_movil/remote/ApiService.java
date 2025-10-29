@@ -24,7 +24,7 @@ import com.example.zavira_movil.model.OtorgarAreaRequest;
 import com.example.zavira_movil.model.OtorgarAreaResponse;
 
 import com.example.zavira_movil.model.RankingResponse;
-
+import com.example.zavira_movil.retos1vs1.RondaResponse;
 import com.example.zavira_movil.model.SimulacroRequest;
 import com.example.zavira_movil.niveleshome.CerrarRequest;
 import com.example.zavira_movil.niveleshome.CerrarResponse;
