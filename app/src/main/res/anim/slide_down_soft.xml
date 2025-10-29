@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+
+    <!-- Movimiento más suave y lento -->
+    <translate
+        android:fromYDelta="-100%"
+        android:toYDelta="0%"
+        android:duration="2500" />
+
+    <!-- Efecto de aparición -->
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0"
+        android:duration="2800" />
+</set>

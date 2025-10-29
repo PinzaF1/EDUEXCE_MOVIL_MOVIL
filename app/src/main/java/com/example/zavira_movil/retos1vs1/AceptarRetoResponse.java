@@ -33,29 +33,27 @@ public class AceptarRetoResponse {
         @SerializedName("id_sesion")
         public int id_sesion;
     }
-
     public static class Pregunta {
         @SerializedName("id_pregunta")
         public Integer id_pregunta;
 
-        @SerializedName("area")
-        public String area;
+        @SerializedName("area")       public String area;
+        @SerializedName("subtema")    public String subtema;
+        @SerializedName("dificultad") public String dificultad;
+        @SerializedName("enunciado")  public String enunciado;
 
-        @SerializedName("subtema")
-        public String subtema;
+        // ⬇️ ANTES: List<Opcion>
+        // @SerializedName("opciones")
+        // public List<Opcion> opciones;
 
-        @SerializedName("dificultad")
-        public String dificultad;
-
-        @SerializedName("enunciado")
-        public String enunciado;
-
+        // ⬇️ DESPUÉS: acepta array de strings
         @SerializedName("opciones")
-        public List<Opcion> opciones;
+        public List<String> opciones;
 
         @SerializedName("time_limit_seconds")
         public Integer time_limit_seconds;
     }
+
 
     public static class Opcion {
         @SerializedName("key")

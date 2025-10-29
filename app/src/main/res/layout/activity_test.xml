@@ -4,37 +4,82 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="@color/white"
+    android:padding="16dp">
 
     <!-- TÍTULO PRINCIPAL -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Test de Estilos de Aprendizaje (Kolb)"
+        android:text="Test de Estilos de Aprendizaje"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:gravity="center"
-        android:textColor="@android:color/black"
-        android:paddingBottom="12dp" />
+        android:textColor="@color/primaryyy"
+        android:layout_marginBottom="12dp"
+        android:letterSpacing="0.02" />
 
-    <!-- SCROLL CON LAS PREGUNTAS -->
-    <ScrollView
+    <!-- CARD: Barra de progreso -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:elevation="6dp"
+        android:animation="@anim/fade_down">
+
+        <TextView
+            android:id="@+id/tvProgresoBloque"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Progreso del Test"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="8dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBloque"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="@color/primaryyy"
+            android:backgroundTint="#E0E0E0"
+            android:scaleY="1.4"/>
+    </LinearLayout>
+
+    <!-- CARD PRINCIPAL con animación -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        app:cardCornerRadius="18dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@android:color/white"
+        android:padding="16dp"
+        android:layout_marginTop="12dp"
+        android:animation="@anim/fade_up_slow">
 
-        <LinearLayout
-            android:id="@+id/questionsContainer"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:divider="?android:attr/dividerHorizontal"
-            android:showDividers="middle"
-            android:paddingBottom="16dp" />
-    </ScrollView>
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/questionsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:divider="?android:attr/dividerHorizontal"
+                android:showDividers="middle"
+                android:paddingBottom="16dp" />
+        </ScrollView>
+    </androidx.cardview.widget.CardView>
 
     <!-- BOTÓN ENVIAR -->
     <com.google.android.material.button.MaterialButton
@@ -44,9 +89,14 @@
         android:text="Enviar respuestas"
         android:textAllCaps="false"
         android:textSize="16sp"
-        android:layout_marginTop="12dp"
-        app:cornerRadius="12dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        app:cornerRadius="25dp"
+        android:backgroundTint="@color/primaryyy"
+        android:textColor="@android:color/white"
         app:icon="@android:drawable/ic_menu_send"
         app:iconTint="@android:color/white"
-        app:iconPadding="8dp"/>
+        app:iconPadding="8dp"
+        android:animation="@anim/fade_up_slow" />
+
 </LinearLayout>

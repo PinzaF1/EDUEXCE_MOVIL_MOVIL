@@ -5,6 +5,14 @@ import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
 import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
+
+import com.example.zavira_movil.progreso.DiagnosticoInicial;
+import com.example.zavira_movil.retos1vs1.AceptarRetoResponse;
+import com.example.zavira_movil.retos1vs1.EstadoRetoResponse;
+import com.example.zavira_movil.progreso.HistorialResponse;
+import com.example.zavira_movil.niveleshome.CerrarRequest;
+import com.example.zavira_movil.niveleshome.CerrarResponse;
+
 import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.HislaConocimiento.IslaCerrarRequest;
 import com.example.zavira_movil.HislaConocimiento.IslaCerrarResponse;
@@ -14,6 +22,7 @@ import com.example.zavira_movil.model.KolbResponse;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.model.OtorgarAreaRequest;
 import com.example.zavira_movil.model.OtorgarAreaResponse;
+
 import com.example.zavira_movil.model.RankingResponse;
 import com.example.zavira_movil.model.RondaResponse;
 import com.example.zavira_movil.model.SimulacroRequest;
@@ -22,6 +31,10 @@ import com.example.zavira_movil.niveleshome.CerrarResponse;
 import com.example.zavira_movil.niveleshome.ParadaRequest;
 import com.example.zavira_movil.niveleshome.ParadaResponse;
 import com.example.zavira_movil.niveleshome.SimulacroResponse;
+
+import com.example.zavira_movil.retos1vs1.MarcadorResponse;
+import com.example.zavira_movil.retos1vs1.RetoListItem;
+
 import com.example.zavira_movil.oponente.OpponentBackend;
 import com.example.zavira_movil.progreso.HistorialResponse;
 import com.example.zavira_movil.progreso.MateriasResponse;
@@ -30,6 +43,7 @@ import com.example.zavira_movil.retos1vs1.AceptarRetoResponse;
 import com.example.zavira_movil.retos1vs1.EstadoRetoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreadoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreateRequest;
+
 import com.example.zavira_movil.retos1vs1.RetoListItem;
 import com.example.zavira_movil.model.LogrosResponse;
 import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
@@ -45,8 +59,15 @@ import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
 import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
 import com.example.zavira_movil.HislaConocimiento.IslaIniciarRequest;
 
+import com.example.zavira_movil.retos1vs1.RondaResponse;
+import com.example.zavira_movil.niveleshome.ParadaRequest;
+import com.example.zavira_movil.niveleshome.ParadaResponse;
+import com.example.zavira_movil.retos1vs1.RondaRequest;
+
+
 import java.util.List;
 import java.util.Map;
+
 
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -93,6 +114,11 @@ public interface ApiService {
             @Header("Authorization") String bearerToken,
             @Body QuizCerrarRequest request
     );
+
+    // NUEVO: progreso del diagnóstico (cuando tengas el JSON exacto, creamos el modelo)
+    @GET("quizz/progreso")
+    Call<DiagnosticoInicial> diagnosticoProgreso();
+
 
     // ---------- Foto de perfil ----------
     @Multipart
@@ -164,7 +190,7 @@ public interface ApiService {
     Call<AceptarRetoResponse> aceptarRetoConBody(@Path("id") String idReto, @Body Map<String, Object> empty);
 
     @POST("movil/retos/ronda")
-    Call<RondaResponse> responderRonda(@Body com.example.zavira_movil.model.RondaRequest body);
+    Call<RondaResponse> responderRonda(@Body RondaRequest body);
 
     @GET("movil/retos/{id}/estado")
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
@@ -174,6 +200,18 @@ public interface ApiService {
 
     @GET("movil/retos/oponentes")
     Call<List<OpponentBackend>> listarOponentes();
+
+
+    // Marcador por usuario (token)
+    @GET("movil/retos/marcador")
+    Call<MarcadorResponse> marcador();
+
+    // Marcador por sesión (si el backend lo soporta como query param; si no, simplemente lo ignorará)
+    @GET("movil/retos/marcador")
+    Call<MarcadorResponse> marcadorPorSesion(@Query("id_sesion") Integer idSesion);
+
+
+
 
     // ---------- Ranking / Logros ----------
     @GET("movil/ranking")
@@ -194,4 +232,14 @@ public interface ApiService {
             @Path("id") int id,
             @Body com.example.zavira_movil.Perfil.EditarPerfilRequest body
     );
+
+    // ---------- Recuperación de Contraseña ----------
+    @POST("estudiante/recuperar/solicitar")
+    Call<BasicResponse> solicitarCodigoRecuperacion(@Body com.example.zavira_movil.resetpassword.SolicitarCodigoRequest body);
+
+    @POST("estudiante/recuperar/verificar")
+    Call<BasicResponse> verificarCodigoRecuperacion(@Body com.example.zavira_movil.resetpassword.VerificarCodigoRequest body);
+
+    @POST("estudiante/recuperar/restablecer")
+    Call<BasicResponse> restablecerPassword(@Body com.example.zavira_movil.resetpassword.RestablecerPasswordRequest body);
 }

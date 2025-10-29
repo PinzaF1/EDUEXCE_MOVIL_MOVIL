@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/zavira_movil/retos1vs1/EstadoRetoResponse.java
 package com.example.zavira_movil.retos1vs1;
 
 import java.util.List;
