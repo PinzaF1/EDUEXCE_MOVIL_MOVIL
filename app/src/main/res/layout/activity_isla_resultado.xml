@@ -1,50 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@android:color/white"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F1FF">
 
     <LinearLayout
-        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+        android:padding="16dp">
 
-        <TextView
-            android:text="¡Simulacro Completado!"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-        <TextView
-            android:id="@+id/tvModo"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp"
-            android:textColor="#666"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-        <TextView
-            android:text="Puntuación Global"
-            android:layout_marginTop="16dp"
-            android:textStyle="bold"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-        <TextView
-            android:id="@+id/tvGlobal"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1E88E5"
-            android:layout_marginTop="8dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
-        <TextView
-            android:text="Resultados por Área"
-            android:layout_marginTop="20dp"
-            android:textStyle="bold"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-
+        <!-- Tarjeta principal -->
         <LinearLayout
-            android:id="@+id/contAreas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="8dp"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            android:layout_marginBottom="12dp"
+            android:clipToPadding="false"
+            android:clipToOutline="false">
+
+            <TextView
+                android:id="@+id/tvTituloPct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡Simulacro Completado!"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="#1E1B4B" />
+
+            <TextView
+                android:id="@+id/tvSubtitulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Puntuación Global"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="#22000000" />
+
+            <TextView
+                android:id="@+id/tvPorcentaje"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="0%"
+                android:textColor="#7C3AED"
+                android:textStyle="bold"
+                android:textSize="42sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Puntuación Global"
+                android:textColor="#666666"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <!-- Resultados por Área -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            android:clipToPadding="false"
+            android:clipToOutline="false">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Resultados por Área"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#1E1B4B" />
+
+            <LinearLayout
+                android:id="@+id/contAreas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <!-- Tarjeta consejo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="12dp"
+            android:background="@android:color/white"
+            android:elevation="2dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡Sigue mejorando!"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#1E1B4B" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Este es un buen punto de partida. Enfócate en las áreas con menor puntuación y practica regularmente."
+                android:textSize="14sp"
+                android:textColor="#666666" />
+        </LinearLayout>
+
+        <!-- Botón Finalizar -->
+        <Button
+            android:id="@+id/btnFinalizar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:text="Finalizar"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#1E88E5" />
+
     </LinearLayout>
 </ScrollView>

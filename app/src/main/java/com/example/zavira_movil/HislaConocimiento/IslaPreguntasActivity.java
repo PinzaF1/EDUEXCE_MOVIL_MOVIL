@@ -2,60 +2,56 @@ package com.example.zavira_movil.HislaConocimiento;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Muestra una pregunta a la vez y al final llama /cerrar.
- * No crea nuevas activities ni adapters.
- */
 public class IslaPreguntasActivity extends AppCompatActivity {
 
-    // ---- UI del layout existente ----
+    private static final int LIMITE_SEG_DIFICIL = 60;
+    private static final String[] ABCD = {"A","B","C","D"};
+
     private TextView tvIndex, tvTimer, tvProgresoBloque, tvTitulo, tvEnunciado;
     private ProgressBar progressBloque;
     private Button btnOp1, btnOp2, btnOp3, btnOp4, btnResponder;
 
-    // ---- Datos de flujo ----
-    private String modalidadSeleccionada;
-    private String payloadJson;
-    private String idSesion;
+    private String modalidad; // "facil" | "dificil"
+    private IslaSimulacroResponse data;
     private final List<PreguntaUI> preguntas = new ArrayList<>();
     private int idx = 0;
     private long inicioPreguntaElapsed = 0L;
+    private CountDownTimer timerActual;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    private static class PreguntaUI {
+        int id;
+        String area, subtema, enunciado;
+        List<String> opciones;
+        String elegida; // "A".."D" o null
+    }
+
+    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_isla_preguntas);
 
-        // Vincular vistas
         tvIndex = findViewById(R.id.tvIndex);
         tvTimer = findViewById(R.id.tvTimer);
         tvProgresoBloque = findViewById(R.id.tvProgresoBloque);
@@ -68,105 +64,60 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         btnOp4 = findViewById(R.id.btnOp4);
         btnResponder = findViewById(R.id.btnResponder);
 
-        // Extras
-        Intent it = getIntent();
-        if (it != null) {
-            modalidadSeleccionada = it.getStringExtra("modalidad");
-            payloadJson = it.getStringExtra("payload");
+        modalidad = getIntent().getStringExtra("modalidad");
+        String payload = getIntent().getStringExtra("payload");
+        data = GsonHolder.gson().fromJson(payload, IslaSimulacroResponse.class);
+
+        tvTimer.setVisibility("dificil".equalsIgnoreCase(modalidad) ? View.VISIBLE : View.GONE);
+
+        if (data == null || data.getPreguntas() == null || data.getPreguntas().isEmpty()) {
+            Toast.makeText(this, "No se recibieron preguntas", Toast.LENGTH_LONG).show();
+            finish(); return;
         }
 
-        // Parsear payload
-        try {
-            JsonObject root = new JsonParser().parse(payloadJson).getAsJsonObject();
-            JsonObject sesion = root.has("sesion") && root.get("sesion").isJsonObject()
-                    ? root.getAsJsonObject("sesion") : null;
-            if (sesion != null && sesion.has("idSesion")) {
-                idSesion = safeString(sesion.get("idSesion"));
-            }
-
-            JsonArray arr = root.has("preguntas") && root.get("preguntas").isJsonArray()
-                    ? root.getAsJsonArray("preguntas") : new JsonArray();
-
-            preguntas.clear();
-            for (int i = 0; i < arr.size(); i++) {
-                JsonObject p = arr.get(i).getAsJsonObject();
-                PreguntaUI q = new PreguntaUI();
-                q.id = p.has("id_pregunta") ? safeString(p.get("id_pregunta")) : "";
-                q.area = p.has("area") ? safeString(p.get("area")) : "";
-                q.subtema = p.has("subtema") ? safeString(p.get("subtema")) : "";
-                q.enunciado = p.has("enunciado") ? safeString(p.get("enunciado")) : "";
-                q.opciones = new ArrayList<>();
-                if (p.has("opciones") && p.get("opciones").isJsonArray()) {
-                    JsonArray ops = p.getAsJsonArray("opciones");
-                    for (int k = 0; k < ops.size(); k++) q.opciones.add(safeString(ops.get(k)));
-                }
-                while (q.opciones.size() < 4) q.opciones.add("");
-                preguntas.add(q);
-            }
-            progressBloque.setMax(preguntas.size());
-            Log.i("IslaPreg", "Preguntas recibidas: " + preguntas.size());
-        } catch (Exception e) {
-            Log.e("IslaPreg", "Error parseando payload", e);
-            Toast.makeText(this, "No se pudo leer preguntas", Toast.LENGTH_LONG).show();
+        // Adaptar a UI
+        for (IslaSimulacroResponse.PreguntaDto p : data.getPreguntas()) {
+            PreguntaUI q = new PreguntaUI();
+            try { q.id = Integer.parseInt(String.valueOf(p.getIdPregunta())); } catch (Exception e) { q.id = 0; }
+            q.area = p.getArea();
+            q.subtema = p.getSubtema();
+            q.enunciado = p.getEnunciado();
+            q.opciones = p.getOpciones();
+            q.elegida = null;
+            preguntas.add(q);
         }
 
-        // Listeners de selección
-        btnOp1.setOnClickListener(v -> seleccionar("A"));
-        btnOp2.setOnClickListener(v -> seleccionar("B"));
-        btnOp3.setOnClickListener(v -> seleccionar("C"));
-        btnOp4.setOnClickListener(v -> seleccionar("D"));
+        progressBloque.setMax(preguntas.size());
 
-        // Responder / avanzar
+        View.OnClickListener l = v -> {
+            if      (v == btnOp1) seleccionar("A");
+            else if (v == btnOp2) seleccionar("B");
+            else if (v == btnOp3) seleccionar("C");
+            else if (v == btnOp4) seleccionar("D");
+        };
+        btnOp1.setOnClickListener(l);
+        btnOp2.setOnClickListener(l);
+        btnOp3.setOnClickListener(l);
+        btnOp4.setOnClickListener(l);
+
         btnResponder.setOnClickListener(v -> {
-            if (preguntas.isEmpty()) return;
-            PreguntaUI actual = preguntas.get(idx);
-            if (actual.opcionElegida == null || actual.opcionElegida.isEmpty()) {
-                Toast.makeText(this, "Selecciona una opción", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            int seg = (int) Math.max(0, (SystemClock.elapsedRealtime() - inicioPreguntaElapsed) / 1000L);
-            actual.tiempoSeg = seg;
-
             if (idx < preguntas.size() - 1) {
-                idx++;
-                pintarPreguntaActual();
+                idx++; pintarPregunta();
             } else {
-                cerrarSimulacro(); // última
+                cerrarSimulacro();
             }
         });
 
-        if (!preguntas.isEmpty()) {
-            pintarPreguntaActual();
-        }
+        pintarPregunta();
     }
 
-    // ======= UI helpers =======
-
-    private void pintarPreguntaActual() {
-        PreguntaUI q = preguntas.get(idx);
-
-        tvIndex.setText((idx + 1) + " / " + preguntas.size());
-        progressBloque.setProgress(idx + 1);
-        tvProgresoBloque.setText("Progreso: " + (idx + 1) + " / " + preguntas.size());
-
-        String titulo = (q.area.isEmpty() ? "Isla" : q.area) + (q.subtema.isEmpty() ? "" : " • " + q.subtema);
-        tvTitulo.setText(titulo);
-        tvEnunciado.setText(q.enunciado);
-
-        btnOp1.setText(q.opciones.get(0));
-        btnOp2.setText(q.opciones.get(1));
-        btnOp3.setText(q.opciones.get(2));
-        btnOp4.setText(q.opciones.get(3));
-
-        marcarSeleccion(q.opcionElegida);
-        btnResponder.setText(idx == preguntas.size() - 1 ? "Finalizar" : "Responder");
-
-        inicioPreguntaElapsed = SystemClock.elapsedRealtime();
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        if (timerActual != null) timerActual.cancel();
     }
 
     private void seleccionar(String letra) {
-        PreguntaUI q = preguntas.get(idx);
-        q.opcionElegida = letra;
+        preguntas.get(idx).elegida = letra;
         marcarSeleccion(letra);
     }
 
@@ -177,91 +128,91 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         btnOp4.setSelected("D".equals(letra));
     }
 
-    // ======= Cerrar simulacro (array de arrays para el backend) =======
+    private void pintarPregunta() {
+        if (timerActual != null) timerActual.cancel();
+
+        PreguntaUI q = preguntas.get(idx);
+        tvIndex.setText((idx + 1) + " / " + preguntas.size());
+        progressBloque.setProgress(idx + 1);
+        tvProgresoBloque.setText("Progreso: " + (idx + 1) + " / " + preguntas.size());
+
+        String titulo = (q.area == null ? "Isla" : q.area)
+                + ((q.subtema == null || q.subtema.isEmpty()) ? "" : " • " + q.subtema);
+        tvTitulo.setText(titulo);
+        tvEnunciado.setText(q.enunciado);
+
+        btnOp1.setText(safeOpt(0, q.opciones));
+        btnOp2.setText(safeOpt(1, q.opciones));
+        btnOp3.setText(safeOpt(2, q.opciones));
+        btnOp4.setText(safeOpt(3, q.opciones));
+        marcarSeleccion(q.elegida);
+
+        btnResponder.setText(idx == preguntas.size() - 1 ? "Finalizar" : "Responder");
+        inicioPreguntaElapsed = SystemClock.elapsedRealtime();
+
+        if ("dificil".equalsIgnoreCase(modalidad)) {
+            tvTimer.setText("00:60");
+            timerActual = new CountDownTimer(LIMITE_SEG_DIFICIL * 1000L, 1000L) {
+                @Override public void onTick(long ms) {
+                    int s = (int) Math.ceil(ms / 1000.0);
+                    tvTimer.setText(String.format(Locale.getDefault(), "00:%02d", s));
+                }
+                @Override public void onFinish() {
+                    if (preguntas.get(idx).elegida == null) {
+                        preguntas.get(idx).elegida = ""; // nula
+                    }
+                    if (idx < preguntas.size() - 1) {
+                        idx++; pintarPregunta();
+                    } else {
+                        cerrarSimulacro();
+                    }
+                }
+            }.start();
+        }
+    }
+
+    private String safeOpt(int i, List<String> ops) {
+        if (ops == null || ops.size() <= i) return ABCD[i] + ".";
+        String t = ops.get(i) == null ? "" : ops.get(i).trim();
+        // No dupliques si ya viene "A. ...":
+        if (t.matches("^\\s*[A-Da-d][\\.)]\\s+.*")) return t;
+        return ABCD[i] + ". " + t;
+    }
 
     private void cerrarSimulacro() {
-        if (idSesion == null || idSesion.trim().isEmpty()) {
-            Toast.makeText(this, "Falta idSesion para cerrar", Toast.LENGTH_LONG).show();
+        int idSesion = 0;
+        try { idSesion = Integer.parseInt(String.valueOf(data.getSesion().getIdSesion())); } catch (Exception ignore) {}
+
+        if (idSesion <= 0) {
+            Toast.makeText(this, "Falta id_sesion", Toast.LENGTH_LONG).show();
             return;
         }
 
-        ApiService api = RetrofitClient.getInstance(getApplicationContext()).create(ApiService.class);
-
-        JsonObject body = new JsonObject();
-        body.addProperty("id_sesion", idSesion);
-
-        // timestamp ISO (respondida_at), el backend ignora el tiempo por pregunta aquí
-        String isoNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US)
-                .format(new Date());
-
-        JsonArray respuestasJA = new JsonArray();
-        for (int i = 0; i < preguntas.size(); i++) {
-            PreguntaUI p = preguntas.get(i);
-            String opcion = (p.opcionElegida == null) ? "" : p.opcionElegida;
-
-            // Tupla: [$1 alternativa_elegida, $2 es_correcta=null, $3 respondida_at, $4 id_detalle(orden)]
-            JsonArray tupla = new JsonArray();
-            tupla.add(opcion);           // $1
-            tupla.add((String) null);    // $2 -> lo calcula el backend
-            tupla.add(isoNow);           // $3
-            tupla.add(i + 1);            // $4 -> usamos orden 1..N
-
-            respuestasJA.add(tupla);
+        List<IslaCerrarRequest.Resp> resps = new ArrayList<>();
+        for (PreguntaUI q : preguntas) {
+            String letra = q.elegida == null ? "" : q.elegida.trim().toUpperCase();
+            resps.add(new IslaCerrarRequest.Resp(q.id, letra));
         }
-        body.add("respuestas", respuestasJA);
+        IslaCerrarRequest body = new IslaCerrarRequest(idSesion, resps);
 
-        Log.i("IslaCerrar", "Payload cerrar (arrays): " + body);
-
-        api.cerrarIslaSimulacro(body).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> res) {
-                if (!res.isSuccessful()) {
-                    String msg = "No se pudo cerrar el simulacro (HTTP " + res.code() + ")";
-                    try {
-                        if (res.errorBody() != null) {
-                            String raw = res.errorBody().string();
-                            Log.e("IslaCerrar", "HTTP " + res.code() + " -> " + raw);
-                            msg = raw;
-                        }
-                    } catch (Exception ignore) {}
-                    Toast.makeText(IslaPreguntasActivity.this, msg, Toast.LENGTH_LONG).show();
+        ApiService api = RetrofitClient.getInstance(getApplicationContext()).create(ApiService.class);
+        api.cerrarIslaSimulacro(body).enqueue(new Callback<IslaCerrarResultadoResponse>() {
+            @Override public void onResponse(Call<IslaCerrarResultadoResponse> call, Response<IslaCerrarResultadoResponse> res) {
+                if (!res.isSuccessful() || res.body() == null) {
+                    Toast.makeText(IslaPreguntasActivity.this, "No se pudo cerrar ("+res.code()+")", Toast.LENGTH_LONG).show();
                     return;
                 }
-
-                // OK -> ir a resultados (si tienes esa pantalla)
-                try {
-                    Intent it = new Intent(IslaPreguntasActivity.this, IslaResultadoActivity.class);
-                    it.putExtra("modalidad", modalidadSeleccionada);
-                    it.putExtra("payload", payloadJson);
-                    startActivity(it);
-                    finish();
-                } catch (Exception e) {
-                    Log.w("IslaCerrar", "Cerró OK pero no pude abrir resultados", e);
-                }
+                String resultadoJson = GsonHolder.gson().toJson(res.body());
+                Intent it = new Intent(IslaPreguntasActivity.this, IslaResultadoActivity.class);
+                it.putExtra("modalidad", modalidad);
+                it.putExtra("resultado_json", resultadoJson);
+                startActivity(it);
+                finish();
             }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("IslaCerrar", "Fallo de red al cerrar", t);
-                Toast.makeText(IslaPreguntasActivity.this,
-                        "Error de red al cerrar: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            @Override public void onFailure(Call<IslaCerrarResultadoResponse> call, Throwable t) {
+                Log.e("IslaCerrar", "Error de red", t);
+                Toast.makeText(IslaPreguntasActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    // ======= Utils =======
-    private static String safeString(JsonElement e) {
-        if (e == null || e.isJsonNull()) return "";
-        try { return e.getAsString(); } catch (Exception ex) { return String.valueOf(e); }
-    }
-
-    private static class PreguntaUI {
-        String id = "";
-        String area = "";
-        String subtema = "";
-        String enunciado = "";
-        List<String> opciones = new ArrayList<>();
-        String opcionElegida = "";
-        int tiempoSeg = 0;
     }
 }

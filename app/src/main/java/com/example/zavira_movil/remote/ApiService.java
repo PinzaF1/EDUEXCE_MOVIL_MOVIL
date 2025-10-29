@@ -32,6 +32,18 @@ import com.example.zavira_movil.retos1vs1.RetoCreadoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreateRequest;
 import com.example.zavira_movil.retos1vs1.RetoListItem;
 import com.example.zavira_movil.model.LogrosResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarResultadoResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaResumenResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarMixtoRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarResultadoResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaResumenResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaIniciarRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -76,7 +88,7 @@ public interface ApiService {
             @Body Map<String, Object> body
     );
 
-    @POST("quiz-inicial/cerrar")
+    @POST("quizz/cerrar")
     Call<ResponseBody> cerrar(
             @Header("Authorization") String bearerToken,
             @Body QuizCerrarRequest request
@@ -104,18 +116,29 @@ public interface ApiService {
     @POST("movil/simulacro")
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
 
-    @POST("movil/simulacro/cerrar")
-    Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
 
-    @POST("movil/simulacro/cerrar")
-    Call<CerrarResponse> cerrarSimulacroCompat(@Body Map<String, Object> bodyCompat);
+    @POST("movil/isla/simulacro")
+    Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest body);
+
+    @POST("movil/isla/simulacro/cerrar")
+    Call<IslaCerrarResultadoResponse> cerrarIslaSimulacro(@Body IslaCerrarRequest body);
+
+
 
     // ---------- Isla ----------
+    // Iniciar simulacro: POST /movil/isla/simulacro  => body: {"modalidad":"facil"|"dificil"}
     @POST("movil/isla/simulacro")
-    Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest req);
+    Call<IslaSimulacroResponse> iniciarIslaSimulacro(
+            @Header("Authorization") String authBearer,
+            @Body IslaIniciarRequest body
+    );
 
-    @POST("/movil/isla/simulacro/cerrar")
-    Call<IslaCerrarResponse> cerrarIslaSimulacro(@Body IslaCerrarRequest body);
+    // Cerrar simulacro: POST /movil/isla/simulacro/cerrar  => body: {id_sesion, respuestas:[{id_pregunta,respuesta}]}
+    @POST("movil/isla/simulacro/cerrar")
+    Call<IslaCerrarResultadoResponse> cerrarIslaSimulacro(
+            @Header("Authorization") String authBearer,
+            @Body IslaCerrarRequest body
+    );
 
     @GET("movil/isla/simulacro/{id}/resumen")
     Call<IslaResumenResponse> getIslaResumen(@Path("id") int idSesion);

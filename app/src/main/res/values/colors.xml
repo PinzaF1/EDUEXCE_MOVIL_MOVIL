@@ -115,6 +115,19 @@
     <color name="level_row_title">#111827</color>
     <color name="level_row_sub">#6B7280</color>
     <color name="brand_blue">#2563EB</color>
+    <color name="ripple_neutral">#1F000000</color>
+
+    <color name="quizBlue">#2563EB</color>          <!-- azul principal -->
+    <color name="quizBluePressed">#1D4ED8</color>   <!-- azul al presionar -->
+    <color name="quizBlueLight">#E5EDFF</color>     <!-- azul muy claro (hover) -->
+
+    <!-- Texto y grises -->
+    <color name="quizText">#000000</color>          <!-- negro para textos -->
+    <color name="quizTitle">#1F2937</color>
+    <color name="quizSubtle">#6B7280</color>
+    <color name="quizProgressTrack">#E0E0E0</color>
+
+    <color name="quizStroke">#CBD5E1</color>         <!-- borde gris de opciones -->
 
 
 

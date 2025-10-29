@@ -25,7 +25,7 @@
                 android:text="1 / 25"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#1F2937" />
+                android:textColor="#111827" />
 
             <TextView
                 android:id="@+id/tvTimer"
@@ -34,7 +34,7 @@
                 android:text="00:60"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#1E88E5"
+                android:textColor="#2563EB"
                 android:visibility="gone" />
         </LinearLayout>
 
@@ -46,7 +46,7 @@
             android:layout_height="10dp"
             android:max="25"
             android:progress="0"
-            android:progressTint="#1E88E5"
+            android:progressTint="#2563EB"
             android:backgroundTint="#E0E0E0"
             android:scaleY="1.4"
             android:layout_marginTop="12dp" />
@@ -68,7 +68,7 @@
             android:text="Matemáticas • Subtema"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#1F2937"
+            android:textColor="#111827"
             android:layout_marginTop="16dp" />
 
         <!-- Enunciado -->
@@ -78,71 +78,96 @@
             android:layout_height="wrap_content"
             android:text="Aquí va el enunciado…"
             android:textSize="18sp"
-            android:textColor="#1F2937"
+            android:textColor="#111827"
             android:layout_marginTop="12dp" />
 
-        <!-- Opciones (blancas por defecto, azules al seleccionar) -->
+        <!-- Opciones (texto SIEMPRE negro, fondo azul al seleccionar/presionar) -->
         <Button
             android:id="@+id/btnOp1"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:paddingVertical="14dp"
             android:layout_marginTop="16dp"
             android:text="A. Opción 1"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="#1E88E5"
+            android:textColor="#000000"
+            android:singleLine="false"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:gravity="center"
             android:background="@drawable/selector_option"
             android:backgroundTint="@android:color/transparent" />
 
         <Button
             android:id="@+id/btnOp2"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:paddingVertical="14dp"
             android:layout_marginTop="12dp"
             android:text="B. Opción 2"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="#1E88E5"
+            android:textColor="#000000"
+            android:singleLine="false"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:gravity="center"
             android:background="@drawable/selector_option"
             android:backgroundTint="@android:color/transparent" />
 
         <Button
             android:id="@+id/btnOp3"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:paddingVertical="14dp"
             android:layout_marginTop="12dp"
             android:text="C. Opción 3"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="#1E88E5"
+            android:textColor="#000000"
+            android:singleLine="false"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:gravity="center"
             android:background="@drawable/selector_option"
             android:backgroundTint="@android:color/transparent" />
 
         <Button
             android:id="@+id/btnOp4"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:paddingVertical="14dp"
             android:layout_marginTop="12dp"
             android:text="D. Opción 4"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="#1E88E5"
+            android:textColor="#000000"
+            android:singleLine="false"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:gravity="center"
             android:background="@drawable/selector_option"
             android:backgroundTint="@android:color/transparent" />
 
-        <!-- Botón Responder (más abajo y azul) -->
+        <!-- Botón Responder (AZUL) -->
         <Button
             android:id="@+id/btnResponder"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:paddingVertical="14dp"
             android:layout_marginTop="28dp"
             android:layout_marginBottom="8dp"
             android:text="Responder"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/btn_primary_round"
+            android:textColor="#000000"
+            android:background="@drawable/bg_cta_blue"
             android:backgroundTint="@android:color/transparent" />
-
     </LinearLayout>
 </ScrollView>
