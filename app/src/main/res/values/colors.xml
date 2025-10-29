@@ -115,11 +115,25 @@
     <color name="level_row_title">#111827</color>
     <color name="level_row_sub">#6B7280</color>
     <color name="brand_blue">#2563EB</color>
+    <color name="ripple_neutral">#1F000000</color>
+
+    <color name="quizBlue">#2563EB</color>          <!-- azul principal -->
+    <color name="quizBluePressed">#1D4ED8</color>   <!-- azul al presionar -->
+    <color name="quizBlueLight">#E5EDFF</color>     <!-- azul muy claro (hover) -->
+
+    <!-- Texto y grises -->
+    <color name="quizText">#000000</color>          <!-- negro para textos -->
+    <color name="quizTitle">#1F2937</color>
+    <color name="quizSubtle">#6B7280</color>
+    <color name="quizProgressTrack">#E0E0E0</color>
+
+    <color name="quizStroke">#CBD5E1</color>         <!-- borde gris de opciones -->
     <color name="primaryyy">#004AAD</color>
 
     <color name="asimilador_bg">#C0DBEF</color>     <!-- Fondo celeste claro -->
     <color name="asimilador_border">#B1D1E7</color> <!-- Borde celeste más intenso -->
-
+    <color name="radio_default">#212121</color>
+  
         <color name="pri_500">#6C63FF</color>
         <color name="pri_600">#5A52E6</color>
         <color name="sec_500">#6BC3FF</color>
@@ -129,15 +143,9 @@
         <color name="bg_warning">#FFF8E1</color>
         <color name="warning">#D9822B</color>
         <color name="card_shadow">#1A000000</color>
-    <color name="radio_default">#212121</color>
-
+ 
         <color name="card_surface_neutral">#F5F6FA</color>
         <color name="card_stroke_neutral">#E5E9F0</color>
-
-
-
-
-
 
 
 

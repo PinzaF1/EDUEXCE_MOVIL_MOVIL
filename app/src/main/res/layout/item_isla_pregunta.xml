@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvIndex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1."
+            android:textStyle="bold"
+            android:textColor="#111827"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="Matemáticas • Subtema"
+            android:textStyle="bold"
+            android:textColor="#111827"
+            android:textSize="15sp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvEnunciado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Enunciado…"
+        android:textColor="#111827"
+        android:textSize="16sp"/>
+
+    <!-- Opciones: fondo blanco/transparent y azul al seleccionar -->
+    <Button
+        android:id="@+id/btnOp1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:text="A. Opción 1"
+        android:textAllCaps="false"
+        android:textSize="15sp"
+        android:textColor="#2563EB"
+        android:background="@drawable/selector_option"
+        android:backgroundTint="@android:color/transparent"/>
+
+    <Button
+        android:id="@+id/btnOp2"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:text="B. Opción 2"
+        android:textAllCaps="false"
+        android:textSize="15sp"
+        android:textColor="#2563EB"
+        android:background="@drawable/selector_option"
+        android:backgroundTint="@android:color/transparent"/>
+
+    <Button
+        android:id="@+id/btnOp3"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:text="C. Opción 3"
+        android:textAllCaps="false"
+        android:textSize="15sp"
+        android:textColor="#2563EB"
+        android:background="@drawable/selector_option"
+        android:backgroundTint="@android:color/transparent"/>
+
+    <Button
+        android:id="@+id/btnOp4"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:text="D. Opción 4"
+        android:textAllCaps="false"
+        android:textSize="15sp"
+        android:textColor="#2563EB"
+        android:background="@drawable/selector_option"
+        android:backgroundTint="@android:color/transparent"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>

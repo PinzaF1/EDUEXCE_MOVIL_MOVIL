@@ -1,40 +1,64 @@
 package com.example.zavira_movil.remote;
 
 import com.example.zavira_movil.BasicResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
 import com.example.zavira_movil.QuizCerrarRequest;
 import com.example.zavira_movil.QuizInicialResponse;
+
 import com.example.zavira_movil.progreso.DiagnosticoInicial;
 import com.example.zavira_movil.retos1vs1.AceptarRetoResponse;
 import com.example.zavira_movil.retos1vs1.EstadoRetoResponse;
 import com.example.zavira_movil.progreso.HistorialResponse;
 import com.example.zavira_movil.niveleshome.CerrarRequest;
 import com.example.zavira_movil.niveleshome.CerrarResponse;
+
 import com.example.zavira_movil.model.Estudiante;
-import com.example.zavira_movil.model.KolbResultado;
-import com.example.zavira_movil.model.LoginRequest;
-import com.example.zavira_movil.model.SimulacroRequest;
-import com.example.zavira_movil.niveleshome.SimulacroResponse;
-import com.example.zavira_movil.model.IslaCerrarRequest;
-import com.example.zavira_movil.model.IslaResumenResponse;
-import com.example.zavira_movil.model.IslaCerrarResponse;
-import com.example.zavira_movil.model.IslaSimulacroResponse;
-import com.example.zavira_movil.model.IslaSimulacroRequest;
-import com.example.zavira_movil.model.RankingResponse;
-import com.example.zavira_movil.model.LogrosResponse;
-import com.example.zavira_movil.model.OtorgarAreaRequest;
-import com.example.zavira_movil.model.OtorgarAreaResponse;
-import com.example.zavira_movil.retos1vs1.MarcadorResponse;
-import com.example.zavira_movil.retos1vs1.RetoListItem;
-import com.example.zavira_movil.oponente.OpponentBackend;
-
-
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaResumenResponse;
 import com.example.zavira_movil.model.KolbRequest;
 import com.example.zavira_movil.model.KolbResponse;
+import com.example.zavira_movil.model.LoginRequest;
+import com.example.zavira_movil.model.OtorgarAreaRequest;
+import com.example.zavira_movil.model.OtorgarAreaResponse;
+
+import com.example.zavira_movil.model.RankingResponse;
+import com.example.zavira_movil.model.RondaResponse;
+import com.example.zavira_movil.model.SimulacroRequest;
+import com.example.zavira_movil.niveleshome.CerrarRequest;
+import com.example.zavira_movil.niveleshome.CerrarResponse;
+import com.example.zavira_movil.niveleshome.ParadaRequest;
+import com.example.zavira_movil.niveleshome.ParadaResponse;
+import com.example.zavira_movil.niveleshome.SimulacroResponse;
+
+import com.example.zavira_movil.retos1vs1.MarcadorResponse;
+import com.example.zavira_movil.retos1vs1.RetoListItem;
+
+import com.example.zavira_movil.oponente.OpponentBackend;
+import com.example.zavira_movil.progreso.HistorialResponse;
 import com.example.zavira_movil.progreso.MateriasResponse;
-import com.example.zavira_movil.model.PreguntasKolb;
 import com.example.zavira_movil.progreso.ResumenGeneral;
+import com.example.zavira_movil.retos1vs1.AceptarRetoResponse;
+import com.example.zavira_movil.retos1vs1.EstadoRetoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreadoResponse;
 import com.example.zavira_movil.retos1vs1.RetoCreateRequest;
+
+import com.example.zavira_movil.retos1vs1.RetoListItem;
+import com.example.zavira_movil.model.LogrosResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarResultadoResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaResumenResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarMixtoRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaCerrarResultadoResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaResumenResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroRequest;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroResponse;
+import com.example.zavira_movil.HislaConocimiento.IslaIniciarRequest;
+
 import com.example.zavira_movil.retos1vs1.RondaResponse;
 import com.example.zavira_movil.niveleshome.ParadaRequest;
 import com.example.zavira_movil.niveleshome.ParadaResponse;
@@ -70,13 +94,13 @@ public interface ApiService {
 
     // ---------- Kolb ----------
     @GET("kolb/preguntas")
-    Call<List<PreguntasKolb>> getPreguntas();
+    Call<List<com.example.zavira_movil.model.PreguntasKolb>> getPreguntas();
 
     @POST("kolb/enviar")
     Call<KolbResponse> guardarRespuestas(@Body KolbRequest request);
 
     @GET("kolb/resultado")
-    Call<KolbResultado> obtenerResultado();
+    Call<com.example.zavira_movil.model.KolbResultado> obtenerResultado();
 
     // ---------- Examen inicial ----------
     @POST("quizz/iniciar")
@@ -108,11 +132,9 @@ public interface ApiService {
     @POST("sesion/parada")
     Call<ParadaResponse> crearParada(@Body ParadaRequest body);
 
-    // Cierre NUEVO (objetos {opcion, orden})
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesion(@Body CerrarRequest request);
 
-    // Cierre LEGACY (fallback): {"id_sesion": N, "respuestas":[["A",1],["C",2], ...]}
     @POST("sesion/cerrar")
     Call<CerrarResponse> cerrarSesionCompat(@Body Map<String, Object> bodyCompat);
 
@@ -120,18 +142,29 @@ public interface ApiService {
     @POST("movil/simulacro")
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
 
-    @POST("movil/simulacro/cerrar")
-    Call<CerrarResponse> cerrarSimulacro(@Body CerrarRequest request);
 
-    @POST("movil/simulacro/cerrar")
-    Call<CerrarResponse> cerrarSimulacroCompat(@Body Map<String, Object> bodyCompat);
-
-    // ---------- Isla ----------
     @POST("movil/isla/simulacro")
-    Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest req);
+    Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest body);
 
     @POST("movil/isla/simulacro/cerrar")
-    Call<IslaCerrarResponse> cerrarIslaSimulacro(@Body IslaCerrarRequest req);
+    Call<IslaCerrarResultadoResponse> cerrarIslaSimulacro(@Body IslaCerrarRequest body);
+
+
+
+    // ---------- Isla ----------
+    // Iniciar simulacro: POST /movil/isla/simulacro  => body: {"modalidad":"facil"|"dificil"}
+    @POST("movil/isla/simulacro")
+    Call<IslaSimulacroResponse> iniciarIslaSimulacro(
+            @Header("Authorization") String authBearer,
+            @Body IslaIniciarRequest body
+    );
+
+    // Cerrar simulacro: POST /movil/isla/simulacro/cerrar  => body: {id_sesion, respuestas:[{id_pregunta,respuesta}]}
+    @POST("movil/isla/simulacro/cerrar")
+    Call<IslaCerrarResultadoResponse> cerrarIslaSimulacro(
+            @Header("Authorization") String authBearer,
+            @Body IslaCerrarRequest body
+    );
 
     @GET("movil/isla/simulacro/{id}/resumen")
     Call<IslaResumenResponse> getIslaResumen(@Path("id") int idSesion);
