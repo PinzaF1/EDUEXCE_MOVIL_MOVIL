@@ -3,8 +3,11 @@ package com.example.zavira_movil.Perfil;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -35,9 +39,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,8 +61,6 @@ public class PerfilFragment extends Fragment {
 
     private FragmentPerfilBinding binding;
     private ApiService api;
-
-    // ID del usuario (PUT /movil/perfil/{id} y para foto por usuario)
     private Integer perfilUserId = null;
 
     // Cámara/Galería
@@ -67,11 +69,10 @@ public class PerfilFragment extends Fragment {
     private ActivityResultLauncher<Uri> takePictureLauncher;
     private ActivityResultLauncher<String> pickImageLauncher;
 
-    // Persistencia de foto
     private static final String PREFS_NAME = "perfil_prefs";
     private static final String KEY_FOTO_PATH_BASE = "foto_path";
     private static final String TMP_KEY = KEY_FOTO_PATH_BASE + "_tmp";
-    private static final String AVATAR_FILE_BASE = "avatar"; // avatar_<id>.jpg
+    private static final String AVATAR_FILE_BASE = "avatar";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,17 +108,11 @@ public class PerfilFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
-
-        // 1) Intentar obtener el id desde el JWT
         perfilUserId = getUserIdFromToken();
 
-        // Foto: picker
         binding.icon.setOnClickListener(v -> showPickerDialog());
+        cargarFotoPreferida(null);
 
-        // Cargar lo que haya (si no hay id aún, usa clave y archivo temporales)
-        cargarFotoPreferida(/*remoteUrl=*/null);
-
-        // Editar info personal
         binding.rowEditarPerfil.setOnClickListener(v -> {
             if (perfilUserId == null) {
                 android.widget.Toast.makeText(requireContext(), "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
@@ -128,10 +123,54 @@ public class PerfilFragment extends Fragment {
 
         cargarPerfil();
         cargarKolb();
+
+        binding.rowKolbTrigger.setOnClickListener(v -> showKolbDialog());
     }
 
-    // ===================== ID =====================
+    // ---------------- Diálogo Kolb ----------------
+    private void showKolbDialog() {
+        // Inflar el layout del diálogo
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_kolb, null, false);
 
+        // Pasar datos al layout
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvEstiloSheet))
+                .setText(binding.tvEstilo.getText());
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvFechaSheet))
+                .setText(binding.tvFechaKolb.getText());
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvCaracteristicasSheet))
+                .setText(binding.tvCaracteristicas.getText());
+        ((android.widget.TextView) dialogView.findViewById(R.id.tvRecomendacionesSheet))
+                .setText(binding.tvRecomendaciones.getText());
+
+        // Construir sin botones del builder (el botón está en el XML)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogView)
+                .create();
+
+        // Click en "Cerrar" (definido en el XML)
+        View btnCerrar = dialogView.findViewById(R.id.btnCerrarSheet);
+        if (btnCerrar != null) btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+        // Fullscreen como una página
+        dialog.setOnShowListener(dlg -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setLayout(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                );
+                // Fondo blanco de página
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            }
+        });
+
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+    }
+
+
+
+    // ---------------- Util para ID ----------------
     @Nullable
     private Integer getUserIdFromToken() {
         try {
@@ -172,22 +211,7 @@ public class PerfilFragment extends Fragment {
         return null;
     }
 
-    // ===================== Helpers foto por usuario =====================
-
-    private String prefsKeyForUser() {
-        return (perfilUserId == null) ? TMP_KEY : KEY_FOTO_PATH_BASE + "_" + perfilUserId;
-    }
-
-    private String fileNameForUser() {
-        return (perfilUserId == null) ? AVATAR_FILE_BASE + "_tmp.jpg" : AVATAR_FILE_BASE + "_" + perfilUserId + ".jpg";
-    }
-
-    private File absoluteFileForUser() {
-        return new File(requireContext().getFilesDir(), fileNameForUser());
-    }
-
-    // ===================== Cámara / Galería =====================
-
+    // ---------------- Cámara/Galería ----------------
     private void showPickerDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Foto de perfil")
@@ -224,13 +248,11 @@ public class PerfilFragment extends Fragment {
     }
 
     private void setPhoto(@NonNull Uri uri) {
-        // Mostrar de inmediato
         Glide.with(requireContext())
                 .load(uri)
                 .placeholder(R.drawable.usuario)
                 .into(binding.icon);
 
-        // Guardar archivo por-usuario y persistir ruta
         File saved = copyUriToInternalFile(uri, fileNameForUser());
         if (saved != null) guardarPathFoto(saved.getAbsolutePath());
     }
@@ -252,20 +274,11 @@ public class PerfilFragment extends Fragment {
         }
     }
 
-    /**
-     * Orden de carga:
-     * 1) Buscar ruta en SharedPrefs por-usuario (o tmp).
-     * 2) Si no hay o no existe el archivo, buscar directamente el archivo avatar_<id>.jpg;
-     *    si existe, mostrarlo y reconstruir la preferencia.
-     * 3) Si tampoco, usar remoteUrl (si viene).
-     * 4) Si nada, robot.
-     */
     private void cargarFotoPreferida(@Nullable String remoteUrl) {
-        var sp   = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String k = prefsKeyForUser();
         String path = sp.getString(k, null);
 
-        // 1) Preferencia existente
         if (path != null) {
             File f = new File(path);
             if (f.exists()) {
@@ -276,23 +289,31 @@ public class PerfilFragment extends Fragment {
             }
         }
 
-        // 2) Archivo por convención (por si borraron las prefs al cerrar sesión)
         File byName = absoluteFileForUser();
         if (byName.exists()) {
             Glide.with(this).load(byName).placeholder(R.drawable.usuario).into(binding.icon);
-            // reconstruir preferencia
             sp.edit().putString(k, byName.getAbsolutePath()).apply();
             return;
         }
 
-        // 3) URL remota del backend
         if (remoteUrl != null && !remoteUrl.trim().isEmpty() && !"null".equalsIgnoreCase(remoteUrl.trim())) {
             Glide.with(this).load(remoteUrl.trim()).placeholder(R.drawable.usuario).into(binding.icon);
             return;
         }
 
-        // 4) Placeholder
         binding.icon.setImageResource(R.drawable.usuario);
+    }
+
+    private String prefsKeyForUser() {
+        return (perfilUserId == null) ? TMP_KEY : KEY_FOTO_PATH_BASE + "_" + perfilUserId;
+    }
+
+    private String fileNameForUser() {
+        return (perfilUserId == null) ? AVATAR_FILE_BASE + "_tmp.jpg" : AVATAR_FILE_BASE + "_" + perfilUserId + ".jpg";
+    }
+
+    private File absoluteFileForUser() {
+        return new File(requireContext().getFilesDir(), fileNameForUser());
     }
 
     private void guardarPathFoto(@NonNull String absolutePath) {
@@ -303,7 +324,7 @@ public class PerfilFragment extends Fragment {
     }
 
     private void eliminarFotoLocal() {
-        var sp   = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String k = prefsKeyForUser();
         String path = sp.getString(k, null);
 
@@ -314,104 +335,214 @@ public class PerfilFragment extends Fragment {
         binding.icon.setImageResource(R.drawable.usuario);
     }
 
-    // ===================== Perfil / Kolb =====================
-
+    // ---------------- Perfil / Kolb ----------------
     private void cargarPerfil() {
         api.getPerfilEstudiante().enqueue(new Callback<Estudiante>() {
             @Override public void onResponse(Call<Estudiante> call, Response<Estudiante> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) { logHttpError("PROFILE_PERFIL", resp); return; }
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    logHttpError("PROFILE_PERFIL", resp);
+                    return;
+                }
                 Estudiante e = resp.body();
 
-                // Migración TMP -> id real si acabamos de conocer el id
-                Integer oldId = perfilUserId;
+                // Asegurar id
                 if (perfilUserId == null) perfilUserId = guessIdFromPerfil(e);
-                if (oldId == null && perfilUserId != null) {
-                    var sp = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                    String tmpPath = sp.getString(TMP_KEY, null);
-                    if (tmpPath != null) {
-                        // mueve la preferencia a la key por usuario (el archivo ya está en /files)
-                        sp.edit()
-                                .remove(TMP_KEY)
-                                .putString(prefsKeyForUser(), tmpPath)
-                                .apply();
-                    }
-                }
 
-                // Decide foto (local por-usuario > archivo por nombre > remota > robot)
                 cargarFotoPreferida(e.getFotoUrl());
-
                 binding.rowEditarPerfil.setEnabled(perfilUserId != null);
 
+                // Encabezado: nombre al lado del avatar
+                String nombreCompleto = safe(e.getNombreUsuario()) + " " + safe(e.getApellido());
+                binding.tvNombreHeader.setText(nombreCompleto);
+
+                // Subtítulo opcional “Estudiante de Grado X”
+                String gradoSolo = safe(e.getGrado());
+                if (!"-".equals(gradoSolo)) {
+                } else {
+                }
+
+                // Grado combinado con curso -> “11 - C”
+                String cursoSolo = safe(e.getCurso());
+                String gradoCurso;
+                if (!"-".equals(gradoSolo) && !"-".equals(cursoSolo)) {
+                    gradoCurso = gradoSolo + " - " + cursoSolo;
+                } else if (!"-".equals(gradoSolo)) {
+                    gradoCurso = gradoSolo;
+                } else if (!"-".equals(cursoSolo)) {
+                    gradoCurso = cursoSolo;
+                } else {
+                    gradoCurso = "-";
+                }
+                binding.tvGrado.setText(gradoCurso);
+
+                // Esconder el bloque de curso si estuviera en el layout
+                View rowCurso = getView() != null ? getView().findViewById(R.id.rowCurso) : null;
+                if (rowCurso != null) rowCurso.setVisibility(View.GONE);
+
+                // Resto de campos de la tarjeta
                 binding.tvInstitucion.setText(safe(e.getNombreInstitucion()));
-                binding.tvNombre.setText(safe(e.getNombreUsuario()) + " " + safe(e.getApellido()));
-                binding.tvDocumento.setText(safe(e.getNumeroDocumento()));
                 binding.tvTipoDoc.setText(safe(e.getTipoDocumento()));
-                binding.tvGrado.setText(safe(e.getGrado()));
-                binding.tvCurso.setText(safe(e.getCurso()));
+                binding.tvDocumento.setText(safe(e.getNumeroDocumento()));
                 binding.tvJornada.setText(safe(e.getJornada()));
                 binding.tvCorreo.setText(safe(e.getCorreo()));
                 binding.tvTelefono.setText(safe(e.getTelefono()));
                 binding.tvDireccion.setText(safe(e.getDireccion()));
-                String estado = (e.getIsActive() != null && e.getIsActive()) ? "Activo" : "Inactivo";
-                binding.tvEstado.setText(estado);
             }
-            @Override public void onFailure(Call<Estudiante> call, Throwable t) { Log.e("PROFILE_PERFIL_FAIL", "onFailure", t); }
+            @Override public void onFailure(Call<Estudiante> call, Throwable t) {
+                Log.e("PROFILE_PERFIL_FAIL", "onFailure", t);
+            }
         });
     }
 
     private void cargarKolb() {
         api.obtenerResultado().enqueue(new Callback<KolbResultado>() {
             @Override public void onResponse(Call<KolbResultado> call, Response<KolbResultado> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) { logHttpError("PROFILE_KOLB", resp); return; }
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    logHttpError("PROFILE_KOLB", resp);
+                    return;
+                }
                 KolbResultado r = resp.body();
                 binding.tvEstilo.setText(safe(r.getEstilo()));
                 binding.tvFechaKolb.setText(formatearFechaFlexible(r.getFecha()));
                 binding.tvCaracteristicas.setText(limpiarTexto(r.getCaracteristicas()));
                 binding.tvRecomendaciones.setText(limpiarTexto(r.getRecomendaciones()));
             }
-            @Override public void onFailure(Call<KolbResultado> call, Throwable t) { Log.e("PROFILE_KOLB_FAIL", "onFailure", t); }
+            @Override public void onFailure(Call<KolbResultado> call, Throwable t) {
+                Log.e("PROFILE_KOLB_FAIL", "onFailure", t);
+            }
         });
     }
 
-    // ===================== Editar contacto =====================
-
+    // ---------------- Editor de contacto ----------------
     private void abrirEditorContacto() {
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        View content = LayoutInflater.from(requireContext()).inflate(R.layout.editar_infopersonal, null, false);
-        dialog.setContentView(content);
+        View content = LayoutInflater.from(requireContext())
+                .inflate(R.layout.editar_infopersonal, null, false);
 
         TextInputEditText etCorreo    = content.findViewById(R.id.etCorreo);
         TextInputEditText etTelefono  = content.findViewById(R.id.etTelefono);
         TextInputEditText etDireccion = content.findViewById(R.id.etDireccion);
         MaterialButton btnGuardar     = content.findViewById(R.id.btnGuardar);
+        MaterialButton btnCancelar    = content.findViewById(R.id.btnCancelar);
 
+        // Prefill
         etCorreo.setText(textOrEmpty(binding.tvCorreo));
         etTelefono.setText(textOrEmpty(binding.tvTelefono));
         etDireccion.setText(textOrEmpty(binding.tvDireccion));
 
+        // Diálogo centrado
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(content)
+                .create();
+        dialog.setOnShowListener(dlg -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setDimAmount(0.6f);
+                int w = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+                dialog.getWindow().setLayout(w, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        });
+
+        // --- Habilitar/Deshabilitar Guardar según vacíos ---
+        btnGuardar.setEnabled(false);
+        btnGuardar.setAlpha(0.5f);
+
+        TextWatcher watcher = new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
+                boolean ok = !isEmpty(str(etCorreo))
+                        && !isEmpty(str(etTelefono))
+                        && !isEmpty(str(etDireccion));
+                btnGuardar.setEnabled(ok);
+                btnGuardar.setAlpha(ok ? 1f : 0.5f);
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        };
+        etCorreo.addTextChangedListener(watcher);
+        etTelefono.addTextChangedListener(watcher);
+        etDireccion.addTextChangedListener(watcher);
+
+        // Cancelar
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        // Guardar
         btnGuardar.setOnClickListener(v -> {
             String correo    = str(etCorreo);
             String telefono  = str(etTelefono);
             String direccion = str(etDireccion);
 
-            if (!isEmpty(correo) && !android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
+            // Requeridos
+            if (isEmpty(correo) || isEmpty(telefono) || isEmpty(direccion)) {
+                if (isEmpty(correo))    etCorreo.setError("Requerido");
+                if (isEmpty(telefono))  etTelefono.setError("Requerido");
+                if (isEmpty(direccion)) etDireccion.setError("Requerido");
+                android.widget.Toast.makeText(requireContext(),
+                        "Completa todos los campos", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validaciones de formato
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
                 etCorreo.setError("Correo inválido"); return;
             }
-            if (!isEmpty(telefono) && !Pattern.compile("^\\+?[0-9\\s\\-()]{7,20}$").matcher(telefono).matches()) {
+            if (!java.util.regex.Pattern.compile("^\\+?[0-9\\s\\-()]{7,20}$")
+                    .matcher(telefono).matches()) {
                 etTelefono.setError("Teléfono inválido"); return;
             }
-            if (!isEmpty(direccion) && direccion.length() > 255) {
+            if (direccion.length() > 255) {
                 etDireccion.setError("Dirección demasiado larga"); return;
             }
             if (perfilUserId == null) {
-                android.widget.Toast.makeText(requireContext(), "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(requireContext(),
+                        "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Llamada a API; el diálogo se cierra al finalizar
             enviarEdicionContacto(perfilUserId, correo, direccion, telefono, dialog);
         });
 
         dialog.show();
     }
+
+
+    private void enviarEdicionContacto(int userId,
+                                       String correo,
+                                       String direccion,
+                                       String telefono,
+                                       @Nullable android.app.Dialog dialogToClose) {
+
+        EditarPerfilRequest body = new EditarPerfilRequest(correo, direccion, telefono);
+        api.editarPerfil(userId, body).enqueue(new Callback<EditarPerfilResponse>() {
+            @Override
+            public void onResponse(Call<EditarPerfilResponse> call, Response<EditarPerfilResponse> response) {
+                if (!response.isSuccessful()) {
+                    logHttpError("PROFILE_EDIT", response);
+                    android.widget.Toast.makeText(requireContext(),
+                            "Error guardando cambios", android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // Actualiza los valores visibles en el perfil
+                binding.tvCorreo.setText(isEmpty(correo) ? "-" : correo.trim());
+                binding.tvTelefono.setText(isEmpty(telefono) ? "-" : telefono.trim());
+                binding.tvDireccion.setText(isEmpty(direccion) ? "-" : direccion.trim());
+
+                String msg = (response.body() != null && response.body().getMessage() != null)
+                        ? response.body().getMessage() : "Actualizado";
+                android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show();
+
+                if (dialogToClose != null && dialogToClose.isShowing()) dialogToClose.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<EditarPerfilResponse> call, Throwable t) {
+                Log.e("PROFILE_EDIT_FAIL", "onFailure", t);
+                android.widget.Toast.makeText(requireContext(),
+                        "Error de red: " + t.getLocalizedMessage(), android.widget.Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     private void enviarEdicionContacto(int userId, String correo, String direccion, String telefono, BottomSheetDialog dialog) {
         EditarPerfilRequest body = new EditarPerfilRequest(correo, direccion, telefono);
@@ -445,8 +576,7 @@ public class PerfilFragment extends Fragment {
         });
     }
 
-    // ===================== Utilidades =====================
-
+    // ---------------- Utilidades ----------------
     private static void logHttpError(String tag, Response<?> response) {
         try {
             ResponseBody err = response.errorBody();
@@ -458,7 +588,8 @@ public class PerfilFragment extends Fragment {
 
     private static String limpiarTexto(String s) {
         if (s == null) return "-";
-        String out = s.replace("\\t", " ").replace("\t", " ").replace("\\n", "\n").replace("\r", "");
+        String out = s.replace("\\t", " ").replace("\t", " ")
+                .replace("\\n", "\n").replace("\r", "");
         out = out.trim();
         return out.isEmpty() ? "-" : out;
     }

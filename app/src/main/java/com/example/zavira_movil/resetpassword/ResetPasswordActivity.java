@@ -37,13 +37,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
     // Paso 1: Solicitar código
     private EditText etCorreo;
     private Button btnEnviarCodigo;
-    private Button btnSkipStep1;
+
     private ProgressBar progressStep1;
 
     // Paso 2: Verificar código
     private EditText etCodigo;
     private Button btnVerificarCodigo;
-    private Button btnSkipStep2;
+
     private TextView tvReenviarCodigo;
     private TextView tvEmailEnviado;
     private TextView tvTimer;
@@ -92,13 +92,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
         // Paso 1
         etCorreo = findViewById(R.id.etCorreo);
         btnEnviarCodigo = findViewById(R.id.btnEnviarCodigo);
-        btnSkipStep1 = findViewById(R.id.btnSkipStep1);
+
         progressStep1 = findViewById(R.id.progressStep1);
 
         // Paso 2
         etCodigo = findViewById(R.id.etCodigo);
         btnVerificarCodigo = findViewById(R.id.btnVerificarCodigo);
-        btnSkipStep2 = findViewById(R.id.btnSkipStep2);
+
         tvReenviarCodigo = findViewById(R.id.tvReenviarCodigo);
         tvEmailEnviado = findViewById(R.id.tvEmailEnviado);
         tvTimer = findViewById(R.id.tvTimer);
@@ -121,20 +121,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         // Paso 1: Enviar código
         btnEnviarCodigo.setOnClickListener(v -> solicitarCodigo());
-        btnSkipStep1.setOnClickListener(v -> {
-            correoActual = "test@example.com"; // Correo de prueba
-            showStep(1);
-            startCountDownTimer();
-            Toast.makeText(this, "Atajo activado - Paso 2", Toast.LENGTH_SHORT).show();
-        });
+
 
         // Paso 2: Verificar código
         btnVerificarCodigo.setOnClickListener(v -> verificarCodigo());
-        btnSkipStep2.setOnClickListener(v -> {
-            codigoActual = "123456"; // Código de prueba
-            showStep(2);
-            Toast.makeText(this, "Atajo activado - Paso 3", Toast.LENGTH_SHORT).show();
-        });
+
         tvReenviarCodigo.setOnClickListener(v -> reenviarCodigo());
 
         // Paso 3: Restablecer contraseña

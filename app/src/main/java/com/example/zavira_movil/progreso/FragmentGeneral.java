@@ -18,6 +18,8 @@ import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
+import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,8 +28,8 @@ public class FragmentGeneral extends Fragment {
 
     private CircularProgressIndicator progresoGeneral;
     private TextView textoProgreso, tvNivelActual;
-    private RecyclerView recyclerNiveles;
-    private NivelesAdapter nivelesAdapter;
+    private RecyclerView recyclerNiveles;      // mismo ID del XML
+    private MateriasAdapter materiasAdapter;   // ← ahora materias
 
     @Nullable
     @Override
@@ -42,16 +44,17 @@ public class FragmentGeneral extends Fragment {
         progresoGeneral.setIndeterminate(false);
         progresoGeneral.setMax(100);
 
-        // Para que el RecyclerView se expanda dentro del ScrollView
         recyclerNiveles.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerNiveles.setNestedScrollingEnabled(false);
         recyclerNiveles.setHasFixedSize(false);
         recyclerNiveles.setItemAnimator(null);
 
-        nivelesAdapter = new NivelesAdapter();
-        recyclerNiveles.setAdapter(nivelesAdapter);
+        materiasAdapter = new MateriasAdapter();
+        materiasAdapter.setLista(new ArrayList<>()); // vacío inicial
+        recyclerNiveles.setAdapter(materiasAdapter);
 
-        cargarResumen();
+        cargarResumen();   // anillo + nivel actual
+        cargarMaterias();  // lista de materias
         return v;
     }
 
@@ -66,8 +69,6 @@ public class FragmentGeneral extends Fragment {
                     ResumenGeneral rg = res.body();
 
                     int valor = rg.getProgresoGlobal();
-                    Log.d("API", "progresoGlobal=" + valor);
-
                     try {
                         progresoGeneral.setProgressCompat(valor, true);
                     } catch (NoSuchMethodError e) {
@@ -76,12 +77,6 @@ public class FragmentGeneral extends Fragment {
                     textoProgreso.setText(valor + "%");
 
                     tvNivelActual.setText(rg.getNivelActual() != null ? rg.getNivelActual() : "");
-
-                    if (rg.getNiveles() != null) {
-                        // >>> IMPORTANTE: primero el % global, luego la lista
-                        nivelesAdapter.setGlobalProgress(valor);
-                        nivelesAdapter.setData(rg.getNiveles());
-                    }
                 } else {
                     Log.e("API", "HTTP " + res.code());
                 }
@@ -91,6 +86,30 @@ public class FragmentGeneral extends Fragment {
             public void onFailure(Call<ResumenGeneral> call, Throwable t) {
                 if (!isAdded()) return;
                 Log.e("API", "Fallo: " + t.getMessage());
+            }
+        });
+    }
+
+    private void cargarMaterias() {
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+        api.getMaterias().enqueue(new Callback<MateriasResponse>() {
+            @Override
+            public void onResponse(Call<MateriasResponse> call, Response<MateriasResponse> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null && response.body().getMaterias() != null) {
+                    materiasAdapter.setLista(response.body().getMaterias());
+                } else {
+                    Log.e("Materias", "Error HTTP: " + response.code());
+                    materiasAdapter.setLista(new ArrayList<>());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MateriasResponse> call, Throwable t) {
+                if (!isAdded()) return;
+                Log.e("Materias", "Fallo: " + t.getMessage());
+                materiasAdapter.setLista(new ArrayList<>());
             }
         });
     }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Fondo degradado suave -->
+    <gradient
+        android:startColor="#FFF5FA"
+        android:endColor="#FFFFFF"
+        android:angle="90" />
+
+    <!-- Bordes redondeados -->
+    <corners android:radius="18dp" />
+
+    <!-- Borde sutil -->
+    <stroke
+        android:width="1dp"
+        android:color="#FFE1ED" />
+</shape>

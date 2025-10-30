@@ -8,6 +8,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -18,18 +19,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZAVIRA_MOVIL"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".Home.NotificationsActivity"
+            android:exported="false" />
         <!-- Lanzador -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Login / flujo principal -->
+        </activity> <!-- Login / flujo principal -->
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
@@ -48,24 +50,26 @@
             android:exported="false" />
         <activity
             android:name=".niveleshome.SimulacroActivity"
-            android:exported="false" />
 
+            android:exported="false" />
+        <activity
+            android:name=".HislaConocimiento.IslasActivity"
+            android:exported="false" />
         <!-- Perfil -->
+            android:exported="false" /> <!-- Perfil -->
         <activity
             android:name=".Perfil.ProfileActivity"
-            android:exported="false" />
-
-        <!-- Islas / Simulacros -->
+            android:exported="false" /> <!-- Islas / Simulacros -->
         <activity
-            android:name=".Home.IslaSimulacroActivity"
+            android:name=".HislaConocimiento.IslaSimulacroActivity"
             android:exported="false"
             android:label="Simulacro Isla" />
         <activity
-            android:name=".Home.IslaPreguntasActivity"
+            android:name=".HislaConocimiento.IslaPreguntasActivity"
             android:exported="false"
             android:label="Preguntas Simulacro" />
         <activity
-            android:name=".Home.IslaResultadoActivity"
+            android:name=".HislaConocimiento.IslaResultadoActivity"
             android:exported="false"
             android:label="Resultados Simulacro" />
         <activity
@@ -76,22 +80,19 @@
             android:exported="false" />
         <activity
             android:name=".InfoTestActivity"
-            android:exported="false" />
-
-        <!-- Ranking -->
+            android:exported="false" /> <!-- Ranking -->
         <activity
             android:name=".ui.ranking.RankingLogrosActivity"
-            android:exported="false" />
-
-        <!-- Resultados / tests sueltos -->
+            android:exported="false" /> <!-- Resultados / tests sueltos -->
         <activity
             android:name=".TestActivity"
             android:exported="false" />
         <activity
             android:name=".ResultActivity"
             android:exported="false" />
-
+        <activity android:name=".HislaConocimiento.IslaModalityActivity" android:exported="false" />l
         <!-- FileProvider para guardar la foto tomada en cache/ -->
+            android:exported="false" /> <!-- FileProvider para guardar la foto tomada en cache/ -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -101,7 +102,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>

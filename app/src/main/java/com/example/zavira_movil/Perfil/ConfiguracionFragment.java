@@ -23,9 +23,9 @@ import com.example.zavira_movil.model.Estudiante;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.button.MaterialButton;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -49,7 +49,7 @@ public class ConfiguracionFragment extends Fragment {
         View rowCambiar = view.findViewById(R.id.rowCambiarContrasena);
         if (rowCambiar != null) rowCambiar.setOnClickListener(v -> mostrarDialogoCambio());
 
-        View rowLogout = view.findViewById(R.id.btnCerrarSesion);
+        View rowLogout = view.findViewById(R.id.rowCerrarSesion);
         if (rowLogout != null) rowLogout.setOnClickListener(v -> confirmarCerrarSesion());
     }
 
@@ -70,42 +70,93 @@ public class ConfiguracionFragment extends Fragment {
     }
 
     // ---------------------------------------------------------------------
-    // Cambiar contraseña (con botones dentro del layout)
+    // Cambiar contraseña
     // ---------------------------------------------------------------------
     private void mostrarDialogoCambio() {
+        // Primero preguntar si recuerda su contraseña
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Cambiar Contraseña")
+                .setMessage("¿Recuerdas tu contraseña actual?")
+                .setPositiveButton("Sí, la recuerdo", (d, w) -> {
+                    // Flujo normal: pedir contraseña actual
+                    mostrarDialogoCambioNormal();
+                })
+                .setNeutralButton("No, la olvidé", (d, w) -> {
+                    // Ir a recuperación de contraseña
+                    Intent intent = new Intent(requireContext(), com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    /**
+     * Diálogo normal para cambiar contraseña (requiere contraseña actual)
+     */
+    private void mostrarDialogoCambioNormal() {
         View content = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialogo_cambiar_contrasena, null, false);
 
-        TextInputEditText etActual    = content.findViewById(R.id.etActual);
-        TextInputEditText etNueva     = content.findViewById(R.id.etNueva);
+        TextInputEditText etActual = content.findViewById(R.id.etActual);
+        TextInputEditText etNueva = content.findViewById(R.id.etNueva);
         TextInputEditText etConfirmar = content.findViewById(R.id.etConfirmar);
 
         // Botones del layout
         MaterialButton btnCancelar = content.findViewById(R.id.btnCancelar);
-        MaterialButton btnGuardar  = content.findViewById(R.id.btnGuardar);
+        MaterialButton btnGuardar = content.findViewById(R.id.btnGuardar);
+
+        // Placeholders que se quitan al enfocar y vuelven si queda vacío
+        final String H1 = "Ingresa tu contraseña actual";
+        final String H2 = "Mínimo 8 caracteres";
+        final String H3 = "Repite la nueva contraseña";
+
+        etActual.setHint(H1);
+        etNueva.setHint(H2);
+        etConfirmar.setHint(H3);
+
+        View.OnFocusChangeListener clearOnFocus = (v, hasFocus) -> {
+            TextInputEditText et = (TextInputEditText) v;
+            if (hasFocus) {
+                et.setHint("");
+            } else {
+                boolean empty = et.getText() == null || et.getText().length() == 0;
+                if (empty) {
+                    if (et == etActual) et.setHint(H1);
+                    else if (et == etNueva) et.setHint(H2);
+                    else if (et == etConfirmar) et.setHint(H3);
+                }
+            }
+        };
+        etActual.setOnFocusChangeListener(clearOnFocus);
+        etNueva.setOnFocusChangeListener(clearOnFocus);
+        etConfirmar.setOnFocusChangeListener(clearOnFocus);
 
         final var dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Cambiar Contraseña")
+                // El título ya lo tienes en el XML (TextView superior)
                 .setView(content)
-                // Importante: SIN setPositive/Negative para usar los del layout
                 .create();
 
-        // Cancelar -> cerrar
+        // Acciones
         btnCancelar.setOnClickListener(v -> dialog.dismiss());
 
-        // Guardar -> validar + llamar API
         btnGuardar.setOnClickListener(v -> {
             String actual = etActual.getText() != null ? etActual.getText().toString().trim() : "";
-            String nueva  = etNueva.getText()  != null ? etNueva.getText().toString().trim()  : "";
-            String conf   = etConfirmar.getText()!= null ? etConfirmar.getText().toString().trim() : "";
+            String nueva = etNueva.getText() != null ? etNueva.getText().toString().trim() : "";
+            String conf = etConfirmar.getText() != null ? etConfirmar.getText().toString().trim() : "";
 
             // Validaciones
             if (TextUtils.isEmpty(actual) || TextUtils.isEmpty(nueva) || TextUtils.isEmpty(conf)) {
                 Toast.makeText(requireContext(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (nueva.length() < 6) { etNueva.setError("Mínimo 6 caracteres"); return; }
-            if (!nueva.equals(conf)) { etConfirmar.setError("No coincide"); return; }
+            if (nueva.length() < 6) {
+                etNueva.setError("Mínimo 6 caracteres");
+                return;
+            }
+            if (!nueva.equals(conf)) {
+                etConfirmar.setError("No coincide");
+                return;
+            }
 
             Dialog loading = showLoading();
 
@@ -121,11 +172,14 @@ public class ConfiguracionFragment extends Fragment {
                     if (loading.isShowing()) loading.dismiss();
 
                     if (resp.isSuccessful() && resp.body() != null && resp.body().isOk()) {
-                        // Verificar de una vez la nueva clave para asegurar que quedó bien
+                        // Verificar login con la nueva clave
                         verificarLoginConNuevaClave(api, nueva, dialog);
                     } else {
                         String msg = "Error " + resp.code();
-                        try { if (resp.errorBody() != null) msg += ": " + resp.errorBody().string(); } catch (Exception ignored) {}
+                        try {
+                            if (resp.errorBody() != null) msg += ": " + resp.errorBody().string();
+                        } catch (Exception ignored) {
+                        }
                         showLong(msg);
                     }
                 }
@@ -141,9 +195,10 @@ public class ConfiguracionFragment extends Fragment {
         dialog.show();
     }
 
-    /** Llama al perfil para obtener numero_documento y prueba login con la nueva contraseña. */
+    /**
+     * Llama al perfil para obtener numero_documento y prueba login con la nueva contraseña.
+     */
     private void verificarLoginConNuevaClave(ApiService api, String nuevaClave, Dialog dialogCambio) {
-        // 1) Traer perfil para obtener el identificador de login
         api.getPerfilEstudiante().enqueue(new Callback<Estudiante>() {
             @Override
             public void onResponse(Call<Estudiante> call, Response<Estudiante> rPerfil) {
@@ -155,9 +210,9 @@ public class ConfiguracionFragment extends Fragment {
 
                 String numeroDoc = null;
                 try {
-                    // Ajusta este getter según tu modelo Estudiante
                     numeroDoc = rPerfil.body().getNumeroDocumento();
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
                 if (numeroDoc == null || numeroDoc.trim().isEmpty()) {
                     showLong("Contraseña actualizada. No pude obtener el documento del perfil.");
@@ -165,7 +220,6 @@ public class ConfiguracionFragment extends Fragment {
                     return;
                 }
 
-                // 2) Probar login con la NUEVA clave
                 LoginRequest loginReq = new LoginRequest(numeroDoc.trim(), nuevaClave);
 
                 api.loginEstudiante(loginReq).enqueue(new Callback<ResponseBody>() {
@@ -176,7 +230,11 @@ public class ConfiguracionFragment extends Fragment {
                             dialogCambio.dismiss();
                         } else {
                             String msg = "Falló al actualizar la contraseña (" + rLogin.code() + ")";
-                            try { if (rLogin.errorBody()!=null) msg += ": " + rLogin.errorBody().string(); } catch (Exception ignored) {}
+                            try {
+                                if (rLogin.errorBody() != null)
+                                    msg += ": " + rLogin.errorBody().string();
+                            } catch (Exception ignored) {
+                            }
                             showLong(msg + " → Revisa persistencia/hash en el backend.");
                         }
                     }
@@ -200,16 +258,37 @@ public class ConfiguracionFragment extends Fragment {
     // Cerrar sesión
     // ---------------------------------------------------------------------
     private void confirmarCerrarSesion() {
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("¿Cerrar la sesión de tu cuenta?")
-                .setNegativeButton("Cancelar", (d, w) -> d.dismiss())
-                .setPositiveButton("Cerrar sesión", (d, w) -> {
-                    com.example.zavira_movil.local.TokenManager.clearAll(requireContext());
-                    Intent i = new Intent(requireContext(), LoginActivity.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(i);
-                    requireActivity().finish();
-                })
-                .show();
+        // Infla el layout personalizado
+        View content = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_cerrar_sesion, null, false);
+
+        final var dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(content)
+                .create();
+
+        // Fondo transparente para respetar el card redondeado
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+            );
+        }
+
+        // Botones
+        MaterialButton btnCancelar = content.findViewById(R.id.btnCancelarCerrar);
+        MaterialButton btnConfirmar = content.findViewById(R.id.btnConfirmarCerrar);
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirmar.setOnClickListener(v -> {
+            // Acción real de cerrar sesión
+            com.example.zavira_movil.local.TokenManager.clearAll(requireContext());
+            Intent i = new Intent(requireContext(), LoginActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            requireActivity().finish();
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 }

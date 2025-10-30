@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bg_blue_outline"
+        android:padding="20dp">
+
+        <!-- Ícono centrado arriba (mismo color que el botón Cerrar) -->
+        <ImageView
+            android:id="@+id/ivKolbIcon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/app_name"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/kolb"
+            app:tint="@color/blue" />
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilo de aprendizaje"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="12dp"/>
+
+        <!-- Info -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilo:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvEstiloSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fecha:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvFechaSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Características:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvCaracteristicasSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recomendaciones:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvRecomendacionesSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="16dp"/>
+
+        <!-- Botón Cerrar en el XML -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarSheet"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="Cerrar"
+            android:textAllCaps="false"
+            android:textColor="@color/blue"/>
+    </LinearLayout>
+</ScrollView>

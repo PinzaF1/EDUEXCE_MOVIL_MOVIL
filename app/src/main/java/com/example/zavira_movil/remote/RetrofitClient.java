@@ -13,33 +13,52 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Cliente único de Retrofit con:
+ * - Header Authorization: Bearer <token> (lee de TokenManager)
+ * - Headers JSON por defecto
+ * - Logging de peticiones (BODY)
+ *
+ * Helpers expuestos:
+ *   RetrofitClient.init(context)
+ *   RetrofitClient.getClient() / getInstance()
+ *   RetrofitClient.getApiService()
+ */
 public final class RetrofitClient {
 
-    private static final String BASE_URL = "https://overvaliantly-discourseless-delilah.ngrok-free.dev/";
+    private static final String BASE_URL =
+            "https://gillian-semiluminous-blubberingly.ngrok-free.dev/";
+
     private static Retrofit retrofit;
     private static Context appContext; // para leer el token
 
-    private RetrofitClient() {}
+    private RetrofitClient() { }
 
-    /** Llama esto una vez (por ejemplo en Application o en tu primera Activity) */
+    /** Llama esto una vez (p. ej. en Application.onCreate). */
     public static void init(Context context) {
         if (context != null) appContext = context.getApplicationContext();
     }
 
-    /** Compatibilidad: permite usar getInstance(this) como tú lo estabas haciendo */
+    /** Alias conveniente. */
+    public static Retrofit getClient() {
+        return getInstance();
+    }
+
+    /** Compatibilidad por si llamas con contexto (inicializa token reader). */
     public static Retrofit getInstance(Context context) {
         init(context);
         return getInstance();
     }
 
-    /** Usar cuando ya llamaste init(Context) antes */
+    /** Obtiene/crea el singleton de Retrofit. */
     public static Retrofit getInstance() {
         if (retrofit == null) {
-            // Interceptor de logs (útil en desarrollo)
+
+            // Logs de red (útil en desarrollo)
             HttpLoggingInterceptor log = new HttpLoggingInterceptor();
             log.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            // Interceptor para Authorization
+            // Interceptor para Authorization + headers JSON
             Interceptor authInterceptor = chain -> {
                 Request original = chain.request();
                 Request.Builder builder = original.newBuilder();
@@ -50,10 +69,9 @@ public final class RetrofitClient {
                         builder.header("Authorization", "Bearer " + token);
                     }
                 }
-                // JSON por defecto
+
                 builder.header("Accept", "application/json");
                 builder.header("Content-Type", "application/json");
-
                 return chain.proceed(builder.build());
             };
 
@@ -72,5 +90,10 @@ public final class RetrofitClient {
                     .build();
         }
         return retrofit;
+    }
+
+    /** Helper directo para obtener tu ApiService sin repetir .create(...) */
+    public static ApiService getApiService() {
+        return getInstance().create(ApiService.class);
     }
 }

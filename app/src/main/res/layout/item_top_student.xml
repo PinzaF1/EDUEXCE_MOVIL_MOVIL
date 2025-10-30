@@ -1,60 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rootRow"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@drawable/bg_top_row_blue"
-    android:padding="14dp"
-    android:layout_marginBottom="10dp"
-    android:gravity="center_vertical">
+    android:layout_height="84dp"
+    android:layout_marginTop="12dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="0dp">
 
-    <!-- # de puesto -->
-    <TextView
-        android:id="@+id/tvRank"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="#1"
-        android:textStyle="bold"
-        android:textColor="#0F172A"
-        android:textSize="16sp"
-        android:layout_marginEnd="12dp"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
-    <!-- Nombre (izquierda) + puntos (derecha) -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        <!-- Contenedor (puedes dejar tu bg_card_white o el que uses) -->
+        <LinearLayout
+            android:id="@+id/bgRow"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_card_white"
+            android:orientation="horizontal"
+            android:padding="14dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- Círculo con número de posición -->
         <TextView
-            android:id="@+id/tvName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nombre Apellido"
-            android:textColor="#0F172A"
+            android:id="@+id/tvRank"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="1"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:maxLines="1"
-            android:ellipsize="end"/>
+            android:textColor="@android:color/white"
+            android:background="@drawable/azul"
+            android:layout_marginStart="18dp"
+            app:layout_constraintStart_toStartOf="@id/bgRow"
+            app:layout_constraintTop_toTopOf="@id/bgRow"
+            app:layout_constraintBottom_toBottomOf="@id/bgRow" />
 
+        <!-- Nombre + "x pts" debajo -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="14dp"
+            app:layout_constraintStart_toEndOf="@id/tvRank"
+            app:layout_constraintEnd_toStartOf="@id/tvPointsRight"
+            app:layout_constraintTop_toTopOf="@id/bgRow"
+            app:layout_constraintBottom_toBottomOf="@id/bgRow">
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre del estudiante"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="#111827"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvPointsSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="11 pts"
+                android:textSize="13sp"
+                android:textColor="#6B7280" />
+        </LinearLayout>
+
+        <!-- Número grande a la derecha -->
         <TextView
-            android:id="@+id/tvPointsSmall"
+            android:id="@+id/tvPointsRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 pts"
-            android:textColor="#334155"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp"/>
-    </LinearLayout>
+            android:text="11"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#111827"
+            android:layout_marginEnd="18dp"
+            app:layout_constraintEnd_toEndOf="@id/bgRow"
+            app:layout_constraintTop_toTopOf="@id/bgRow"
+            app:layout_constraintBottom_toBottomOf="@id/bgRow" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Puntos grande, opcional (puedes quitarlo si no lo quieres) -->
-    <TextView
-        android:id="@+id/tvPointsRight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textColor="#0F172A"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
-</LinearLayout>
+</androidx.cardview.widget.CardView>

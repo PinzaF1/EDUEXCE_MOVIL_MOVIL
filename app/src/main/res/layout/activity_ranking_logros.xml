@@ -85,7 +85,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvTop"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="302dp"
                 android:nestedScrollingEnabled="false" />
 
             <!-- Tu Posición Actual -->
