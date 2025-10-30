@@ -129,7 +129,7 @@ public class FragmentHistorial extends Fragment {
             b.putString("fecha", it.getFecha());
         }
 
-        // 👉 Forzar que el detalle abra en la pestaña "Resumen" (posición 0)
+        //  Forzar que el detalle abra en la pestaña "Resumen" (posición 0)
         b.putInt("initial_tab", 0); // el FragmentDetalleSimulacro puede leerlo y hacer pager.setCurrentItem(0,false)
 
         Fragment f = new FragmentDetalleSimulacro();

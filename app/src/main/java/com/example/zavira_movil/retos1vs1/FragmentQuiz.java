@@ -40,6 +40,8 @@ public class FragmentQuiz extends Fragment {
 
     private int index = 0;
     private final Map<Integer, String> marcadas = new HashMap<>();
+    private final Map<Integer, Long> tiemposPorPregunta = new HashMap<>(); // tiempo en ms por pregunta
+    private long tiempoInicioPreguntaActual;
 
     private TextView tvLeft, tvIndex, tvRight, tvPregunta;
     private Button btnNext;
@@ -94,6 +96,7 @@ public class FragmentQuiz extends Fragment {
         render();
 
         startMillis = System.currentTimeMillis();
+        tiempoInicioPreguntaActual = System.currentTimeMillis(); // iniciar timer de primera pregunta
 
         if (btnNext != null) {
             btnNext.setOnClickListener(v12 -> {
@@ -101,8 +104,14 @@ public class FragmentQuiz extends Fragment {
                     Toast.makeText(getContext(), "Selecciona una opción", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                
+                // Guardar tiempo de la pregunta actual
+                long tiempoEmpleado = System.currentTimeMillis() - tiempoInicioPreguntaActual;
+                tiemposPorPregunta.put(index, tiempoEmpleado);
+                
                 if (index < data.preguntas.size() - 1) {
                     index++;
+                    tiempoInicioPreguntaActual = System.currentTimeMillis(); // reiniciar timer
                     render();
                 } else {
                     enviarRonda();
@@ -174,7 +183,13 @@ public class FragmentQuiz extends Fragment {
         List<RondaRequest.Item> items = new ArrayList<>();
         for (int i = 0; i < data.preguntas.size(); i++) {
             String key = marcadas.get(i);
-            if (key != null) items.add(new RondaRequest.Item(i + 1, key));
+            if (key != null) {
+                // Obtener tiempo en segundos (con decimales)
+                Long tiempoMs = tiemposPorPregunta.get(i);
+                Double tiempoSeg = (tiempoMs != null) ? (tiempoMs / 1000.0) : 0.0;
+                
+                items.add(new RondaRequest.Item(i + 1, key, tiempoSeg));
+            }
         }
 
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);

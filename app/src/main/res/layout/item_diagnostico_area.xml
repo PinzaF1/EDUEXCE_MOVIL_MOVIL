@@ -1,99 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardArea"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
     app:cardCornerRadius="16dp"
-    app:cardBackgroundColor="@android:color/white"
+    app:cardElevation="3dp"
     app:cardUseCompatPadding="true"
-    app:cardElevation="4dp">
+    app:strokeWidth="2dp"
+    app:strokeColor="@color/card_stroke_neutral">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp">
 
-        <!-- Cinta superior con color y esquinas redondeadas -->
+        <!-- “Chip” con el nombre (izquierda) -->
         <TextView
             android:id="@+id/tvAreaChip"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="36dp"
-            android:gravity="center_vertical"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:text="Área"
-            app:cardBackgroundColor="@color/card_surface"
-            android:textStyle="bold"
             android:background="@drawable/bg_chip_round"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- Inicial  ↔  Actual -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:weightSum="3"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp">
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Área"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/badgeIcon"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginEnd="8dp" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+        <!-- Badge + ícono (derecha) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badgeIcon"
+            android:layout_width="32dp"
+            android:layout_height="37dp"
+            app:cardBackgroundColor="@color/row_violet"
+            app:cardCornerRadius="21dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/tvAreaChip"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvAreaChip"
+            app:strokeWidth="0dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Inicial"
-                    android:textColor="#687089"
-                    android:textSize="13sp"/>
+            <ImageView
+                android:id="@+id/ivAreaIcon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/calculator" />
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/tvInicialValor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textStyle="bold"
-                    android:textSize="20sp"/>
-            </LinearLayout>
+        <!-- Línea “Inicial” -->
+        <TextView
+            android:id="@+id/labelInicial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Inicial"
+            android:textColor="@color/text_muted"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvAreaChip"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- Símbolo de comparación -->
-            <TextView
-                android:id="@+id/tvCompare"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="↔"
-                android:gravity="center"
-                android:textSize="20sp"
-                android:textColor="#9FA7B8"/>
+        <TextView
+            android:id="@+id/tvInicialValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 %"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            app:layout_constraintBaseline_toBaselineOf="@id/labelInicial"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="end">
+        <ProgressBar
+            android:id="@+id/pbInicial"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="6dp"
+            android:layout_marginTop="8dp"
+            android:max="100"
+            android:progress="0"
+            android:indeterminate="false"
+            app:layout_constraintTop_toBottomOf="@id/labelInicial"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Actual"
-                    android:textColor="#687089"
-                    android:textSize="13sp"/>
+        <!-- Línea “Actual” -->
+        <TextView
+            android:id="@+id/labelActual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Actual"
+            android:textColor="@color/text_muted"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/pbInicial"
+            app:layout_constraintStart_toStartOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvActualValor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textStyle="bold"
-                    android:textSize="20sp"/>
-            </LinearLayout>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvActualValor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 %"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            app:layout_constraintBaseline_toBaselineOf="@id/labelActual"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </LinearLayout>
+        <ProgressBar
+            android:id="@+id/pbActual"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:minHeight="8dp"
+            android:maxHeight="8dp"
+            android:max="100"
+            android:progress="0"
+            android:indeterminate="false"
+            android:progressDrawable="@drawable/progress_rounded"
+            android:progressBackgroundTint="@color/progress_track_light"
+            android:progressBackgroundTintMode="src_in"
+            app:layout_constraintTop_toBottomOf="@id/labelActual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <!-- Lo pides presente para evitar errores, pero oculto -->
+        <TextView
+            android:id="@+id/tvCompare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="↔"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/pbActual"
+            app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

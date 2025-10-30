@@ -187,7 +187,10 @@ public interface ApiService {
     Call<AceptarRetoResponse> aceptarReto(@Path("id") String idReto);
 
     @POST("movil/retos/{id}/aceptar")
-    Call<AceptarRetoResponse> aceptarRetoConBody(@Path("id") String idReto, @Body Map<String, Object> empty);
+    Call<AceptarRetoResponse> aceptarRetoConBody(
+        @Path("id") String idReto, 
+        @Body Map<String, Object> syncData
+    );
 
     @POST("movil/retos/ronda")
     Call<RondaResponse> responderRonda(@Body RondaRequest body);

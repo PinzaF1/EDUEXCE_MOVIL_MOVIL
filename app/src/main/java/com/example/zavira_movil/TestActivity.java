@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.example.zavira_movil.Home.HomeActivity;
 import com.example.zavira_movil.model.KolbRequest;
@@ -51,7 +52,6 @@ public class TestActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBloque);
         tvProgresoBloque = findViewById(R.id.tvProgresoBloque);
 
-        // Barra de progreso vacía
         progressBar.setProgress(0);
         tvProgresoBloque.setText("Progreso: 0 / 36");
 
@@ -95,65 +95,80 @@ public class TestActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
 
-        for (int i = 0; i < preguntas.size(); i++) {
-            PreguntasKolb p = preguntas.get(i);
+        int totalPreguntas = preguntas.size();
+        int preguntasPorBloque = 9;
+        int totalBloques = (int) Math.ceil(totalPreguntas / (float) preguntasPorBloque);
 
-            // CARD por cada pregunta
-            CardView card = new CardView(this);
-            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            cardParams.setMargins(0, 16, 0, 16);
-            card.setLayoutParams(cardParams);
-            card.setRadius(18f);
-            card.setCardElevation(6f);
-            card.setUseCompatPadding(true);
-            card.setCardBackgroundColor(getResources().getColor(android.R.color.white));
+        for (int b = 0; b < totalBloques; b++) {
+            // ---- Bloque visual ----
+            LinearLayout bloqueLayout = new LinearLayout(this);
+            bloqueLayout.setOrientation(LinearLayout.VERTICAL);
+            bloqueLayout.setPadding(24, 24, 24, 24);
+            bloqueLayout.setBackgroundResource(R.drawable.bg_card);
+            bloqueLayout.setElevation(6f);
 
-            LinearLayout inner = new LinearLayout(this);
-            inner.setOrientation(LinearLayout.VERTICAL);
-            inner.setPadding(24, 24, 24, 24);
+            TextView tituloBloque = new TextView(this);
+            tituloBloque.setText("Bloque " + (b + 1));
+            tituloBloque.setTextSize(18);
+            tituloBloque.setTextColor(ContextCompat.getColor(this, R.color.primaryyy));
+            tituloBloque.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+            tituloBloque.setPadding(0, 0, 0, 12);
+            bloqueLayout.addView(tituloBloque);
 
-            TextView titulo = new TextView(this);
-            titulo.setText(p.getTitulo() != null ? p.getTitulo() : p.getTipo_pregunta());
-            titulo.setTextSize(16);
-            titulo.setTextColor(getResources().getColor(R.color.primaryyy));
-            titulo.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+            // ---- Agregar las 9 preguntas del bloque ----
+            for (int i = b * preguntasPorBloque; i < Math.min((b + 1) * preguntasPorBloque, totalPreguntas); i++) {
+                PreguntasKolb p = preguntas.get(i);
 
-            TextView enunciado = new TextView(this);
-            enunciado.setText(p.getPregunta());
-            enunciado.setTextSize(15);
-            enunciado.setTextColor(getResources().getColor(android.R.color.black));
-            enunciado.setPadding(0, 8, 0, 16);
+                CardView card = new CardView(this);
+                LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                cardParams.setMargins(0, 12, 0, 12);
+                card.setLayoutParams(cardParams);
+                card.setRadius(18f);
+                card.setCardElevation(4f);
+                card.setUseCompatPadding(true);
+                card.setCardBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
 
-            RadioGroup group = new RadioGroup(this);
-            group.setOrientation(RadioGroup.VERTICAL);
+                LinearLayout inner = new LinearLayout(this);
+                inner.setOrientation(LinearLayout.VERTICAL);
+                inner.setPadding(24, 24, 24, 24);
 
-            for (int v = 1; v <= 4; v++) {
-                RadioButton rb = new RadioButton(this);
-                rb.setText("Opción " + v);
-                rb.setTag(v);
-                rb.setTextColor(getResources().getColor(R.color.primaryyy));
-                group.addView(rb);
+                TextView enunciado = new TextView(this);
+                enunciado.setText((i + 1) + ". " + p.getPregunta());
+                enunciado.setTextSize(15);
+                enunciado.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+                enunciado.setPadding(0, 8, 0, 16);
+
+                RadioGroup group = new RadioGroup(this);
+                group.setOrientation(RadioGroup.HORIZONTAL);
+
+                for (int v = 1; v <= 4; v++) {
+                    RadioButton rb = new RadioButton(this);
+                    rb.setText(String.valueOf(v));
+                    rb.setTag(v);
+                    rb.setTextColor(ContextCompat.getColor(this, R.color.primaryyy));
+                    group.addView(rb);
+                }
+
+                final int idx = i;
+                group.setOnCheckedChangeListener((gr, id) -> {
+                    RadioButton rb = gr.findViewById(id);
+                    if (rb != null) {
+                        respuestas.put(idx, (int) rb.getTag());
+                        actualizarProgreso();
+                    }
+                });
+
+                inner.addView(enunciado);
+                inner.addView(group);
+                card.addView(inner);
+                bloqueLayout.addView(card);
             }
 
-            final int idx = i;
-            group.setOnCheckedChangeListener((gr, id) -> {
-                RadioButton rb = gr.findViewById(id);
-                if (rb != null) {
-                    respuestas.put(idx, (int) rb.getTag());
-                    actualizarProgreso();
-                }
-            });
-
-            inner.addView(titulo);
-            inner.addView(enunciado);
-            inner.addView(group);
-            card.addView(inner);
-            container.addView(card);
-
-            card.startAnimation(anim);
+            container.addView(bloqueLayout);
+            bloqueLayout.startAnimation(anim);
         }
     }
 
