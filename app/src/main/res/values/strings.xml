@@ -3,5 +3,11 @@
     <string name="expandir">Expandir</string>
     <string name="back">Atrás</string>
     <string name="ver_detalle">Ver detalle</string>
-    <item name="tag_header_image" type="id"/>
+    <item name="tag_header_image" type="id" />
+
+        <string name="tab_resumen">Resumen</string>
+        <string name="tab_diagnostico_inicial">Diagnóstico inicial</string>
+        <string name="tab_historial">Historial</string>
+
+
 </resources>

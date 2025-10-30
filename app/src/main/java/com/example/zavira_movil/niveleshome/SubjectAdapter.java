@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 
-import com.example.zavira_movil.Home.IslaSimulacroActivity;
+import com.example.zavira_movil.HislaConocimiento.IslaSimulacroActivity;
 import com.example.zavira_movil.Home.LevelMiniAdapter;
 import com.example.zavira_movil.R;
 import com.example.zavira_movil.model.Subject;

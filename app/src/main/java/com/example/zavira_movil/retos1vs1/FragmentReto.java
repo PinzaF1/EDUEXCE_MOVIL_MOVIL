@@ -32,6 +32,10 @@ public class FragmentReto extends Fragment {
     private String selectedOpponentId = null;
     private String selectedOpponentName = null;
 
+    // [MARCADOR]
+    private TextView tvVictorias;
+    private TextView tvDerrotas;
+
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_retos, container, false);
@@ -47,6 +51,10 @@ public class FragmentReto extends Fragment {
         chipSoc = v.findViewById(R.id.chipSoc);
         chipIng = v.findViewById(R.id.chipIng);
         btnEnviar = v.findViewById(R.id.btnEnviarReto);
+
+        // [MARCADOR] localizar TextViews si existen
+        tvVictorias = findMetricViewSafely(v, R.id.tvVictorias);
+        tvDerrotas  = findMetricViewSafely(v, R.id.tvDerrotas);
 
         RecyclerView rvOpp = v.findViewById(R.id.rvOpponents);
         rvOpp.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -74,7 +82,20 @@ public class FragmentReto extends Fragment {
 
         btnEnviar.setOnClickListener(x -> crearRetoIrALobby());
         refreshSendState();
+
+        // [MARCADOR] primer fetch
+        cargarMarcador(null);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // [MARCADOR] refresco al volver
+        cargarMarcador(null);
+    }
+
+    // [MARCADOR] público por si quieres llamarlo desde Resultados
+    public void refreshMarcador() { cargarMarcador(null); }
 
     private void cargarOponentes() {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
@@ -154,7 +175,7 @@ public class FragmentReto extends Fragment {
                         String.valueOf(creado.getId_reto()),
                         selectedArea,
                         (selectedOpponentName != null ? selectedOpponentName : "Oponente"),
-                        true // esCreador
+                        true
                 );
 
                 getActivity().getSupportFragmentManager().beginTransaction()
@@ -176,5 +197,47 @@ public class FragmentReto extends Fragment {
         String n = Normalizer.normalize(s, Normalizer.Form.NFD);
         n = n.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
         return n.replace("ñ", "n").replace("Ñ", "N");
+    }
+
+    // ===== [MARCADOR] =====
+
+    @Nullable
+    private TextView findMetricViewSafely(@NonNull View thisRoot, int id) {
+        View v = thisRoot.findViewById(id);
+        if (v instanceof TextView) return (TextView) v;
+
+        Fragment parent = getParentFragment();
+        if (parent != null && parent.getView() != null) {
+            v = parent.getView().findViewById(id);
+            if (v instanceof TextView) return (TextView) v;
+        }
+
+        if (getActivity() != null) {
+            v = getActivity().findViewById(id);
+            if (v instanceof TextView) return (TextView) v;
+        }
+        return null;
+    }
+
+    private void cargarMarcador(@Nullable Integer idSesion) {
+        if (!isAdded()) return;
+
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+        Call<MarcadorResponse> call = (idSesion != null)
+                ? api.marcadorPorSesion(idSesion)
+                : api.marcador();
+
+        call.enqueue(new Callback<MarcadorResponse>() {
+            @Override public void onResponse(Call<MarcadorResponse> c, Response<MarcadorResponse> r) {
+                if (!isAdded() || r.body() == null || !r.isSuccessful()) return;
+                pintarMarcador(r.body().victorias, r.body().derrotas);
+            }
+            @Override public void onFailure(Call<MarcadorResponse> c, Throwable t) { }
+        });
+    }
+
+    private void pintarMarcador(int victorias, int derrotas) {
+        if (tvVictorias != null) tvVictorias.setText(String.valueOf(victorias));
+        if (tvDerrotas  != null) tvDerrotas.setText(String.valueOf(derrotas));
     }
 }

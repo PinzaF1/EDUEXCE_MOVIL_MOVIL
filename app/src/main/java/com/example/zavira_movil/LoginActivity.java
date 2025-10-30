@@ -58,6 +58,12 @@ public class LoginActivity extends AppCompatActivity {
             destinoPendiente = Destino.HOME;
             doLogin();
         });
+
+        // Enlace "¿Olvidaste tu contraseña?"
+        binding.tvOlvideContra.setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void doLogin() {
@@ -130,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
     // Navegación → InfoTestActivity
     private void goToInfoTest() {
         Intent i = new Intent(this, InfoTestActivity.class);
-        // ✅ Limpia la pila para que Back no regrese al login
+
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
@@ -138,8 +144,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Navegación → HomeActivity
     private void goToHome() {
-        Intent i = new Intent(this, HomeActivity.class);
-        // ✅ Limpia la pila para que Back no regrese al login
+        Intent i = new Intent(this, InfoAcademico.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();

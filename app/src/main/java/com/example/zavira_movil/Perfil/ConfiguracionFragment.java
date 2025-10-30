@@ -73,6 +73,27 @@ public class ConfiguracionFragment extends Fragment {
     // Cambiar contraseña
     // ---------------------------------------------------------------------
     private void mostrarDialogoCambio() {
+        // Primero preguntar si recuerda su contraseña
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Cambiar Contraseña")
+                .setMessage("¿Recuerdas tu contraseña actual?")
+                .setPositiveButton("Sí, la recuerdo", (d, w) -> {
+                    // Flujo normal: pedir contraseña actual
+                    mostrarDialogoCambioNormal();
+                })
+                .setNeutralButton("No, la olvidé", (d, w) -> {
+                    // Ir a recuperación de contraseña
+                    Intent intent = new Intent(requireContext(), com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    /**
+     * Diálogo normal para cambiar contraseña (requiere contraseña actual)
+     */
+    private void mostrarDialogoCambioNormal() {
         View content = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialogo_cambiar_contrasena, null, false);
 

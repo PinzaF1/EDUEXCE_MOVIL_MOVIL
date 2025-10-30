@@ -3,5 +3,7 @@
     <style name="Base.Theme.ZAVIRA_MOVIL" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorControlHighlight">@color/ripple_neutral</item>
+        <item name="android:colorControlHighlight">@color/ripple_neutral</item>
     </style>
 </resources>

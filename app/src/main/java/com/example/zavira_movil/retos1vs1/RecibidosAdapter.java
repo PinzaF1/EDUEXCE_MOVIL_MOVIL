@@ -72,19 +72,18 @@ public class RecibidosAdapter extends RecyclerView.Adapter<RecibidosAdapter.VH> 
         String estado = it.getEstado() != null ? it.getEstado() : "";
         h.tvSub.setText(area + (estado.isEmpty() ? "" : " • " + estado));
 
-        boolean pendiente = "pendiente".equalsIgnoreCase(estado);
+        // ✅ Mostrar botones si el reto está 'pendiente' o 'en_curso'
+        boolean visible = "pendiente".equalsIgnoreCase(estado) || "en_curso".equalsIgnoreCase(estado);
 
-        // Texto del botón para el retado
         h.btnAceptar.setText("Comenzar reto");
-
-        h.btnAceptar.setVisibility(pendiente ? View.VISIBLE : View.GONE);
+        h.btnAceptar.setVisibility(visible ? View.VISIBLE : View.GONE);
         if (h.btnRechazar != null) {
-            h.btnRechazar.setVisibility(pendiente ? View.VISIBLE : View.GONE);
+            h.btnRechazar.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
 
         h.btnAceptar.setOnClickListener(v -> {
             if (aceptarListener != null) aceptarListener.onAceptar(it);
-            // DisponibilidadLocal.setDisponible(false); // opcional
+            //DisponibilidadLocal.setDisponible(false); // opcional
         });
 
         if (h.btnRechazar != null) {

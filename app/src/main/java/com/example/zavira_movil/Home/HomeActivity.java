@@ -146,6 +146,15 @@ public class HomeActivity extends AppCompatActivity {
         });
         // --------------------------------------------------------------------
 
+        // ✅ CLICK EN LA CAMPANA → abre NotificationsActivity
+        View btnBell = findViewById(R.id.btnBell);
+        View ivBell  = findViewById(R.id.ivBell);
+        View.OnClickListener goNotifications = v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
+        };
+        if (btnBell != null) btnBell.setOnClickListener(goNotifications);
+        if (ivBell  != null) ivBell.setOnClickListener(goNotifications);
+
         // Bottom navigation
         setupBottomNav(binding.bottomNav);
 

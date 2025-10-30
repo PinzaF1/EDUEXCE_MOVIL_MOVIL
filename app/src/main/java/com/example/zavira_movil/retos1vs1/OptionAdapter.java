@@ -19,14 +19,13 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
     public interface OnPick { void onSelect(String key); }
 
     private final OnPick onPick;
-    private List<AceptarRetoResponse.Opcion> items = new ArrayList<>();
+    private List<String> items = new ArrayList<>(); // strings puro
     private String selectedKey;
 
-    public OptionAdapter(OnPick onPick) {
-        this.onPick = onPick;
-    }
+    public OptionAdapter(OnPick onPick) { this.onPick = onPick; }
 
-    public void submit(List<AceptarRetoResponse.Opcion> list, String selected) {
+    // recibe strings y la selección actual (A,B,C,D)
+    public void submit(List<String> list, String selected) {
         items = (list != null) ? list : new ArrayList<>();
         selectedKey = selected;
         notifyDataSetChanged();
@@ -34,8 +33,7 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
 
     public String getSelectedKey() { return selectedKey; }
 
-    @NonNull
-    @Override
+    @NonNull @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_opcion, parent, false);
         return new VH(v);
@@ -43,14 +41,16 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
-        AceptarRetoResponse.Opcion o = items.get(pos);
+        // key A/B/C/D...
+        String key = String.valueOf((char)('A' + pos));
+        String text = items.get(pos);
 
         h.radio.setOnCheckedChangeListener(null);
-        h.key.setText(o.key);
-        h.text.setText(o.text);
-        h.radio.setChecked(o.key.equals(selectedKey));
+        h.key.setText(key);
+        h.text.setText(text != null ? text : "");
+        h.radio.setChecked(key.equals(selectedKey));
 
-        View.OnClickListener click = v -> select(o.key);
+        View.OnClickListener click = v -> select(key);
         h.itemView.setOnClickListener(click);
         h.radio.setOnClickListener(click);
     }
@@ -62,8 +62,7 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
         if (onPick != null) onPick.onSelect(key);
     }
 
-    @Override
-    public int getItemCount() { return items.size(); }
+    @Override public int getItemCount() { return items.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView key, text;
