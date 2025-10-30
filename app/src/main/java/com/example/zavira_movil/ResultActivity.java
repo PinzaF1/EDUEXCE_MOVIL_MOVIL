@@ -37,7 +37,6 @@ public class ResultActivity extends AppCompatActivity {
         binding = ActivityResultBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.tvNombreCompleto.setVisibility(View.GONE);
         binding.btnIrHome.setOnClickListener(v -> {
             Intent i = new Intent(ResultActivity.this, HomeActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -50,31 +49,28 @@ public class ResultActivity extends AppCompatActivity {
         String extraCarac  = getIntent().getStringExtra("caracteristicas");
         String extraRec    = getIntent().getStringExtra("recomendaciones");
 
-        binding.tvFecha.setText("Fecha: " + formatearFechaFlexible(extraFecha));
-        binding.tvEstilo.setText("Estilo: " + safe(extraEstilo));
-        binding.tvCaracteristicas.setText("Características: " + limpiarTexto(extraCarac));
-        binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(extraRec));
+        binding.tvFecha.setText(formatearFechaFlexible(extraFecha));
+        binding.tvEstilo.setText(safe(extraEstilo));
+        binding.tvCaracteristicas.setText(limpiarTexto(extraCarac));
+        binding.tvRecomendaciones.setText(limpiarTexto(extraRec));
 
         boolean falta = isEmpty(extraFecha) || isEmpty(extraEstilo) || isEmpty(extraCarac) || isEmpty(extraRec);
         if (falta) {
             apiService = RetrofitClient.getInstance(this).create(ApiService.class);
             apiService.obtenerResultado().enqueue(new Callback<KolbResultado>() {
                 @Override public void onResponse(Call<KolbResultado> call, Response<KolbResultado> r) {
-                    if (!r.isSuccessful() || r.body() == null) {
-                        Log.e("KOLB_RESULT", "code=" + r.code());
-                        return;
-                    }
+                    if (!r.isSuccessful() || r.body() == null) return;
+
                     KolbResultado k = r.body();
 
-                    binding.tvFecha.setText("Fecha: " + formatearFechaFlexible(k.getFecha()));
-                    binding.tvEstilo.setText("Estilo: " + safe(k.getEstilo()));
-                    binding.tvCaracteristicas.setText("Características: " + limpiarTexto(k.getCaracteristicas()));
-                    binding.tvRecomendaciones.setText("Recomendaciones: " + limpiarTexto(k.getRecomendaciones()));
+                    binding.tvFecha.setText(formatearFechaFlexible(k.getFecha()));
+                    binding.tvEstilo.setText(safe(k.getEstilo()));
+                    binding.tvCaracteristicas.setText(limpiarTexto(k.getCaracteristicas()));
+                    binding.tvRecomendaciones.setText(limpiarTexto(k.getRecomendaciones()));
 
                     if (k.getEstudiante() != null) {
                         binding.tvNombreCompleto.setVisibility(View.VISIBLE);
-                        String doc = k.getDocumento() == null ? "" : (" • " + k.getDocumento());
-                        binding.tvNombreCompleto.setText(k.getEstudiante() + doc);
+                        binding.tvNombreCompleto.setText(k.getEstudiante());
                     }
                 }
                 @Override public void onFailure(Call<KolbResultado> call, Throwable t) {
@@ -110,9 +106,11 @@ public class ResultActivity extends AppCompatActivity {
         for (String p : pats) {
             try {
                 SimpleDateFormat in = new SimpleDateFormat(p, Locale.getDefault());
-                if (p.contains("'Z'") || p.endsWith("XXX")) in.setTimeZone(TimeZone.getTimeZone("UTC"));
+                if (p.contains("'Z'") || p.endsWith("XXX"))
+                    in.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Date d = in.parse(iso);
-                if (d != null) return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(d);
+                if (d != null)
+                    return new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(d);
             } catch (ParseException ignored) {}
         }
         return iso;

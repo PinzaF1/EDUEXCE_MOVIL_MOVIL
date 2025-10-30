@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
         api = RetrofitClient.getInstance(this).create(ApiService.class);
 
-        // ✅ Si ya hay token => entra directo a HOME
+        // Si ya hay token => entra directo a HOME
         if (TokenManager.getToken(this) != null) {
             goToHome();
             return;
@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Navegación → HomeActivity
     private void goToHome() {
-        Intent i = new Intent(this, InfoAcademico.class);
+        Intent i = new Intent(this, InfoTestActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();

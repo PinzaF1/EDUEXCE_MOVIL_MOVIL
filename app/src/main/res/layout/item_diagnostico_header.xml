@@ -1,89 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="12dp"
+    app:cardCornerRadius="18dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/card_stroke_neutral"
+    app:cardBackgroundColor="@android:color/white">
 
-    <!-- Tarjeta con título, fecha y porcentaje general (sin caja aparte para el número) -->
-    <com.google.android.material.card.MaterialCardView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="@android:color/white"
-        app:cardUseCompatPadding="true"
-        app:cardElevation="3dp">
+        android:padding="16dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvHeaderTitulo"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:text="Diagnóstico Inicial"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:textColor="@color/text_primary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvHeaderNumero"
+            app:layout_goneMarginEnd="12dp"/>
 
-            <TextView
-                android:id="@+id/tvHeaderTitulo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Diagnóstico Inicial"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/boxPercent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <!-- % grande a la derecha -->
+        <TextView
+            android:id="@+id/tvHeaderNumero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textStyle="bold"
+            android:textSize="26sp"
+            android:textColor="@color/text_primary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-            <LinearLayout
-                android:id="@+id/boxPercent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+        <!-- Chip 'General' debajo del título -->
+        <TextView
+            android:id="@+id/tvHeaderEtiqueta"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginTop="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_vertical"
+            android:text="General"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"
+            android:background="@drawable/bg_chip_outlined"
+            app:layout_constraintTop_toBottomOf="@id/tvHeaderTitulo"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-                <TextView
-                    android:id="@+id/tvHeaderNumero"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="32%"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvHeaderEtiqueta"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="General"
-                    android:textColor="#687089"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvHeaderFecha"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Realizado el 24 de octubre de 2025"
-                android:textColor="#687089"
-                android:textSize="13sp"
-                android:layout_marginTop="6dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/boxPercent"
-                app:layout_constraintTop_toBottomOf="@id/tvHeaderTitulo" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- ESTA ES LA VISTA QUE FALTABA -->
-    <TextView
-        android:id="@+id/tvSeccion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:text="Tu Progreso Inicial"
-        android:textStyle="bold"
-        android:textSize="16sp" />
-</LinearLayout>
+        <!-- Fecha (opcional; tu adapter la oculta si no hay) -->
+        <TextView
+            android:id="@+id/tvHeaderFecha"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Realizado el —"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvHeaderEtiqueta"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

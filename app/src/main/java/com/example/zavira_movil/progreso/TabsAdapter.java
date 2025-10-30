@@ -15,9 +15,9 @@ public class TabsAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position){
-            case 0: return new FragmentGeneral();   // Resumen
-            case 1: return new FragmentMaterias();  // Diagnóstico inicial
-            case 2: return new FragmentHistorial(); // Historial
+            case 0: return new FragmentGeneral();            // Resumen
+            case 1: return new FragmentDiagnosticoInicial(); // ← AQUÍ (antes: FragmentMaterias)
+            case 2: return new FragmentHistorial();          // Historial
             default: return new FragmentGeneral();
         }
     }

@@ -23,10 +23,12 @@ public class RondaRequest {
     public static class Item {
         @SerializedName("orden")  public final int orden;
         @SerializedName("opcion") public final String opcion;
+        @SerializedName("tiempo_empleado_seg") public final Double tiempoEmpleadoSeg;
 
-        public Item(int orden, String opcion) {
+        public Item(int orden, String opcion, Double tiempoEmpleadoSeg) {
             this.orden = orden;
             this.opcion = opcion;
+            this.tiempoEmpleadoSeg = tiempoEmpleadoSeg;
         }
     }
 }
