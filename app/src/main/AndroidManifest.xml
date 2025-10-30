@@ -34,7 +34,8 @@
         </activity> <!-- Login / flujo principal -->
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".resetpassword.ResetPasswordActivity"
             android:exported="false"
@@ -55,8 +56,6 @@
         <activity
             android:name=".HislaConocimiento.IslasActivity"
             android:exported="false" />
-        <!-- Perfil -->
-            android:exported="false" /> <!-- Perfil -->
         <activity
             android:name=".Perfil.ProfileActivity"
             android:exported="false" /> <!-- Islas / Simulacros -->
@@ -90,9 +89,9 @@
         <activity
             android:name=".ResultActivity"
             android:exported="false" />
-        <activity android:name=".HislaConocimiento.IslaModalityActivity" android:exported="false" />l
-        <!-- FileProvider para guardar la foto tomada en cache/ -->
-            android:exported="false" /> <!-- FileProvider para guardar la foto tomada en cache/ -->
+        <activity
+            android:name=".HislaConocimiento.IslaModalityActivity"
+            android:exported="false" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

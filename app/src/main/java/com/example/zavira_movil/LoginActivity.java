@@ -9,7 +9,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.zavira_movil.Home.HomeActivity;
 import com.example.zavira_movil.databinding.ActivityLoginBinding;
 import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.model.LoginRequest;
@@ -28,10 +27,6 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private ApiService api;
 
-    // Destino después de validar
-    private enum Destino { INFO_TEST, HOME }
-    private Destino destinoPendiente = Destino.INFO_TEST;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,25 +36,10 @@ public class LoginActivity extends AppCompatActivity {
 
         api = RetrofitClient.getInstance(this).create(ApiService.class);
 
-        // Si ya hay token => entra directo a HOME
-        if (TokenManager.getToken(this) != null) {
-            goToHome();
-            return;
-        }
+        // Login normal (un solo botón)
+        binding.btnLogin.setOnClickListener(v -> doLogin());
 
-        // Botón que va a InfoTest tras login
-        binding.btnLogin.setOnClickListener(v -> {
-            destinoPendiente = Destino.INFO_TEST;
-            doLogin();
-        });
-
-        // Botón provisional que va a Home tras login
-        binding.btnLoginprovicional.setOnClickListener(v -> {
-            destinoPendiente = Destino.HOME;
-            doLogin();
-        });
-
-        // Enlace "¿Olvidaste tu contraseña?"
+        // Enlace "¿Olvidó su contraseña?"
         binding.tvOlvideContra.setOnClickListener(v -> {
             Intent intent = new Intent(this, com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
             startActivity(intent);
@@ -67,8 +47,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void doLogin() {
-        String doc = binding.etDocumento.getText().toString().trim();
-        String pass = binding.etPassword.getText().toString().trim();
+        String doc = binding.etDocumento.getText() != null
+                ? binding.etDocumento.getText().toString().trim() : "";
+        String pass = binding.etPassword.getText() != null
+                ? binding.etPassword.getText().toString().trim() : "";
 
         if (doc.isEmpty() || pass.isEmpty()) {
             Toast.makeText(this, "Documento y contraseña son obligatorios", Toast.LENGTH_SHORT).show();
@@ -112,12 +94,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(LoginActivity.this, "Bienvenido/a", Toast.LENGTH_SHORT).show();
 
-                    // Navega según el botón que se pulsó
-                    if (destinoPendiente == Destino.HOME) {
-                        goToHome();
-                    } else {
-                        goToInfoTest();
-                    }
+                    // 👉 Después de loguear, ve a InfoTest (ajústalo si quieres ir a Home directamente)
+                    goToInfoTest();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -133,17 +111,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // Navegación → InfoTestActivity
     private void goToInfoTest() {
-        Intent i = new Intent(this, InfoTestActivity.class);
-
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(i);
-        finish();
-    }
-
-    // Navegación → HomeActivity
-    private void goToHome() {
         Intent i = new Intent(this, InfoTestActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
