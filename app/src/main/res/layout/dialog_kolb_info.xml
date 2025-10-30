@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_blue_outline">
+
+        <TextView
+            android:id="@+id/tvTitleKolb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilo de Aprendizaje "
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:textColor="@color/blue"
+            android:paddingBottom="8dp"/>
+
+        <!-- Estilo -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilo"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+        <TextView
+            android:id="@+id/tvEstiloSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <!-- Fecha -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fecha"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+        <TextView
+            android:id="@+id/tvFechaSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <!-- Características -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Características"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+        <TextView
+            android:id="@+id/tvCaracteristicasSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <!-- Recomendaciones -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recomendaciones"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+        <TextView
+            android:id="@+id/tvRecomendacionesSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="2dp"/>
+
+    </LinearLayout>
+</ScrollView>

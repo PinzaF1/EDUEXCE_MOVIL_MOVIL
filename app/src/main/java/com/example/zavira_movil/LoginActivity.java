@@ -58,6 +58,12 @@ public class LoginActivity extends AppCompatActivity {
             destinoPendiente = Destino.HOME;
             doLogin();
         });
+
+        // Enlace "¿Olvidaste tu contraseña?"
+        binding.tvOlvideContra.setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void doLogin() {

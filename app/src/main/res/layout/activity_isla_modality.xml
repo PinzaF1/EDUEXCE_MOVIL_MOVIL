@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp"
+            android:background="#FFFFFF">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🏆"
+                android:textSize="36sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Isla del Conocimiento"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="#111827"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pon a prueba tus conocimientos en todas las áreas
+con simulacros completos"
+                android:textSize="12sp"
+                android:textColor="#6B7280"
+                android:gravity="center"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- Contenido -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- ¿Cómo funciona? -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="¿Cómo funciona?"
+                        android:textStyle="bold"
+                        android:textColor="#111827"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="25 preguntas en total (5 por área: Matemáticas, Lenguaje, Ciencias, Sociales e Inglés)"
+                        android:layout_marginTop="12dp"
+                        android:textColor="#374151"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Obtendrás un resultado por área y un porcentaje global"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#374151"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Elige entre modalidad fácil (sin límite de tiempo) o difícil (1 minuto por pregunta)"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#374151"
+                        android:textSize="14sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecciona la Modalidad"
+                android:textStyle="bold"
+                android:textColor="#9CA3AF"
+                android:layout_marginTop="18dp"/>
+
+            <!-- Card: Fácil -->
+            <LinearLayout
+                android:id="@+id/cardFacil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/selector_option_card_islas_del_conocimiento"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:descendantFocusability="blocksDescendants">
+
+                <TextView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:text="🌿"
+                    android:textSize="18sp"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Modalidad Fácil"
+                        android:textStyle="bold"
+                        android:textColor="#111827"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sin límite de tiempo • Ideal para practicar sin presión"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/checkFacil"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:text="✓"
+                    android:textSize="16sp"
+                    android:textColor="#10B981"
+                    android:visibility="gone"
+                    android:background="@drawable/islas_del_conocimiento_bg_check_circle_unselected"/>
+            </LinearLayout>
+
+            <!-- Card: Difícil -->
+            <LinearLayout
+                android:id="@+id/cardDificil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/selector_option_card_islas_del_conocimiento"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:descendantFocusability="blocksDescendants">
+
+                <TextView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:text="🔥"
+                    android:textSize="18sp"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Modalidad Difícil"
+                        android:textStyle="bold"
+                        android:textColor="#111827"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1 minuto por pregunta • Desafía tu velocidad"
+                        android:textColor="#6B7280"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/checkDificil"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:text="✓"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:visibility="gone"
+                    android:background="@drawable/islas_del_conocimiento_bg_check_circle_selected"/>
+            </LinearLayout>
+
+            <!-- Botón Iniciar -->
+            <Button
+                android:id="@+id/btnIniciar"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="8dp"
+                android:text="Iniciar Simulacro"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:enabled="false"
+                android:alpha="0.6"
+                android:background="@drawable/bg_cta_blue"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

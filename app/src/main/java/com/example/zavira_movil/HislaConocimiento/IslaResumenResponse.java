@@ -1,9 +1,12 @@
-package com.example.zavira_movil.model;
+package com.example.zavira_movil.HislaConocimiento;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.Map;
 
-public class IslaResumenResponse {
+/** Respuesta de GET /movil/isla/simulacro/{id}/resumen */
+public class IslaResumenResponse implements Serializable {
+
     @SerializedName("id_sesion")
     public int idSesion;
 
