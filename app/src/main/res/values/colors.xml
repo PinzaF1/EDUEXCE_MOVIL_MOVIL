@@ -9,7 +9,7 @@
     <color name="blue_zavira">#2979FF</color>
     <color name="darker_gray">#A9A9A9</color>
     <color name="primary">#3B82F6</color>
-    <color name="bnv_tint">#374151</color>
+    <color name="bnv_tint">#070707</color>
 
 
     <color name="pastel_rosa">#FFC1CC</color>
@@ -72,7 +72,7 @@
     <color name="bg_card">#FFFFFFFF</color>
 
     <color name="brand_purple">#6A4CFF</color>
-    <color name="text_secondary">#4D000000</color>
+    <color name="text_secondary">#EB020101</color>
 
     <color name="row_blue">#EAF2FF</color>
     <color name="row_violet">#F3EDFF</color>
@@ -143,6 +143,7 @@
         <color name="bg_warning">#FFF8E1</color>
         <color name="warning">#D9822B</color>
         <color name="card_shadow">#1A000000</color>
+        <color name="radio_default">#212121</color>
  
         <color name="card_surface_neutral">#F5F6FA</color>
         <color name="card_stroke_neutral">#E5E9F0</color>

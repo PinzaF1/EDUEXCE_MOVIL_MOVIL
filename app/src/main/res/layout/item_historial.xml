@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Fila principal: materia + botón + % + flecha -->
+    <!-- Fila principal: materia (texto) + flecha (único click habilitado) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,34 +21,24 @@
             android:text="Matemáticas"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="@color/text_primary" />
+            android:textColor="@color/text_primary"
+            android:clickable="false"
+            android:focusable="false" />
 
-        <!-- Botón para ver detalle -->
-
-
-        <!-- Porcentaje al lado -->
-        <TextView
-            android:id="@+id/tvPorcentaje"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="40%"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:textColor="@color/text_primary" />
-
-        <!-- Flecha (vector compatible) -->
+        <!-- Flecha (vector) → ÚNICA acción de navegación -->
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivFlecha"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="10dp"
-            android:contentDescription="@string/ver_detalle"
+            android:contentDescription="Ver detalle"
+            android:clickable="true"
+            android:focusable="true"
             app:srcCompat="@drawable/ic_chevron_right_24"
             android:tint="?attr/colorOnSurface" />
     </LinearLayout>
 
-    <!-- Nivel -->
+    <!-- Nivel (solo display) -->
     <TextView
         android:id="@+id/tvNivel"
         android:layout_width="wrap_content"
@@ -57,11 +47,12 @@
         android:textColor="@color/text_secondary"
         android:layout_marginTop="6dp" />
 
-    <!-- Fecha -->
+    <!-- Fecha (solo display) -->
     <TextView
         android:id="@+id/tvFecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="07/10/2025"
         android:textColor="@color/text_secondary" />
+
 </LinearLayout>

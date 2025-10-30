@@ -4,8 +4,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.zavira_movil.R;
 
 public class DiagnosticoHeaderAdapter extends RecyclerView.Adapter<DiagnosticoHeaderAdapter.VH> {
@@ -29,7 +31,7 @@ public class DiagnosticoHeaderAdapter extends RecyclerView.Adapter<DiagnosticoHe
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
-        h.tvHeaderTitulo.setText(tieneDiag ? "Diagnóstico Inicial Completado" : "Diagnóstico Inicial");
+        h.tvHeaderTitulo.setText("Diagnóstico Inicial");
         h.tvHeaderNumero.setText(porcentajeGeneral + "%");
         h.tvHeaderEtiqueta.setText("General");
 
@@ -39,20 +41,18 @@ public class DiagnosticoHeaderAdapter extends RecyclerView.Adapter<DiagnosticoHe
             h.tvHeaderFecha.setVisibility(View.VISIBLE);
             h.tvHeaderFecha.setText("Realizado el " + fecha);
         }
-        h.tvSeccion.setText("Progreso desde el Diagnóstico Inicial");
     }
 
     @Override public int getItemCount() { return 1; }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView tvHeaderTitulo, tvHeaderFecha, tvHeaderNumero, tvHeaderEtiqueta, tvSeccion;
+        TextView tvHeaderTitulo, tvHeaderFecha, tvHeaderNumero, tvHeaderEtiqueta;
         VH(@NonNull View v){
             super(v);
-            tvHeaderTitulo  = v.findViewById(R.id.tvHeaderTitulo);
-            tvHeaderFecha   = v.findViewById(R.id.tvHeaderFecha);
-            tvHeaderNumero  = v.findViewById(R.id.tvHeaderNumero);
-            tvHeaderEtiqueta= v.findViewById(R.id.tvHeaderEtiqueta);
-            tvSeccion       = v.findViewById(R.id.tvSeccion);
+            tvHeaderTitulo   = v.findViewById(R.id.tvHeaderTitulo);
+            tvHeaderFecha    = v.findViewById(R.id.tvHeaderFecha);
+            tvHeaderNumero   = v.findViewById(R.id.tvHeaderNumero);
+            tvHeaderEtiqueta = v.findViewById(R.id.tvHeaderEtiqueta);
         }
     }
 }

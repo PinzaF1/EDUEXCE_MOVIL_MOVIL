@@ -40,7 +40,8 @@
                 android:alpha="0.9"/>
         </LinearLayout>
 
-        <!-- ===== Tarjeta: Nombre completo + Fecha ===== -->
+
+        <!-- ✅ TARJETA: Nombre Completo -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +57,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Cabecera de la tarjeta -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -83,14 +83,12 @@
                         android:textSize="15sp"/>
                 </LinearLayout>
 
-                <!-- Contenido -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:padding="12dp"
                     android:background="@drawable/acad_item_soft"
-
                     android:orientation="vertical">
 
                     <TextView
@@ -100,21 +98,71 @@
                         android:text="—"
                         android:textColor="#2D3139"
                         android:textSize="14sp"
-                        android:lineSpacingExtra="2dp"
-                        android:breakStrategy="balanced"
-                        android:hyphenationFrequency="normal"/>
-
-                    <TextView
-                        android:id="@+id/tvFecha"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Fecha: —"
-                        android:textColor="#8A94A6"
-                        android:textSize="12sp"/>
+                        android:lineSpacingExtra="2dp"/>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ✅ TARJETA NUEVA: Fecha -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="18dp"
+            app:strokeColor="#E6EAF2"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="#FFE8D1"
+                        android:gravity="center"
+                        android:text="📅"
+                        android:textSize="14sp"
+                        android:padding="2dp"
+                        android:includeFontPadding="false"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Fecha"
+                        android:textStyle="bold"
+                        android:textColor="#171A1F"
+                        android:textSize="15sp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvFecha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/acad_item_soft"
+                    android:padding="12dp"
+                    android:text="—"
+                    android:textColor="#2D3139"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ✅ A partir de aquí TODO IGUAL (estilo, descripción, características, recomendaciones, botón) -->
+        <!-- NO BORRÉ NADA -->
 
         <!-- ===== Tarjeta: Estilo de aprendizaje ===== -->
         <com.google.android.material.card.MaterialCardView
@@ -172,7 +220,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Tarjeta: Descripción ===== -->
+        <!-- Tarjeta Descripción -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -224,13 +272,11 @@
                     android:text="—"
                     android:textColor="#2D3139"
                     android:textSize="14sp"
-                    android:lineSpacingExtra="2dp"
-                    android:breakStrategy="balanced"
-                    android:hyphenationFrequency="normal"/>
+                    android:lineSpacingExtra="2dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Tarjeta: Características ===== -->
+        <!-- Tarjeta Características -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -282,13 +328,11 @@
                     android:text="—"
                     android:textColor="#2D3139"
                     android:textSize="14sp"
-                    android:lineSpacingExtra="4dp"
-                    android:breakStrategy="balanced"
-                    android:hyphenationFrequency="normal"/>
+                    android:lineSpacingExtra="4dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Tarjeta: Recomendaciones ===== -->
+        <!-- Tarjeta Recomendaciones -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -340,9 +384,7 @@
                     android:text="—"
                     android:textColor="#2D3139"
                     android:textSize="14sp"
-                    android:lineSpacingExtra="4dp"
-                    android:breakStrategy="balanced"
-                    android:hyphenationFrequency="normal"/>
+                    android:lineSpacingExtra="4dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

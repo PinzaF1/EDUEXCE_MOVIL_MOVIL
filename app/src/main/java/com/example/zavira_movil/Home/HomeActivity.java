@@ -1,6 +1,7 @@
 package com.example.zavira_movil.Home;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -146,7 +148,7 @@ public class HomeActivity extends AppCompatActivity {
         });
         // --------------------------------------------------------------------
 
-        // ✅ CLICK EN LA CAMPANA → abre NotificationsActivity
+        // CLICK EN LA CAMPANA → abre NotificationsActivity
         View btnBell = findViewById(R.id.btnBell);
         View ivBell  = findViewById(R.id.ivBell);
         View.OnClickListener goNotifications = v -> {
@@ -167,6 +169,19 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupBottomNav(BottomNavigationView nav) {
+        //   Tinte azul al seleccionado y gris al resto (por CÓDIGO)  ⬇
+        int[][] states = new int[][]{
+                new int[]{android.R.attr.state_checked},
+                new int[]{} // default
+        };
+        int[] colors = new int[]{
+                ContextCompat.getColor(this, R.color.primaryyy),
+                ContextCompat.getColor(this, R.color.text_secondary)
+        };
+        ColorStateList tint = new ColorStateList(states, colors);
+        nav.setItemIconTintList(tint);
+        nav.setItemTextColor(tint);
+
         nav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -179,7 +194,7 @@ public class HomeActivity extends AppCompatActivity {
             // PERFIL es una Activity (no Fragment)
             if (id == R.id.nav_perfil) {
                 startActivity(new Intent(this, ProfileActivity.class));
-                return false;
+                return false; // mantiene la selección anterior
             }
 
             Fragment f;
