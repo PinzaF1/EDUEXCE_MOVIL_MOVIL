@@ -8,6 +8,6 @@
         <string name="tab_resumen">Resumen</string>
         <string name="tab_diagnostico_inicial">Diagnóstico inicial</string>
         <string name="tab_historial">Historial</string>
-
+    <string name="oponente_predeterminado">Oponente</string>
 
 </resources>

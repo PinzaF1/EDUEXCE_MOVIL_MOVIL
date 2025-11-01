@@ -152,7 +152,7 @@
         android:paddingTop="4dp"
         android:paddingBottom="6dp"
         app:itemIconSize="22dp"
-        app:itemIconTint="@color/bnv_tint"
+        app:itemIconTint="@color/black"
         app:itemTextColor="@color/bnv_tint"
         app:itemHorizontalTranslationEnabled="false"
         app:labelVisibilityMode="labeled"

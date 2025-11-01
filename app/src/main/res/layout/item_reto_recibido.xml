@@ -37,8 +37,8 @@
             android:layout_height="42dp"
             android:layout_weight="1"
             android:text="Rechazar"
-            android:background="@drawable/bg_button_rechazar"
-            android:textColor="@color/text_primary" />
+            android:backgroundTint="@color/red"
+            android:textColor="@android:color/white"/>
 
         <!-- ACEPTAR (tu botón existente) -->
         <Button
@@ -48,7 +48,7 @@
             android:layout_weight="1"
             android:layout_marginStart="10dp"
             android:text="Aceptar reto"
-            android:background="@drawable/bg_button_primary"
+            android:backgroundTint="@color/verde_buen"
             android:textColor="@android:color/white"/>
     </LinearLayout>
 </LinearLayout>

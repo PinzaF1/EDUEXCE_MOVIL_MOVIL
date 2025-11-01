@@ -1,156 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#F5F6FA"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F6FA"
+    android:fillViewport="true">
 
-
-
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootLoginContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:background="#FFFFFF"
-        android:padding="24dp"
-        android:elevation="4dp"
-        android:layout_margin="16dp"
-        android:clipToPadding="false"
-        android:clipChildren="false"
-        android:layout_gravity="center"
-        android:layout_marginTop="80dp"
-        android:layout_marginBottom="80dp"
-        android:backgroundTintMode="src_in"
-        android:backgroundTint="#FFFFFF"
-        android:shape="rectangle">
-        <!-- Título principal -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="EduExce"
-            android:textColor="#212121"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="4dp" />
+        android:layout_height="match_parent"
+        android:padding="24dp">
 
-        <!-- Subtítulo -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Plataforma de preparación ICFES"
-            android:textColor="#2196F3"
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Login Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="39dp"
-            android:layout_marginBottom="8dp"
-            android:text="Iniciar Sesión"
-            android:textColor="#212121"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-
-
-        <!-- Campo Documento -->
-        <EditText
-            android:id="@+id/etDocumento"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:hint="Ingresa tu número de documento"
-            android:inputType="number"
-            android:background="@drawable/rounded_edittext"
-            android:padding="14dp"
-            android:textColor="#212121"
-            android:layout_marginTop="7dp"
-            android:layout_marginBottom="17dp"
-            android:textColorHint="#999999" />
-
-
-        <!-- Recordarme y olvidé contraseña -->
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edittext"
-            android:hint="Ingresa tu contraseña"
-            android:inputType="textPassword"
-            android:padding="14dp"
-            android:textColor="#212121"
-            android:layout_marginBottom="14dp"
-            android:textColorHint="#999999" />
-
+        <!-- Contenido, centrado horizontal y con sesgo vertical hacia arriba -->
         <LinearLayout
-
-            android:layout_width="match_parent"
+            android:id="@+id/content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp">
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.38">
 
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/ivLogo"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginBottom="12dp"
+                android:src="@drawable/iconoeduexce" />
+
+            <!-- Título principal -->
             <TextView
-                android:id="@+id/tvOlvideContra"
+                android:id="@+id/tvTitulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Iniciar Sesión"
+                android:textColor="#111827"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="18dp" />
+
+            <!-- Card centrada; ancho máx para pantallas grandes -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="¿Olvidaste tu contraseña?"
-                android:textColor="#2979FF"
-                android:textSize="14sp" />
+                android:layout_margin="12dp"
+                android:maxWidth="520dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="18dp"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Credenciales de Acceso"
+                        android:textColor="#0F172A"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ingrese su número de documento y contraseña"
+                        android:textColor="#8E95A3"
+                        android:textSize="13sp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Documento -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilDocumento"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundMode="filled"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxBackgroundColor="#EAF1FF"
+                        app:hintEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etDocumento"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:gravity="center_vertical"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:textSize="16sp"
+                            android:singleLine="true"
+                            android:hint="Número de documento"
+                            android:inputType="number"
+                            android:imeOptions="actionNext"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
+                            android:includeFontPadding="false"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="10dp" />
+
+                    <!-- Fila: etiqueta Contraseña + enlace Olvido -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="2dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Contraseña"
+                            android:textColor="#0F172A"
+                            android:textSize="14sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/tvOlvideContra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="¿Olvidó su contraseña?"
+                            android:textColor="#2D79FF"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <!-- Contraseña -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilPassword"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:endIconMode="password_toggle"
+                        app:boxBackgroundMode="filled"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxBackgroundColor="#EAF1FF">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:gravity="center_vertical"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:textSize="16sp"
+                            android:singleLine="true"
+                            android:hint="Contraseña"
+                            android:inputType="textPassword"
+                            android:imeOptions="actionDone"
+                            android:textColor="#111827"
+                            android:textColorHint="#9CA3AF"
+                            android:includeFontPadding="false"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Botón de inicio de sesión -->
+                    <Button
+                        android:id="@+id/btnLogin"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="18dp"
+                        android:text="Iniciar Sesión"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="@color/primaryyy" />
+
+                    <!-- Loader -->
+                    <ProgressBar
+                        android:id="@+id/progress"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="14dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
-        <!-- Botón login -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Iniciar Sesión"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#2979FF"
-            android:textAllCaps="false"
-            android:layout_marginTop="24dp"/>
-
-        <!-- Botón Provicional -->
-        <Button
-            android:id="@+id/btnLoginprovicional"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Boton Provicional"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#2979FF"
-            android:textAllCaps="false"
-            android:layout_marginTop="24dp"/>
-
-
-        <!-- Footer -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="¿Problemas para acceder?"
-            android:textColor="#999999"
-            android:textSize="14sp"
-            android:layout_marginTop="24dp" />
-
-        <TextView
-            android:id="@+id/tvContactaInstitucion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Contacta a tu institución"
-            android:textColor="#2979FF"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginTop="4dp" />
-
-        <!-- Loader -->
-        <ProgressBar
-            android:id="@+id/progress"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:visibility="gone" />
-
-    </LinearLayout>
-</ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,93 +1,131 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:padding="16dp"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ProgressBar
         android:id="@+id/progress"
         style="?android:attr/progressBarStyleSmall"
-        android:layout_gravity="center" android:visibility="gone"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-    <!-- Header card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/headerCard"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp" app:cardUseCompatPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        app:cardUseCompatPadding="true"
         app:cardCornerRadius="16dp">
 
         <LinearLayout
-            android:orientation="vertical" android:padding="16dp"
-            android:layout_width="match_parent" android:layout_height="wrap_content">
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <!-- ✅ Corregido: fila con peso para separar materia (izq) y fecha (der) -->
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent" android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/tvMateria"
-                    android:textStyle="bold" android:textSize="16sp"
-                    android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/tvFecha"
-                    android:textSize="12sp" android:textColor="#888888"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    android:textSize="12sp"
+                    android:textColor="#888888"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:gravity="center_vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical">
+
                 <TextView
-                    android:id="@+id/tvPuntaje" android:text="0%"
-                    android:textSize="28sp" android:textStyle="bold"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    android:id="@+id/tvPuntaje"
+                    android:text="0%"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
                 <TextView
-                    android:id="@+id/tvNivel" android:text="Nivel"
-                    android:layout_marginStart="12dp"
-                    android:textSize="16sp"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    android:id="@+id/tvNivel"
+                    android:text="Nivel"
+                    android:layout_marginStart="10dp"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal" android:layout_marginTop="8dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:weightSum="3">
-                <LinearLayout android:layout_weight="1" android:orientation="vertical"
-                    android:layout_width="0dp" android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
                     <TextView android:text="Correctas" android:textSize="12sp"
                         android:textColor="#888" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/tvCorrectas" android:text="0"
                         android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
-                <LinearLayout android:layout_weight="1" android:orientation="vertical"
-                    android:layout_width="0dp" android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
                     <TextView android:text="Incorrectas" android:textSize="12sp"
                         android:textColor="#888" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/tvIncorrectas" android:text="0"
                         android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
-                <LinearLayout android:layout_weight="1" android:orientation="vertical"
-                    android:layout_width="0dp" android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
                     <TextView android:text="Tiempo" android:textSize="12sp"
                         android:textColor="#888" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <TextView android:id="@+id/tvTiempo" android:text="0s"
                         android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
-            </LinearLayout>
 
+            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        app:tabIndicatorFullWidth="false"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabIndicatorFullWidth="false" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
-        android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:layout_marginTop="8dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="492dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1" />
+
 </LinearLayout>
