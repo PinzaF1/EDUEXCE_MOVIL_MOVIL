@@ -9,10 +9,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.zavira_movil.Home.HomeActivity;
 import com.example.zavira_movil.databinding.ActivityLoginBinding;
 import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.model.LoginResponse;
+import com.example.zavira_movil.progreso.DiagnosticoInicial;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.gson.Gson;
@@ -27,6 +29,10 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private ApiService api;
 
+    // Destino después de validar
+    private enum Destino { INFO_TEST, HOME }
+    private Destino destinoPendiente = Destino.INFO_TEST;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,10 +42,25 @@ public class LoginActivity extends AppCompatActivity {
 
         api = RetrofitClient.getInstance(this).create(ApiService.class);
 
-        // Login normal (un solo botón)
-        binding.btnLogin.setOnClickListener(v -> doLogin());
+        // ✅ Si ya hay token => entra directo a HOME
+        if (TokenManager.getToken(this) != null) {
+            goToHome();
+            return;
+        }
 
-        // Enlace "¿Olvidó su contraseña?"
+        // Botón que va a InfoTest tras login
+        binding.btnLogin.setOnClickListener(v -> {
+            destinoPendiente = Destino.INFO_TEST;
+            doLogin();
+        });
+
+        // Botón provisional que va a Home tras login
+        binding.btnLoginprovicional.setOnClickListener(v -> {
+            destinoPendiente = Destino.HOME;
+            doLogin();
+        });
+
+        // Enlace "¿Olvidaste tu contraseña?"
         binding.tvOlvideContra.setOnClickListener(v -> {
             Intent intent = new Intent(this, com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
             startActivity(intent);
@@ -47,10 +68,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void doLogin() {
-        String doc = binding.etDocumento.getText() != null
-                ? binding.etDocumento.getText().toString().trim() : "";
-        String pass = binding.etPassword.getText() != null
-                ? binding.etPassword.getText().toString().trim() : "";
+        String doc = binding.etDocumento.getText().toString().trim();
+        String pass = binding.etPassword.getText().toString().trim();
 
         if (doc.isEmpty() || pass.isEmpty()) {
             Toast.makeText(this, "Documento y contraseña son obligatorios", Toast.LENGTH_SHORT).show();
@@ -94,8 +113,12 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(LoginActivity.this, "Bienvenido/a", Toast.LENGTH_SHORT).show();
 
-                    // 👉 Después de loguear, ve a InfoTest (ajústalo si quieres ir a Home directamente)
-                    goToInfoTest();
+                    // Navega según el botón que se pulsó
+                    if (destinoPendiente == Destino.HOME) {
+                        goToHome();
+                    } else {
+                        goToInfoTest();
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -111,10 +134,56 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // Navegación → InfoTestActivity
     private void goToInfoTest() {
         Intent i = new Intent(this, InfoTestActivity.class);
+
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
+    }
+
+    // Navegación → HomeActivity
+    private void goToHome() {
+        ApiService api = RetrofitClient.getInstance(this).create(ApiService.class);
+        String token = com.example.zavira_movil.local.TokenManager.getToken(this);
+
+        if (token == null || token.isEmpty()) {
+            // Si no hay token, redirigir al login
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        String bearer = token.startsWith("Bearer ") ? token : "Bearer " + token;
+
+        // Llamar al endpoint para verificar el estado del diagnóstico
+        api.diagnosticoProgreso().enqueue(new Callback<DiagnosticoInicial>() {
+            @Override
+            public void onResponse(Call<DiagnosticoInicial> call, Response<DiagnosticoInicial> response) {
+                Intent intent;
+
+                if (response.isSuccessful() && response.body() != null && response.body().tieneDiagnostico) {
+                    // Si ya completó el diagnóstico, ir a Home
+                    intent = new Intent(LoginActivity.this, HomeActivity.class);
+                } else {
+                    // Si no ha completado el diagnóstico, ir a InfoAcademico
+                    intent = new Intent(LoginActivity.this, InfoAcademico.class);
+                }
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<DiagnosticoInicial> call, Throwable t) {
+                // En caso de error, redirigir a Home por defecto
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 }
