@@ -245,4 +245,8 @@ public interface ApiService {
 
     @POST("estudiante/recuperar/restablecer")
     Call<BasicResponse> restablecerPassword(@Body com.example.zavira_movil.resetpassword.RestablecerPasswordRequest body);
+    
+    // ---------- Notificaciones FCM ----------
+    @POST("movil/fcm-token")
+    Call<Void> registerFCMToken(@Body okhttp3.RequestBody body);
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "623020199567",
+    "project_id": "eduexce-b1296",
+    "storage_bucket": "eduexce-b1296.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623020199567:android:612e92510e0b89ff836afa",
+        "android_client_info": {
+          "package_name": "com.example.zavira_movil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC36Sf167XzN5TaaVJzbufrfUp2oWyw54U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

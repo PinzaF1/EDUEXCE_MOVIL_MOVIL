@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -41,10 +44,22 @@ configurations.all {
 }
 
 dependencies {
+    // Firebase BoM (Bill of Materials)
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging")
+    
+    // Firebase Analytics (opcional pero recomendado)
+    implementation("com.google.firebase:firebase-analytics")
+    
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    
+    // OkHttp para WebSockets
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Material
     implementation("com.google.android.material:material:1.13.0-alpha05")
@@ -53,6 +68,15 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    
+    // WorkManager para tareas en segundo plano
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    
+    // EventBus para comunicación entre componentes
+    implementation("org.greenrobot:eventbus:3.3.1")
+    
+    // ShortcutBadger para contadores en el ícono
+    implementation("me.leolin:ShortcutBadger:1.1.22@aar")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
