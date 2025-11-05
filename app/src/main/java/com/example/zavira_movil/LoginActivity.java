@@ -2,6 +2,7 @@ package com.example.zavira_movil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -14,10 +15,16 @@ import com.example.zavira_movil.databinding.ActivityLoginBinding;
 import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.model.LoginResponse;
+import com.example.zavira_movil.notifications.NotificationHelper;
 import com.example.zavira_movil.progreso.DiagnosticoInicial;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -28,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private ApiService api;
+    private NotificationHelper notificationHelper;
 
     // No necesitamos el enum Destino ya que siempre vamos a Home después del login exitoso
 
@@ -39,6 +47,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         api = RetrofitClient.getInstance(this).create(ApiService.class);
+        notificationHelper = new NotificationHelper(this);
+        
+        // Solicitar permisos de notificaciones (Android 13+)
+        notificationHelper.requestNotificationPermission(this);
 
         // ✅ Si ya hay token => entra directo a HOME
         if (TokenManager.getToken(this) != null) {
@@ -139,6 +151,10 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(LoginActivity.this, "¡Bienvenido/a!", Toast.LENGTH_SHORT).show();
+                    
+                    // Registrar token FCM después del login exitoso
+                    registerFCMToken();
+                    
                     goToHome();
 
                 } catch (Exception e) {
@@ -215,6 +231,78 @@ public class LoginActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
+            }
+        });
+    }
+    
+    /**
+     * Registra el token FCM en el servidor después del login exitoso
+     */
+    private void registerFCMToken() {
+        notificationHelper.getCurrentToken(new NotificationHelper.OnTokenReceivedListener() {
+            @Override
+            public void onTokenReceived(String token) {
+                if (token == null) {
+                    Log.w("FCM_TOKEN", "⚠️ No se pudo obtener el token FCM");
+                    return;
+                }
+                
+                Log.d("FCM_TOKEN", "📱 Token FCM obtenido: " + token.substring(0, 20) + "...");
+                
+                // Verificar autenticación
+                String authToken = TokenManager.getToken(LoginActivity.this);
+                if (authToken == null) {
+                    Log.w("FCM_TOKEN", "⚠️ No hay token de autenticación");
+                    return;
+                }
+                
+                try {
+                    // Obtener device_id único del dispositivo
+                    String deviceId = Settings.Secure.getString(
+                        getContentResolver(), 
+                        Settings.Secure.ANDROID_ID
+                    );
+                    
+                    // Construir body según el formato esperado por el backend
+                    JSONObject jsonBody = new JSONObject();
+                    jsonBody.put("token", token);
+                    jsonBody.put("device_id", deviceId);
+                    jsonBody.put("platform", "android");
+                    
+                    RequestBody body = RequestBody.create(
+                        MediaType.parse("application/json"),
+                        jsonBody.toString()
+                    );
+                    
+                    Log.d("FCM_TOKEN", "📤 Enviando token al servidor...");
+                    
+                    ApiService apiService = RetrofitClient.getInstance(LoginActivity.this).create(ApiService.class);
+                    Call<Void> call = apiService.registerFCMToken(body);
+                    
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                Log.d("FCM_TOKEN", "✅ Token FCM registrado exitosamente en el servidor");
+                            } else {
+                                try {
+                                    String errorBody = response.errorBody() != null ? 
+                                        response.errorBody().string() : "Sin detalles";
+                                    Log.e("FCM_TOKEN", "❌ Error al registrar token: " + response.code() + " - " + errorBody);
+                                } catch (Exception e) {
+                                    Log.e("FCM_TOKEN", "❌ Error al registrar token: " + response.code());
+                                }
+                            }
+                        }
+                        
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.e("FCM_TOKEN", "❌ Fallo de red al registrar token FCM", t);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("FCM_TOKEN", "❌ Error al preparar el token para enviar", e);
+                }
             }
         });
     }

@@ -9,5 +9,11 @@
         <string name="tab_diagnostico_inicial">Diagnóstico inicial</string>
         <string name="tab_historial">Historial</string>
     <string name="oponente_predeterminado">Oponente</string>
+    
+    <!-- Notificaciones -->
+    <string name="default_notification_channel_id">eduexce_notifications</string>
+    <string name="default_notification_channel_name">Notificaciones de EduExce</string>
+    <string name="notification_title">Nueva notificación</string>
+    <string name="notification_message">Tienes una nueva notificación</string>
 
 </resources>
