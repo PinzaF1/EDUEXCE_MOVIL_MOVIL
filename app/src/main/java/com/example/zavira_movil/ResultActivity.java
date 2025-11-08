@@ -1,5 +1,7 @@
 package com.example.zavira_movil;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,18 +41,20 @@ public class ResultActivity extends AppCompatActivity {
 
         binding.btnIrHome.setOnClickListener(v -> {
             Intent i = new Intent(ResultActivity.this, HomeActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
             finish();
         });
 
         String extraFecha  = getIntent().getStringExtra("fecha");
         String extraEstilo = getIntent().getStringExtra("estilo");
+        String extraDesc   = getIntent().getStringExtra("descripcion");
         String extraCarac  = getIntent().getStringExtra("caracteristicas");
         String extraRec    = getIntent().getStringExtra("recomendaciones");
 
         binding.tvFecha.setText(formatearFechaFlexible(extraFecha));
         binding.tvEstilo.setText(safe(extraEstilo));
+        binding.tvDescripcion.setText(limpiarTexto(extraDesc));
         binding.tvCaracteristicas.setText(limpiarTexto(extraCarac));
         binding.tvRecomendaciones.setText(limpiarTexto(extraRec));
 
@@ -59,12 +63,25 @@ public class ResultActivity extends AppCompatActivity {
             apiService = RetrofitClient.getInstance(this).create(ApiService.class);
             apiService.obtenerResultado().enqueue(new Callback<KolbResultado>() {
                 @Override public void onResponse(Call<KolbResultado> call, Response<KolbResultado> r) {
-                    if (!r.isSuccessful() || r.body() == null) return;
+                    if (!r.isSuccessful() || r.body() == null) {
+                        if (r.code() == 404) {
+                            Toast.makeText(ResultActivity.this, "No se encontró resultado del test de Kolb", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ResultActivity.this, "Error al obtener resultado: " + r.code(), Toast.LENGTH_SHORT).show();
+                        }
+                        Log.e("ResultActivity", "Error al obtener resultado: " + r.code());
+                        return;
+                    }
 
                     KolbResultado k = r.body();
+                    
+                    // Log para debug
+                    Log.d("ResultActivity", "Estilo recibido: " + (k.getEstilo() != null ? k.getEstilo() : "null"));
+                    Log.d("ResultActivity", "Fecha recibida: " + (k.getFecha() != null ? k.getFecha() : "null"));
 
                     binding.tvFecha.setText(formatearFechaFlexible(k.getFecha()));
                     binding.tvEstilo.setText(safe(k.getEstilo()));
+                    binding.tvDescripcion.setText(limpiarTexto(k.getDescripcion()));
                     binding.tvCaracteristicas.setText(limpiarTexto(k.getCaracteristicas()));
                     binding.tvRecomendaciones.setText(limpiarTexto(k.getRecomendaciones()));
 
@@ -74,6 +91,7 @@ public class ResultActivity extends AppCompatActivity {
                     }
                 }
                 @Override public void onFailure(Call<KolbResultado> call, Throwable t) {
+                    Log.e("ResultActivity", "Error de red al obtener resultado", t);
                     Toast.makeText(ResultActivity.this, "No se pudo completar el resultado", Toast.LENGTH_SHORT).show();
                 }
             });

@@ -115,17 +115,36 @@
             android:clipToPadding="false"
             android:paddingBottom="12dp" />
 
-        <!-- Botón Enviar -->
-        <Button
+        <!-- Botón Enviar Reto -->
+        <LinearLayout
             android:id="@+id/btnEnviarReto"
-            android:text="Enviar Reto"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:enabled="false"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_button_primary"
-            android:textColor="@android:color/white"
-            android:elevation="3dp"/>
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_button_enviar_reto_selector"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:enabled="false">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_swords_white"
+                android:contentDescription=""
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enviar Reto"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

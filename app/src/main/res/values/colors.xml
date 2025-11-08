@@ -100,6 +100,20 @@
     <color name="area_ingles">#8E24AA</color>          <!-- morado -->
     <color name="area_lenguaje">#2C92EB</color>        <!-- azul -->
     <color name="area_ciencias">#43A047</color>        <!-- verde -->
+    
+    <!-- Colores pastel para áreas (como corazones) -->
+    <color name="area_matematicas_pastel">#FFE5E5</color>     <!-- rojo pastel -->
+    <color name="area_sociales_pastel">#FFF4E5</color>        <!-- naranja pastel -->
+    <color name="area_ingles_pastel">#F3E5F5</color>          <!-- morado pastel -->
+    <color name="area_lenguaje_pastel">#E3F2FD</color>        <!-- azul pastel -->
+    <color name="area_ciencias_pastel">#E8F5E9</color>        <!-- verde pastel -->
+    
+    <!-- Colores suaves para botones -->
+    <color name="area_matematicas_soft">#FF6B6B</color>     <!-- rojo suave -->
+    <color name="area_sociales_soft">#FFB84D</color>        <!-- naranja suave -->
+    <color name="area_ingles_soft">#BA68C8</color>          <!-- morado suave -->
+    <color name="area_lenguaje_soft">#64B5F6</color>        <!-- azul suave -->
+    <color name="area_ciencias_soft">#66BB6A</color>        <!-- verde suave -->
 
     <!-- Chips de rendimiento -->
     <color name="chip_experto">#1E88E5</color>       <!-- azul -->

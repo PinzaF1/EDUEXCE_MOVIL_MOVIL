@@ -3,6 +3,7 @@ package com.example.zavira_movil.retos1vs1;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -44,11 +45,27 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
         // key A/B/C/D...
         String key = String.valueOf((char)('A' + pos));
         String text = items.get(pos);
+        boolean isSelected = key.equals(selectedKey);
 
         h.radio.setOnCheckedChangeListener(null);
-        h.key.setText(key);
+        h.key.setText(key + ".");
         h.text.setText(text != null ? text : "");
-        h.radio.setChecked(key.equals(selectedKey));
+        h.radio.setChecked(isSelected);
+
+        // Aplicar estilos según si está seleccionada o no
+        if (isSelected) {
+            // Fondo verde claro, texto verde oscuro, mostrar checkmark
+            h.itemView.setSelected(true);
+            h.key.setTextColor(0xFF22C55E); // Verde oscuro
+            h.text.setTextColor(0xFF22C55E); // Verde oscuro
+            h.checkmark.setVisibility(View.VISIBLE);
+        } else {
+            // Fondo gris claro, texto gris oscuro, ocultar checkmark
+            h.itemView.setSelected(false);
+            h.key.setTextColor(0xFF666666); // Gris oscuro
+            h.text.setTextColor(0xFF666666); // Gris oscuro
+            h.checkmark.setVisibility(View.GONE);
+        }
 
         View.OnClickListener click = v -> select(key);
         h.itemView.setOnClickListener(click);
@@ -67,11 +84,13 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
     static class VH extends RecyclerView.ViewHolder {
         TextView key, text;
         RadioButton radio;
+        ImageView checkmark;
         VH(@NonNull View v) {
             super(v);
             key = v.findViewById(R.id.optKey);
             text = v.findViewById(R.id.optText);
             radio = v.findViewById(R.id.optRadio);
+            checkmark = v.findViewById(R.id.optCheckmark);
         }
     }
 }

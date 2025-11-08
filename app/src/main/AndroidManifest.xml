@@ -78,6 +78,9 @@
             android:name=".TestAcademico"
             android:exported="false" />
         <activity
+            android:name=".ResultadoAcademicoActivity"
+            android:exported="false" />
+        <activity
             android:name=".InfoTestActivity"
             android:exported="false" /> <!-- Ranking -->
         <activity

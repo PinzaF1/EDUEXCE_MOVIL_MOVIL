@@ -34,9 +34,29 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    // ✅ Fix de empaquetado (conflictos META-INF)
+    packaging {
+        resources {
+            pickFirsts += setOf(
+                "META-INF/INDEX.LIST",
+                "META-INF/io.netty.versions.properties"
+            )
+            excludes += setOf(
+                "META-INF/DEPENDENCIES",
+                // (opcionales pero recomendados para evitar más choques)
+                "META-INF/NOTICE", "META-INF/NOTICE.txt", "META-INF/notice.txt",
+                "META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/license.txt",
+                "META-INF/ASL2.0"
+            )
+        }
+    }
 }
 
+// ✅ Forzamos material y EXCLUIMOS Ads en TODAS las configuraciones
 configurations.all {
+    exclude(group = "com.google.android.gms", module = "play-services-ads")
+    exclude(group = "com.google.android.gms", module = "play-services-ads-lite")
     resolutionStrategy.force("com.google.android.material:material:1.13.0-alpha05")
 }
 
@@ -53,18 +73,13 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    implementation(libs.activity)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
-    // CircleProgress (desde JitPack)
+    // CircleProgress (JitPack)
     implementation("com.github.lzyzsd:circleprogress:1.2.1")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
-    // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

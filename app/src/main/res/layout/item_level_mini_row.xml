@@ -40,6 +40,17 @@
                 android:text="Aritmética"
                 android:textSize="14sp"
                 android:textColor="#5B5B5B" />
+            
+            <!-- Contenedor de vidas (se mostrará para niveles 2+) -->
+            <LinearLayout
+                android:id="@+id/llVidas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp"
+                android:visibility="gone"
+                android:gravity="center_vertical">
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Botón COMENZAR que ahora SÍ navega -->

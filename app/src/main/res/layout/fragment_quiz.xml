@@ -1,46 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:fillViewport="true"
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="true">
+    
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:paddingTop="48dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- Header: tú / índice / oponente -->
+    <!-- Header: Tú / Pregunta / Oponente -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:layout_marginBottom="8dp"
+        android:padding="16dp"
+        android:paddingTop="20dp"
+        android:layout_marginBottom="16dp"
         android:gravity="center_vertical"
         android:background="#FFFFFFFF">
 
-        <TextView
-            android:id="@+id/txtLeft"
+        <!-- Izquierda: Tú -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tú"
-            android:textStyle="bold"
-            android:textColor="#222222" />
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/txtIndex"
+            <ImageView
+                android:id="@+id/ivFotoUsuario"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/usuario"/>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tú"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Centro: Pregunta y Timer -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pregunta 1/25"
-            android:textStyle="bold"
-            android:textColor="#222222" />
+            android:orientation="vertical"
+            android:gravity="center">
+            
+            <TextView
+                android:id="@+id/txtIndex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pregunta 3/5"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:textSize="16sp" />
+            
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
+            
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#FF0000" />
+            
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" segundos"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtRight"
+        <!-- Derecha: Oponente -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end"
-            android:text="Oponente"
-            android:textStyle="bold"
-            android:textColor="#222222" />
+            android:orientation="vertical"
+            android:gravity="center|end">
+            
+            <ImageView
+                android:id="@+id/ivFotoOponente"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/usuario"/>
+            
+            <TextView
+                android:id="@+id/txtRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ana Garcia"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Barra de progreso del tiempo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+        
+        <!-- Barra de progreso del tiempo -->
+        <ProgressBar
+            android:id="@+id/progressTimer"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_weight="1"
+            android:max="30"
+            android:progress="30"
+            android:progressTint="#FF9800"
+            android:progressBackgroundTint="#E0E0E0" />
     </LinearLayout>
 
     <!-- Enunciado -->
@@ -57,39 +153,23 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/optionsList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:overScrollMode="ifContentScrolls" />
-
-    <!-- Navegación: Anterior y Siguiente -->
-    <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:weightSum="2">
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never" />
 
-        <Button
-            android:id="@+id/btnPrev"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="6dp"
-            android:backgroundTint="#9E9E9E"
-            android:text="Anterior"
-            android:textColor="@android:color/white"
-            android:enabled="false" />
-
-        <Button
-            android:id="@+id/btnNext"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_marginStart="6dp"
-            android:backgroundTint="#3F51B5"
-            android:text="Siguiente"
-            android:textColor="@android:color/white"
-            android:enabled="false" />
+    <!-- Botón Siguiente -->
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_button_siguiente_selector"
+        android:backgroundTint="@null"
+        android:text="Siguiente"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:enabled="false" />
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

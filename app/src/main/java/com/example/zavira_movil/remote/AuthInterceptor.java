@@ -18,7 +18,7 @@ public class AuthInterceptor implements Interceptor {
     private final TokenProvider tokenProvider;
 
     public AuthInterceptor(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
+        this.tokenProvider= tokenProvider;
     }
 
     @Override

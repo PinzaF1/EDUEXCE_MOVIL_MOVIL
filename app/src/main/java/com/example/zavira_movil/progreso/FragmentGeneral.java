@@ -19,6 +19,7 @@ import com.example.zavira_movil.remote.RetrofitClient;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +31,7 @@ public class FragmentGeneral extends Fragment {
     private TextView textoProgreso, tvNivelActual;
     private RecyclerView recyclerNiveles;      // mismo ID del XML
     private MateriasAdapter materiasAdapter;   // ← ahora materias
+    private LinearLayoutManager layoutManager;
 
     @Nullable
     @Override
@@ -44,7 +46,9 @@ public class FragmentGeneral extends Fragment {
         progresoGeneral.setIndeterminate(false);
         progresoGeneral.setMax(100);
 
-        recyclerNiveles.setLayoutManager(new LinearLayoutManager(requireContext()));
+        layoutManager = new LinearLayoutManager(requireContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerNiveles.setLayoutManager(layoutManager);
         recyclerNiveles.setNestedScrollingEnabled(false);
         recyclerNiveles.setHasFixedSize(false);
         recyclerNiveles.setItemAnimator(null);
@@ -98,9 +102,92 @@ public class FragmentGeneral extends Fragment {
                 if (!isAdded()) return;
 
                 if (response.isSuccessful() && response.body() != null && response.body().getMaterias() != null) {
-                    materiasAdapter.setLista(response.body().getMaterias());
+                    List<MateriaDetalle> materiasRecibidas = response.body().getMaterias();
+                    Log.d("Materias", "Materias recibidas del API: " + materiasRecibidas.size());
+                    for (MateriaDetalle m : materiasRecibidas) {
+                        Log.d("Materias", "  - RAW: nombre='" + m.getNombre() + "', porcentaje=" + m.getPorcentaje() + "%, etiqueta='" + m.getEtiqueta() + "'");
+                    }
+                    
+                    // Mapa para rastrear qué áreas ya están presentes (normalizado sin acentos)
+                    java.util.Map<String, MateriaDetalle> mapaAreas = new java.util.HashMap<>();
+                    
+                    // Normalizar nombres y agregar al mapa
+                    for (MateriaDetalle m : materiasRecibidas) {
+                        if (m.getNombre() != null) {
+                            String nombreOriginal = m.getNombre();
+                            String nombreNormalizado = normalizarNombreArea(nombreOriginal);
+                            
+                            // Normalizar nombre para mostrar
+                            if (nombreOriginal.equalsIgnoreCase("Ingles")) {
+                                m.setNombre("Inglés");
+                            } else if (nombreOriginal.equalsIgnoreCase("Matematicas")) {
+                                m.setNombre("Matemáticas");
+                            }
+                            
+                            mapaAreas.put(nombreNormalizado, m);
+                            Log.d("Materias", "Agregada al mapa: '" + nombreNormalizado + "' -> '" + m.getNombre() + "'");
+                        }
+                    }
+                    
+                    // Lista final con todas las áreas requeridas
+                    List<MateriaDetalle> materiasFinales = new ArrayList<>();
+                    String[] areasEsperadas = {"matematicas", "lenguaje", "ciencias", "sociales", "ingles"};
+                    String[] nombresDisplay = {"Matemáticas", "Lenguaje", "Ciencias", "Sociales", "Inglés"};
+                    
+                    for (int i = 0; i < areasEsperadas.length; i++) {
+                        String areaKey = areasEsperadas[i];
+                        String nombreDisplay = nombresDisplay[i];
+                        
+                        MateriaDetalle materia = mapaAreas.get(areaKey);
+                        if (materia != null) {
+                            // Asegurar nombre correcto
+                            if (areaKey.equals("ingles") && !materia.getNombre().equals("Inglés")) {
+                                materia.setNombre("Inglés");
+                            } else if (areaKey.equals("matematicas") && !materia.getNombre().equals("Matemáticas")) {
+                                materia.setNombre("Matemáticas");
+                            }
+                            
+                            // Asegurar que siempre tenga etiqueta
+                            if (materia.getEtiqueta() == null || materia.getEtiqueta().trim().isEmpty()) {
+                                int porcentaje = materia.getPorcentaje();
+                                String etiquetaCalculada;
+                                if (porcentaje >= 75) {
+                                    etiquetaCalculada = "Excelente";
+                                } else if (porcentaje >= 60) {
+                                    etiquetaCalculada = "Buen progreso";
+                                } else {
+                                    etiquetaCalculada = "Necesita mejorar";
+                                }
+                                materia.setEtiqueta(etiquetaCalculada);
+                                Log.d("Materias", "Etiqueta calculada para " + nombreDisplay + ": " + etiquetaCalculada);
+                            }
+                            
+                            materiasFinales.add(materia);
+                            Log.d("Materias", "Área encontrada: " + nombreDisplay + ", etiqueta: '" + materia.getEtiqueta() + "'");
+                        } else {
+                            // Crear área faltante
+                            Log.w("Materias", "Área NO encontrada en API: " + nombreDisplay + " (key: " + areaKey + "), creando por defecto");
+                            MateriaDetalle materiaDefecto = new MateriaDetalle();
+                            materiaDefecto.setNombre(nombreDisplay);
+                            materiaDefecto.setPorcentaje(0);
+                            materiaDefecto.setEtiqueta("Necesita mejorar");
+                            materiasFinales.add(materiaDefecto);
+                            Log.d("Materias", "Área creada por defecto: " + nombreDisplay + ", etiqueta: '" + materiaDefecto.getEtiqueta() + "'");
+                        }
+                    }
+                    
+                    Log.d("Materias", "Total de materias finales: " + materiasFinales.size());
+                    for (MateriaDetalle m : materiasFinales) {
+                        Log.d("Materias", "  FINAL: " + m.getNombre() + " (" + m.getPorcentaje() + "%), etiqueta: '" + m.getEtiqueta() + "'");
+                    }
+                    
+                    materiasAdapter.setLista(materiasFinales);
+                    Log.d("Materias", "Adapter actualizado con " + materiasAdapter.getItemCount() + " items");
                 } else {
                     Log.e("Materias", "Error HTTP: " + response.code());
+                    if (response.body() != null) {
+                        Log.e("Materias", "Response body: " + response.body());
+                    }
                     materiasAdapter.setLista(new ArrayList<>());
                 }
             }
@@ -109,8 +196,21 @@ public class FragmentGeneral extends Fragment {
             public void onFailure(Call<MateriasResponse> call, Throwable t) {
                 if (!isAdded()) return;
                 Log.e("Materias", "Fallo: " + t.getMessage());
+                if (t.getCause() != null) {
+                    Log.e("Materias", "Causa: " + t.getCause().getMessage());
+                }
                 materiasAdapter.setLista(new ArrayList<>());
             }
         });
+    }
+    
+    /**
+     * Normaliza el nombre de un área para comparación (sin acentos, minúsculas)
+     */
+    private String normalizarNombreArea(String nombre) {
+        if (nombre == null) return "";
+        return java.text.Normalizer.normalize(nombre.trim(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase();
     }
 }
