@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardDialog"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal">
+
+        <!-- Icono circular con fondo -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_icono_circular"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center">
+            
+            <ImageView
+                android:id="@+id/ivIconoVida"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:contentDescription="Icono de vida"
+                android:tint="#FF9800"/>
+        </LinearLayout>
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Necesitas Practicar Más"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937"
+            android:layout_marginBottom="6dp"/>
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/tvSubtitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Obtuviste 0 de 5 respuestas correctas"
+            android:textSize="13sp"
+            android:textColor="#4B5563"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Sección de vidas - diseño mejorado -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="#F9FAFB"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vidas en:"
+                android:textSize="13sp"
+                android:textColor="#6B7280"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/llCorazones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:id="@+id/tvVidasRestantes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Te quedan 2 vidas"
+                android:textSize="12sp"
+                android:textColor="#6B7280"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Mensaje de regeneración (solo cuando no hay vidas) -->
+        <TextView
+            android:id="@+id/tvRegeneracion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sin vidas - Regeneran en 24h"
+            android:textSize="12sp"
+            android:textColor="#6B7280"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"/>
+
+        <!-- Mensaje final (solo cuando no hay vidas) -->
+        <TextView
+            android:id="@+id/tvMensajeFinal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sin vidas disponibles. Las vidas se regeneran cada 24 horas."
+            android:textSize="12sp"
+            android:textColor="#6B7280"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"/>
+
+        <!-- Botón de acción -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUsarVida"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Usar 1 Vida (2 restantes)"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:icon="@android:drawable/ic_menu_revert"
+            app:iconTint="@android:color/white"
+            app:cornerRadius="10dp"
+            android:elevation="2dp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Botón cancelar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Cancelar"
+            android:textColor="#6B7280"
+            android:textSize="14sp"
+            android:backgroundTint="@android:color/transparent"
+            app:cornerRadius="10dp"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

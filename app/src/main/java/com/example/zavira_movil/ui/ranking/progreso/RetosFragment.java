@@ -32,6 +32,9 @@ public class RetosFragment extends Fragment {
         TabLayout tabLayout = v.findViewById(R.id.tabLayout);
         ViewPager2 viewPager = v.findViewById(R.id.viewPager);
         View overlayContainer = v.findViewById(R.id.container);
+        
+        // Ocultar logo EduExce y campana en la Activity principal
+        v.post(() -> ocultarTopBar());
 
         // Adapter con constructor que acepta Fragment (ver RetosTabsAdapter abajo)
         viewPager.setAdapter(new RetosTabsAdapter(this));
@@ -46,6 +49,49 @@ public class RetosFragment extends Fragment {
                 boolean hasBackStack = getChildFragmentManager().getBackStackEntryCount() > 0;
                 overlayContainer.setVisibility(hasBackStack ? View.VISIBLE : View.GONE);
             });
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Asegurar que el topBar esté oculto cada vez que el fragmento se muestra
+        if (getView() != null && isAdded()) {
+            getView().post(() -> ocultarTopBar());
+        }
+    }
+    
+    @Override
+    public void onDestroyView() {
+        // NO restaurar el topBar aquí porque puede estar navegando a otra Activity (Perfil)
+        // El topBar solo debe restaurarse cuando cambias a otro fragment dentro de HomeActivity
+        // HomeActivity se encargará de restaurarlo cuando sea necesario
+        super.onDestroyView();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        // NO restaurar el topBar en onPause
+        // ProfileActivity es una Activity separada, así que HomeActivity queda en segundo plano
+        // Si restauramos aquí, el topBar aparecería en segundo plano
+    }
+    
+    private void ocultarTopBar() {
+        if (getActivity() != null && isAdded()) {
+            View topBar = getActivity().findViewById(R.id.topBar);
+            if (topBar != null) {
+                topBar.setVisibility(View.GONE);
+            }
+        }
+    }
+    
+    private void restaurarTopBar() {
+        if (getActivity() != null && isAdded()) {
+            View topBar = getActivity().findViewById(R.id.topBar);
+            if (topBar != null) {
+                topBar.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

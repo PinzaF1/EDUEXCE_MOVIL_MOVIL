@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -52,6 +53,9 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -127,6 +131,9 @@ public class PerfilFragment extends Fragment {
         binding.rowKolbTrigger.setOnClickListener(v -> showKolbDialog());
     }
 
+    // Variable para guardar la descripción del resultado de Kolb
+    private String descripcionKolb = null;
+
     // ---------------- Diálogo Kolb ----------------
     private void showKolbDialog() {
         // Inflar el layout del diálogo
@@ -138,6 +145,40 @@ public class PerfilFragment extends Fragment {
                 .setText(binding.tvEstilo.getText());
         ((android.widget.TextView) dialogView.findViewById(R.id.tvFechaSheet))
                 .setText(binding.tvFechaKolb.getText());
+        
+        // Mostrar la descripción si está guardada, sino obtenerla del API
+        TextView tvDescripcionSheet = dialogView.findViewById(R.id.tvDescripcionSheet);
+        if (tvDescripcionSheet != null) {
+            if (descripcionKolb != null && !descripcionKolb.trim().isEmpty()) {
+                // Usar la descripción guardada
+                tvDescripcionSheet.setText(limpiarTexto(descripcionKolb));
+            } else {
+                // Si no está guardada, obtenerla del API
+                tvDescripcionSheet.setText("-");
+                api.obtenerResultado().enqueue(new Callback<KolbResultado>() {
+                    @Override
+                    public void onResponse(Call<KolbResultado> call, Response<KolbResultado> resp) {
+                        if (resp.isSuccessful() && resp.body() != null) {
+                            KolbResultado r = resp.body();
+                            String descripcion = r.getDescripcion();
+                            if (descripcion != null && !descripcion.trim().isEmpty()) {
+                                descripcionKolb = descripcion; // Guardar para uso futuro
+                                tvDescripcionSheet.setText(limpiarTexto(descripcion));
+                            } else {
+                                tvDescripcionSheet.setText("-");
+                            }
+                        } else {
+                            tvDescripcionSheet.setText("-");
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<KolbResultado> call, Throwable t) {
+                        tvDescripcionSheet.setText("-");
+                    }
+                });
+            }
+        }
+        
         ((android.widget.TextView) dialogView.findViewById(R.id.tvCaracteristicasSheet))
                 .setText(binding.tvCaracteristicas.getText());
         ((android.widget.TextView) dialogView.findViewById(R.id.tvRecomendacionesSheet))
@@ -254,7 +295,65 @@ public class PerfilFragment extends Fragment {
                 .into(binding.icon);
 
         File saved = copyUriToInternalFile(uri, fileNameForUser());
-        if (saved != null) guardarPathFoto(saved.getAbsolutePath());
+        if (saved != null) {
+            guardarPathFoto(saved.getAbsolutePath());
+            // Subir foto al servidor
+            subirFotoAlServidor(saved);
+        }
+    }
+    
+    private void subirFotoAlServidor(@NonNull File fotoFile) {
+        if (!fotoFile.exists()) {
+            Log.e("PERFIL_UPLOAD", "El archivo no existe: " + fotoFile.getAbsolutePath());
+            return;
+        }
+
+        try {
+            // Crear RequestBody para el archivo
+            RequestBody requestFile = RequestBody.create(
+                    MediaType.parse("image/*"),
+                    fotoFile
+            );
+
+            // Crear MultipartBody.Part con el nombre del campo "foto"
+            MultipartBody.Part fotoPart = MultipartBody.Part.createFormData(
+                    "foto",
+                    fotoFile.getName(),
+                    requestFile
+            );
+
+            // Llamar a la API para subir la foto
+            api.subirFoto(fotoPart).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        try {
+                            String responseBody = response.body() != null ? response.body().string() : "";
+                            Log.d("PERFIL_UPLOAD", "Foto subida correctamente: " + responseBody);
+                            // Recargar el perfil para obtener la nueva URL
+                            cargarPerfil();
+                        } catch (Exception e) {
+                            Log.e("PERFIL_UPLOAD", "Error al leer respuesta", e);
+                        }
+                    } else {
+                        Log.e("PERFIL_UPLOAD", "Error al subir foto: " + response.code());
+                        try {
+                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "";
+                            Log.e("PERFIL_UPLOAD", "Error body: " + errorBody);
+                        } catch (Exception e) {
+                            Log.e("PERFIL_UPLOAD", "Error al leer error body", e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.e("PERFIL_UPLOAD", "Error de red al subir foto", t);
+                }
+            });
+        } catch (Exception e) {
+            Log.e("PERFIL_UPLOAD", "Error al preparar foto para subir", e);
+        }
     }
 
     @Nullable
@@ -399,16 +498,37 @@ public class PerfilFragment extends Fragment {
             @Override public void onResponse(Call<KolbResultado> call, Response<KolbResultado> resp) {
                 if (!resp.isSuccessful() || resp.body() == null) {
                     logHttpError("PROFILE_KOLB", resp);
+                    if (resp.code() == 404) {
+                        // Si no hay resultado, mostrar campos vacíos
+                        binding.tvEstilo.setText("-");
+                        binding.tvFechaKolb.setText("-");
+                        binding.tvCaracteristicas.setText("-");
+                        binding.tvRecomendaciones.setText("-");
+                    }
                     return;
                 }
                 KolbResultado r = resp.body();
+                
+                // Log para debug
+                android.util.Log.d("PROFILE_KOLB", "Estilo recibido: " + (r.getEstilo() != null ? r.getEstilo() : "null"));
+                android.util.Log.d("PROFILE_KOLB", "Fecha recibida: " + (r.getFecha() != null ? r.getFecha() : "null"));
+                android.util.Log.d("PROFILE_KOLB", "Descripción recibida: " + (r.getDescripcion() != null ? r.getDescripcion() : "null"));
+                
                 binding.tvEstilo.setText(safe(r.getEstilo()));
                 binding.tvFechaKolb.setText(formatearFechaFlexible(r.getFecha()));
                 binding.tvCaracteristicas.setText(limpiarTexto(r.getCaracteristicas()));
                 binding.tvRecomendaciones.setText(limpiarTexto(r.getRecomendaciones()));
+                
+                // Guardar la descripción para usarla en el diálogo
+                descripcionKolb = r.getDescripcion();
             }
             @Override public void onFailure(Call<KolbResultado> call, Throwable t) {
                 Log.e("PROFILE_KOLB_FAIL", "onFailure", t);
+                // Mostrar error al usuario
+                binding.tvEstilo.setText("-");
+                binding.tvFechaKolb.setText("-");
+                binding.tvCaracteristicas.setText("-");
+                binding.tvRecomendaciones.setText("-");
             }
         });
     }

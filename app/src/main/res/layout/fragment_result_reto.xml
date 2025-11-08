@@ -8,7 +8,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center">
+
+        <!-- GIF de copa (solo visible para ganador) -->
+        <ImageView
+            android:id="@+id/ivTrophyGif"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/tvEmoji"
@@ -44,10 +55,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/card_bg"
+            android:background="@drawable/card_bg_orange_red"
             android:orientation="vertical"
             android:padding="16dp"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/row_soft_blue"
+                android:background="@drawable/row_soft_orange_red"
                 android:padding="12dp"
                 android:layout_marginTop="12dp">
 
@@ -106,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/row_soft_violet"
+                android:background="@drawable/row_soft_orange_red"
                 android:padding="12dp"
                 android:layout_marginTop="10dp">
 
@@ -156,7 +169,11 @@
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:background="@drawable/btn_primary"
-            android:layout_marginTop="12dp"/>
+            android:background="@drawable/bg_button_siguiente_selector"
+            android:backgroundTint="@null"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"/>
     </LinearLayout>
 </ScrollView>

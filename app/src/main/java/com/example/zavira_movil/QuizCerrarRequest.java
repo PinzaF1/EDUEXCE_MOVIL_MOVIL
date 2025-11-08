@@ -7,9 +7,10 @@ public class QuizCerrarRequest {
 
     public static class RespuestaItem {
         @SerializedName("id_pregunta") public String idPregunta;
-        @SerializedName("seleccion")   public String seleccion; // "A"/"B"/"C"/"D"
-        public RespuestaItem(String idPregunta, String seleccion) {
-            this.idPregunta = idPregunta; this.seleccion = seleccion;
+        @SerializedName("respuesta")   public String respuesta; // Cambiar de "seleccion" a "respuesta" para coincidir con backend
+        public RespuestaItem(String idPregunta, String respuesta) {
+            this.idPregunta = idPregunta; 
+            this.respuesta = respuesta != null ? respuesta : "";
         }
     }
 

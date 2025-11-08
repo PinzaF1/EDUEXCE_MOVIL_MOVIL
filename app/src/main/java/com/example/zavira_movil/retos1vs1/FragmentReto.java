@@ -25,7 +25,7 @@ import retrofit2.*;
 public class FragmentReto extends Fragment {
 
     private TextView chipMat, chipLen, chipCie, chipSoc, chipIng;
-    private Button btnEnviar;
+    private View btnEnviar;
     private OpponentAdapter oppAdapter;
 
     private String selectedArea = null;
@@ -92,12 +92,15 @@ public class FragmentReto extends Fragment {
         super.onResume();
         // [MARCADOR] refresco al volver
         cargarMarcador(null);
+        // Refrescar oponentes cuando se vuelve (para actualizar disponibilidad)
+        cargarOponentes();
     }
 
     // [MARCADOR] público por si quieres llamarlo desde Resultados
     public void refreshMarcador() { cargarMarcador(null); }
 
-    private void cargarOponentes() {
+    // Público para poder refrescar desde FragmentLoadingSalaReto cuando se abandona
+    public void cargarOponentes() {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         api.listarOponentes().enqueue(new Callback<List<OpponentBackend>>() {
             @Override public void onResponse(Call<List<OpponentBackend>> call, Response<List<OpponentBackend>> resp) {
@@ -107,7 +110,10 @@ public class FragmentReto extends Fragment {
                     for (OpponentBackend b : resp.body()) {
                         String id = String.valueOf(b.getIdUsuario() != null ? b.getIdUsuario() : 0);
                         String nom = b.getNombre() != null ? b.getNombre() : ("Usuario " + id);
-                        String niv = b.getGrado() != null ? b.getGrado() : "";
+                        // Formato: "10-A" (grado + curso)
+                        String grado = b.getGrado() != null ? b.getGrado() : "";
+                        String curso = b.getCurso() != null ? b.getCurso() : "";
+                        String niv = (grado + (curso.isEmpty() ? "" : "-" + curso)).trim();
                         boolean on = "disponible".equalsIgnoreCase(b.getEstado());
                         items.add(new OpponentItem(id, nom, niv, 0, on));
                     }
@@ -134,6 +140,7 @@ public class FragmentReto extends Fragment {
     private void refreshSendState() {
         boolean ready = !TextUtils.isEmpty(selectedArea) && !TextUtils.isEmpty(selectedOpponentId);
         btnEnviar.setEnabled(ready);
+        btnEnviar.setAlpha(ready ? 1.0f : 0.5f); // Visual feedback cuando está deshabilitado
     }
 
     private void crearRetoIrALobby() {

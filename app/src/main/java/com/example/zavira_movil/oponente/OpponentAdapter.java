@@ -49,8 +49,15 @@ public class OpponentAdapter extends RecyclerView.Adapter<OpponentAdapter.VH> {
         OpponentItem o = items.get(pos);
 
         h.name.setText(o.getNombre());
-        h.level.setText(o.getNivel());
-        h.wins.setText(String.valueOf(o.getWins()));
+        // Formato: "GRADO : 10-A" (usando nivel que contiene grado)
+        String gradoTexto = o.getNivel();
+        if (gradoTexto != null && !gradoTexto.isEmpty()) {
+            h.level.setText("GRADO : " + gradoTexto);
+        } else {
+            h.level.setText("");
+        }
+        // Ocultar el contador de victorias (wins)
+        h.wins.setVisibility(View.GONE);
         h.dot.setImageResource(o.isOnline()
                 ? android.R.drawable.presence_online
                 : android.R.drawable.presence_invisible);
@@ -63,15 +70,31 @@ public class OpponentAdapter extends RecyclerView.Adapter<OpponentAdapter.VH> {
 
         // --- estado de selección (borde y fondo) ---
         boolean isSelected = o.getId() != null && o.getId().equals(selectedId);
-        h.itemView.setBackgroundResource(isSelected
-                ? R.drawable.card_selected_soft
-                : R.drawable.card_normal
-        );
+        boolean isOnline = o.isOnline();
+        
+        // Si está en reto (no disponible), mostrar en gris y deshabilitar
+        if (!isOnline) {
+            h.itemView.setAlpha(0.5f);
+            h.itemView.setEnabled(false);
+            h.itemView.setClickable(false);
+            h.itemView.setBackgroundResource(R.drawable.card_normal);
+        } else {
+            h.itemView.setAlpha(1.0f);
+            h.itemView.setEnabled(true);
+            h.itemView.setClickable(true);
+            h.itemView.setBackgroundResource(isSelected
+                    ? R.drawable.card_selected_soft
+                    : R.drawable.card_normal
+            );
+        }
 
         h.itemView.setOnClickListener(v -> {
-            selectedId = o.getId();
-            notifyDataSetChanged();
-            onClick.onSelect(o);
+            // Solo permitir seleccionar si está disponible (online)
+            if (isOnline) {
+                selectedId = o.getId();
+                notifyDataSetChanged();
+                onClick.onSelect(o);
+            }
         });
     }
 

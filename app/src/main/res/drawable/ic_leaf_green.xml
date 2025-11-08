@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Hoja verde simple -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M12,2C8,2 5,5 5,9c0,4 3,7 7,7s7,-3 7,-7C19,5 16,2 12,2z"/>
+    <!-- Tallo -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M12,16L12,20L11,20L11,16L12,16z"/>
+</vector>

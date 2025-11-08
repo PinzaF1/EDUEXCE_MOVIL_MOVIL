@@ -23,8 +23,15 @@ public class MateriasAdapter extends RecyclerView.Adapter<MateriasAdapter.VH> {
 
     public void setLista(List<MateriaDetalle> nueva) {
         lista.clear();
-        if (nueva != null) lista.addAll(nueva);
+        if (nueva != null) {
+            lista.addAll(nueva);
+            android.util.Log.d("MateriasAdapter", "setLista: " + nueva.size() + " materias");
+            for (MateriaDetalle m : nueva) {
+                android.util.Log.d("MateriasAdapter", "  - " + m.getNombre() + ": " + m.getPorcentaje() + "%");
+            }
+        }
         notifyDataSetChanged();
+        android.util.Log.d("MateriasAdapter", "notifyDataSetChanged() llamado, getItemCount() = " + getItemCount());
     }
 
     @NonNull @Override
@@ -37,9 +44,37 @@ public class MateriasAdapter extends RecyclerView.Adapter<MateriasAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         MateriaDetalle m = lista.get(pos);
-        h.tvNombre.setText(m.getNombre());
+        
+        // Normalizar nombre
+        String nombreMateria = m.getNombre() != null ? m.getNombre() : "";
+        if (nombreMateria.equalsIgnoreCase("Ingles")) {
+            nombreMateria = "Inglés";
+        }
+        
+        // Establecer textos - SIMPLE como ProgresoAdapter
+        h.tvNombre.setText(nombreMateria);
         h.tvPorcentaje.setText(m.getPorcentaje() + "%");
-        h.tvEtiqueta.setText(m.getEtiqueta());
+        
+        // CRÍTICO: Asegurar etiqueta SIEMPRE
+        String etiqueta = m.getEtiqueta();
+        if (etiqueta == null || etiqueta.trim().isEmpty()) {
+            int porcentaje = m.getPorcentaje();
+            if (porcentaje >= 75) {
+                etiqueta = "Excelente";
+            } else if (porcentaje >= 60) {
+                etiqueta = "Buen progreso";
+            } else {
+                etiqueta = "Necesita mejorar";
+            }
+            m.setEtiqueta(etiqueta);
+        }
+        
+        // ESTABLECER ETIQUETA - EXACTAMENTE COMO ProgresoAdapter
+        h.tvEtiqueta.setText(etiqueta);
+        
+        // FORZAR VISIBILIDAD - CRÍTICO para RecyclerView que recicla vistas
+        h.tvEtiqueta.setVisibility(View.VISIBLE);
+        
         h.pb.setProgress(m.getPorcentaje());
 
         // === Tinte por área (misma lógica que ProgresoAdapter) ===
@@ -70,6 +105,11 @@ public class MateriasAdapter extends RecyclerView.Adapter<MateriasAdapter.VH> {
             tvPorcentaje = itemView.findViewById(R.id.tvProgreso);
             tvEtiqueta   = itemView.findViewById(R.id.tvEtiqueta);
             pb           = itemView.findViewById(R.id.progressMateria);
+            
+            // CRÍTICO: Asegurar que el TextView de etiqueta esté visible desde el inicio
+            if (tvEtiqueta != null) {
+                tvEtiqueta.setVisibility(View.VISIBLE);
+            }
         }
     }
 

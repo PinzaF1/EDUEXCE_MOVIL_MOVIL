@@ -6,15 +6,19 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
+import com.example.zavira_movil.niveleshome.LivesManager;
 import com.example.zavira_movil.niveleshome.ProgressLockManager;
-import com.example.zavira_movil.local.UserSession;
+import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.model.Level;
 import com.example.zavira_movil.model.Subject;
 import com.example.zavira_movil.niveleshome.QuizActivity;
@@ -53,7 +57,16 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
 
     @Override
     public void onBindViewHolder(@NonNull Holder h, int position) {
-        String userId = String.valueOf(UserSession.getInstance().getIdUsuario());
+        // CRÍTICO: Usar TokenManager en lugar de UserSession para consistencia
+        int userIdInt = TokenManager.getUserId(h.itemView.getContext());
+        if (userIdInt <= 0) {
+            android.util.Log.e("LevelMiniAdapter", "ERROR: userId inválido");
+            h.itemView.setEnabled(false);
+            h.itemView.setAlpha(0.5f);
+            return;
+        }
+        
+        String userId = String.valueOf(userIdInt);
 
         @ColorInt int areaColor = colorFor(subject.title);
         @ColorInt int grayLocked = Color.parseColor("#B6B9C2");
@@ -78,6 +91,31 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
             // 🎨 Borde + ripple según estado (sin romper si root no es MaterialCardView)
             applyCardStyle(h.itemView, enabled ? areaColor : grayLocked, areaColor);
 
+            // Mostrar vidas SOLO para el nivel ACTUAL (el más alto desbloqueado)
+            // Los niveles anteriores NO deben mostrar vidas
+            int nivelMaximoDesbloqueado = ProgressLockManager.getUnlockedLevel(
+                    h.itemView.getContext(), userId, subject.title);
+            
+            // Solo mostrar vidas si:
+            // 1. Es nivel 2 o superior
+            // 2. Está desbloqueado
+            // 3. Es el nivel ACTUAL (el más alto desbloqueado)
+            // 4. Las vidas están inicializadas (no es -1)
+            if (nivelNumero > 1 && enabled && nivelNumero == nivelMaximoDesbloqueado) {
+                int vidas = LivesManager.getLives(h.itemView.getContext(), userId, subject.title, nivelNumero);
+                // Solo mostrar vidas si están inicializadas (no es -1)
+                if (vidas >= 0) {
+                    // Obtener el color correcto del área usando ContextCompat
+                    int colorCorrecto = obtenerColorArea(h.itemView.getContext(), subject.title);
+                    mostrarVidas(h, vidas, colorCorrecto);
+                } else {
+                    // Vidas no inicializadas aún, ocultar hasta que se sincronicen
+                    ocultarVidas(h);
+                }
+            } else {
+                ocultarVidas(h);
+            }
+
             h.itemView.setOnClickListener(v -> {
                 if (!enabled || launcher == null) return;
 
@@ -95,17 +133,36 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
             // ---------------- Examen Final (25 preguntas) ----------------
             h.txtLevel.setText("Examen Final");
 
-            boolean unlocked = ProgressLockManager.getUnlockedLevel(
+            int nivelMaximoDesbloqueado = ProgressLockManager.getUnlockedLevel(
                     h.itemView.getContext(),
                     userId,
                     subject.title
-            ) >= 5; // Se desbloquea al terminar nivel 5
+            );
+            
+            // El examen final se desbloquea cuando el nivel máximo es >= 6
+            boolean unlocked = nivelMaximoDesbloqueado >= 6;
 
             h.itemView.setEnabled(unlocked);
             h.itemView.setAlpha(unlocked ? 1f : 0.5f);
 
             // 🎨 Borde + ripple para examen final
             applyCardStyle(h.itemView, unlocked ? areaColor : grayLocked, areaColor);
+
+            // Mostrar vidas si está desbloqueado (nivel 6 = examen final) y están inicializadas
+            if (unlocked) {
+                int vidas = LivesManager.getLives(h.itemView.getContext(), userId, subject.title, 6);
+                // Solo mostrar vidas si están inicializadas (no es -1)
+                if (vidas >= 0) {
+                    // Obtener el color correcto del área usando ContextCompat
+                    int colorCorrecto = obtenerColorArea(h.itemView.getContext(), subject.title);
+                    mostrarVidas(h, vidas, colorCorrecto);
+                } else {
+                    // Vidas no inicializadas aún, ocultar hasta que se sincronicen
+                    ocultarVidas(h);
+                }
+            } else {
+                ocultarVidas(h);
+            }
 
             h.itemView.setOnClickListener(v -> {
                 if (!unlocked || launcher == null) return;
@@ -131,6 +188,50 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
         }
     }
 
+    // ===== Métodos para mostrar/ocultar vidas =====
+
+    private void mostrarVidas(Holder h, int vidas, @ColorInt int areaColor) {
+        LinearLayout llVidas = h.itemView.findViewById(R.id.llVidas);
+        if (llVidas == null) return;
+
+        llVidas.removeAllViews();
+        llVidas.setVisibility(View.VISIBLE);
+
+        // Agregar corazones
+        for (int i = 0; i < 3; i++) {
+            ImageView ivCorazon = new ImageView(h.itemView.getContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    dp(h.itemView.getContext(), 20), dp(h.itemView.getContext(), 20)
+            );
+            params.setMargins(0, 0, dp(h.itemView.getContext(), 4), 0);
+            ivCorazon.setLayoutParams(params);
+            ivCorazon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+            if (i < vidas) {
+                // Corazón lleno del color del área
+                ivCorazon.setImageResource(R.drawable.ic_heart_filled);
+                ivCorazon.setColorFilter(areaColor, android.graphics.PorterDuff.Mode.SRC_IN);
+            } else {
+                // Corazón vacío
+                ivCorazon.setImageResource(R.drawable.ic_heart_empty);
+                ivCorazon.setColorFilter(Color.parseColor("#CCCCCC"), android.graphics.PorterDuff.Mode.SRC_IN);
+            }
+            llVidas.addView(ivCorazon);
+        }
+    }
+
+    private void ocultarVidas(Holder h) {
+        LinearLayout llVidas = h.itemView.findViewById(R.id.llVidas);
+        if (llVidas != null) {
+            llVidas.setVisibility(View.GONE);
+        }
+    }
+
+    private int dp(android.content.Context context, int px) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return Math.round(px * density);
+    }
+
     // ===== Helpers de estilo =====
 
     /**
@@ -150,7 +251,7 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
     }
 
     /**
-     * Mapa de color por área (igual al usado en SubjectAdapter).
+     * Mapa de color por área (usando recursos de color).
      */
     @ColorInt
     private int colorFor(String title) {
@@ -158,13 +259,39 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
         String t = title.toLowerCase().trim();
 
         if (t.contains("matem"))                                   return Color.parseColor("#E53935"); // rojo
-        if (t.contains("lectura") || t.contains("lenguaje") || t.contains("espa"))
-            return Color.parseColor("#1E88E5"); // azul
+        if (t.contains("lectura") || t.contains("lenguaje") || t.contains("espa") || t.contains("critica"))
+            return Color.parseColor("#2C92EB"); // azul - usar el color del resource
         if (t.contains("social") || t.contains("ciudad"))          return Color.parseColor("#FB8C00"); // naranja
         if (t.contains("cien") || t.contains("biolo") || t.contains("fis") || t.contains("quim"))
             return Color.parseColor("#43A047"); // verde
-        if (t.contains("ingl"))                                    return Color.parseColor("#8E24AA"); // ámbar
+        if (t.contains("ingl"))                                    return Color.parseColor("#8E24AA"); // morado
 
+        return Color.parseColor("#B6B9C2");
+    }
+    
+    /**
+     * Obtiene el color del área usando ContextCompat (para usar recursos de color).
+     */
+    @ColorInt
+    private int obtenerColorArea(android.content.Context context, String area) {
+        if (area == null) return Color.parseColor("#B6B9C2");
+        String a = area.toLowerCase().trim();
+        
+        try {
+            if (a.contains("matem")) return ContextCompat.getColor(context, R.color.area_matematicas);
+            if (a.contains("lengua") || a.contains("lectura") || a.contains("espa") || a.contains("critica")) 
+                return ContextCompat.getColor(context, R.color.area_lenguaje);
+            if (a.contains("social") || a.contains("ciudad")) 
+                return ContextCompat.getColor(context, R.color.area_sociales);
+            if (a.contains("cien") || a.contains("biolo") || a.contains("fis") || a.contains("quim")) 
+                return ContextCompat.getColor(context, R.color.area_ciencias);
+            if (a.contains("ingl")) 
+                return ContextCompat.getColor(context, R.color.area_ingles);
+        } catch (Exception e) {
+            // Si falla, usar colorFor como fallback
+            return colorFor(area);
+        }
+        
         return Color.parseColor("#B6B9C2");
     }
 }

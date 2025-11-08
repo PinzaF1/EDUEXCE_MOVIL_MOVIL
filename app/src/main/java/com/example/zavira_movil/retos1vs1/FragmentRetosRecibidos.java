@@ -15,9 +15,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.zavira_movil.BasicResponse;
 import com.example.zavira_movil.R;
+import com.example.zavira_movil.local.TokenManager;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,9 +38,10 @@ public class FragmentRetosRecibidos extends Fragment {
     private RecyclerView rv;
     private RecibidosAdapter adapter;
 
-    private Handler handler;
-    private int polls = 0;
-    private final Runnable poller = this::cargar;
+    // QUITAR EL POLLING AUTOMÁTICO - ya no se usa
+    // private Handler handler;
+    // private int polls = 0;
+    // private final Runnable poller = this::cargar;
 
     @Nullable
     @Override
@@ -55,16 +59,26 @@ public class FragmentRetosRecibidos extends Fragment {
 
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new RecibidosAdapter(this::aceptarYIrSala);
+        adapter.setOnRechazarClick(this::rechazarReto);
         rv.setAdapter(adapter);
 
-        handler = new Handler();
-        polls = 0;
+        // QUITAR EL POLLING AUTOMÁTICO - solo cargar una vez
+        // handler = new Handler();
+        // polls = 0;
+        cargar();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refrescar cuando se vuelve a la pantalla (para ver nuevos retos recibidos)
         cargar();
     }
 
     @Override
     public void onDestroyView() {
-        if (handler != null) { handler.removeCallbacksAndMessages(null); handler = null; }
+        // QUITAR EL POLLING AUTOMÁTICO - ya no se usa
+        // if (handler != null) { handler.removeCallbacksAndMessages(null); handler = null; }
         super.onDestroyView();
     }
 
@@ -74,7 +88,7 @@ public class FragmentRetosRecibidos extends Fragment {
         tvEmpty.setVisibility(View.GONE);
 
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
-        Call<List<RetoListItem>> call = api.listarRetos();
+        Call<List<RetoListItem>> call = api.listarRetos("recibidos");
 
         call.enqueue(new Callback<List<RetoListItem>>() {
             @Override public void onResponse(Call<List<RetoListItem>> call, Response<List<RetoListItem>> resp) {
@@ -90,10 +104,8 @@ public class FragmentRetosRecibidos extends Fragment {
                 if (lista.isEmpty()) {
                     tvEmpty.setText("No tienes retos recibidos.");
                     tvEmpty.setVisibility(View.VISIBLE);
-                    if (handler != null && polls < 20) {
-                        polls++;
-                        handler.postDelayed(poller, polls < 10 ? 800 : 1500);
-                    }
+                    // QUITAR EL POLLING AUTOMÁTICO - solo mostrar mensaje
+                    // No hacer polling, el usuario debe refrescar manualmente o usar onResume
                 } else {
                     tvEmpty.setVisibility(View.GONE);
                 }
@@ -102,18 +114,16 @@ public class FragmentRetosRecibidos extends Fragment {
             @Override public void onFailure(Call<List<RetoListItem>> call, Throwable t) {
                 if (!isAdded()) return;
                 mostrarCargando(false);
-                tvEmpty.setText("Fallo de red: " + (t.getMessage() != null ? t.getMessage() : ""));
+                tvEmpty.setText("No tienes retos recibidos.");
                 tvEmpty.setVisibility(View.VISIBLE);
                 adapter.setData(new ArrayList<>());
-                if (handler != null && polls < 5) {
-                    polls++;
-                    handler.postDelayed(poller, 1500);
-                }
+                // QUITAR EL POLLING AUTOMÁTICO - solo mostrar mensaje
+                // No hacer polling, el usuario debe refrescar manualmente o usar onResume
             }
         });
     }
 
-    /** Acepta el reto (primero sin body; si falla, con body {} ) y abre sala como retado. */
+    /** Acepta el reto y abre sala de espera. El quiz comenzará cuando el estado sea 'en_curso'. */
     private void aceptarYIrSala(RetoListItem it) {
         if (!isAdded()) return;
 
@@ -126,16 +136,26 @@ public class FragmentRetosRecibidos extends Fragment {
         ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
         final String retoId = String.valueOf(it.getIdReto());
 
-        // 1) Intento sin body
+        // Aceptar el reto (esto crea la sesión del oponente)
         api.aceptarReto(retoId).enqueue(new Callback<AceptarRetoResponse>() {
             @Override public void onResponse(Call<AceptarRetoResponse> call, Response<AceptarRetoResponse> resp) {
                 if (!isAdded()) return;
+                mostrarCargando(false);
 
                 if (resp.isSuccessful() && resp.body() != null) {
-                    mostrarCargando(false);
+                    AceptarRetoResponse body = resp.body();
+                    // Si el estado es "en_curso" y tiene preguntas, lanzar el quiz INMEDIATAMENTE
+                    if (body.reto != null && "en_curso".equalsIgnoreCase(body.reto.estado) 
+                        && body.preguntas != null && !body.preguntas.isEmpty()
+                        && body.sesiones != null && !body.sesiones.isEmpty()) {
+                        // Lanzar el quiz directamente sin pasar por la sala de espera
+                        lanzarQuizDirectamente(body, it);
+                        return;
+                    }
+                    // Si no está listo aún, abrir sala de espera
                     abrirSalaDespuesDeAceptar(it);
                 } else {
-                    // 2) Fallback con body {}
+                    // Fallback con body {}
                     Map<String, Object> body = new HashMap<>();
                     api.aceptarRetoConBody(retoId, body).enqueue(new Callback<AceptarRetoResponse>() {
                         @Override public void onResponse(Call<AceptarRetoResponse> call2, Response<AceptarRetoResponse> resp2) {
@@ -145,12 +165,20 @@ public class FragmentRetosRecibidos extends Fragment {
                                 Toast.makeText(requireContext(), "No se pudo aceptar (" + resp2.code() + ")", Toast.LENGTH_LONG).show();
                                 return;
                             }
+                            AceptarRetoResponse body2 = resp2.body();
+                            // Si el estado es "en_curso" y tiene preguntas, lanzar el quiz INMEDIATAMENTE
+                            if (body2.reto != null && "en_curso".equalsIgnoreCase(body2.reto.estado) 
+                                && body2.preguntas != null && !body2.preguntas.isEmpty()
+                                && body2.sesiones != null && !body2.sesiones.isEmpty()) {
+                                lanzarQuizDirectamente(body2, it);
+                                return;
+                            }
                             abrirSalaDespuesDeAceptar(it);
                         }
                         @Override public void onFailure(Call<AceptarRetoResponse> call2, Throwable t2) {
                             if (!isAdded()) return;
                             mostrarCargando(false);
-                            Toast.makeText(requireContext(), t2.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(requireContext(), "Error: " + t2.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -158,7 +186,8 @@ public class FragmentRetosRecibidos extends Fragment {
 
             @Override public void onFailure(Call<AceptarRetoResponse> call, Throwable t) {
                 if (!isAdded()) return;
-                // 2) Fallback con body {} si la falla fue de red/protocolo
+                mostrarCargando(false);
+                // Fallback con body {} si la falla fue de red/protocolo
                 Map<String, Object> body = new HashMap<>();
                 api.aceptarRetoConBody(retoId, body).enqueue(new Callback<AceptarRetoResponse>() {
                     @Override public void onResponse(Call<AceptarRetoResponse> call2, Response<AceptarRetoResponse> resp2) {
@@ -168,35 +197,172 @@ public class FragmentRetosRecibidos extends Fragment {
                             Toast.makeText(requireContext(), "No se pudo aceptar (" + resp2.code() + ")", Toast.LENGTH_LONG).show();
                             return;
                         }
+                        AceptarRetoResponse body2 = resp2.body();
+                        // Si el estado es "en_curso" y tiene preguntas, lanzar el quiz INMEDIATAMENTE
+                        if (body2.reto != null && "en_curso".equalsIgnoreCase(body2.reto.estado) 
+                            && body2.preguntas != null && !body2.preguntas.isEmpty()
+                            && body2.sesiones != null && !body2.sesiones.isEmpty()) {
+                            lanzarQuizDirectamente(body2, it);
+                            return;
+                        }
                         abrirSalaDespuesDeAceptar(it);
                     }
                     @Override public void onFailure(Call<AceptarRetoResponse> call2, Throwable t2) {
                         if (!isAdded()) return;
                         mostrarCargando(false);
-                        Toast.makeText(requireContext(), t2.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Error: " + t2.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
         });
     }
 
-    private void abrirSalaDespuesDeAceptar(RetoListItem it) {
-        Fragment f = FragmentLoadingSalaReto.newInstance(
-                String.valueOf(it.getIdReto()),
-                (it.getArea() != null ? it.getArea() : ""),
-                (it.getCreador() != null && it.getCreador().getNombre() != null
-                        ? it.getCreador().getNombre() : "Oponente"),
-                false // esCreador = false (porque estamos en Recibidos)
-        );
-
-        FragmentManager fm = requireActivity().getSupportFragmentManager();
+    private void lanzarQuizDirectamente(AceptarRetoResponse aceptar, RetoListItem it) {
+        if (!isAdded() || getActivity() == null || aceptar == null) return;
+        
+        // Encontrar la sesión del usuario actual
+        Integer myId = null;
+        try {
+            myId = TokenManager.getUserId(requireContext());
+        } catch (Exception e) {
+            // Si no se puede obtener el ID, abrir sala de espera como fallback
+            abrirSalaDespuesDeAceptar(it);
+            return;
+        }
+        
+        int idSesion = aceptar.findSesionIdForUser(myId);
+        if (idSesion <= 0) {
+            // Si no se encuentra la sesión, abrir sala de espera como fallback
+            abrirSalaDespuesDeAceptar(it);
+            return;
+        }
+        
+        // Preparar argumentos para FragmentQuiz
+        Bundle args = new Bundle();
+        args.putString("aceptarJson", new Gson().toJson(aceptar));
+        args.putInt("idSesion", idSesion);
+        args.putString("idReto", aceptar.reto != null ? String.valueOf(aceptar.reto.id_reto) : String.valueOf(it.getIdReto()));
+        
+        // Obtener nombre del oponente (creador)
+        String nombreOponente = "Creador";
+        if (aceptar.oponente != null && aceptar.oponente.nombre != null) {
+            nombreOponente = aceptar.oponente.nombre;
+        } else if (it.getCreador() != null && it.getCreador().getNombre() != null) {
+            nombreOponente = it.getCreador().getNombre();
+        }
+        args.putString("opName", nombreOponente);
+        
+        // Crear y lanzar FragmentQuiz directamente
+        FragmentQuiz f = new FragmentQuiz();
+        f.setArguments(args);
+        
+        View overlay = getActivity().findViewById(R.id.container);
+        if (overlay != null) overlay.setVisibility(View.VISIBLE);
+        
+        FragmentManager fm = getActivity().getSupportFragmentManager();
         fm.beginTransaction()
-                .replace(R.id.fragmentContainer, f)
+                .replace(overlay != null ? R.id.container : R.id.fragmentContainer, f)
+                .addToBackStack("quiz")
+                .commit();
+    }
+    
+    private void abrirSalaDespuesDeAceptar(RetoListItem it) {
+        // aceptarYIrSala ya llamó a aceptarReto, que creó sesiones para ambos y cambió el estado a 'en_curso'
+        // Ahora solo debemos abrir la sala de espera, que detectará el estado 'en_curso' y comenzará el quiz inmediatamente
+        if (!isAdded() || getActivity() == null) return;
+        
+        // Abrir FragmentLoadingSalaReto como RETADO (no creador)
+        View overlay = getActivity().findViewById(R.id.container);
+        if (overlay != null) overlay.setVisibility(View.VISIBLE);
+        
+        FragmentLoadingSalaReto f = FragmentLoadingSalaReto.newInstance(
+                String.valueOf(it.getIdReto()),
+                it.getArea() != null ? it.getArea() : "",
+                it.getCreador() != null && it.getCreador().getNombre() != null ? it.getCreador().getNombre() : "Creador",
+                false // esCreador = false
+        );
+        
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(overlay != null ? R.id.container : R.id.fragmentContainer, f)
                 .addToBackStack("salaRetado")
                 .commit();
     }
 
+    /** Rechaza el reto y actualiza la lista */
+    private void rechazarReto(RetoListItem it) {
+        if (!isAdded()) return;
+
+        if (it == null || it.getIdReto() == null) {
+            Toast.makeText(requireContext(), "Reto inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
+        final String retoId = String.valueOf(it.getIdReto());
+
+        // Llamar al endpoint de rechazar
+        api.rechazarReto(retoId).enqueue(new Callback<BasicResponse>() {
+            @Override
+            public void onResponse(Call<BasicResponse> call, Response<BasicResponse> resp) {
+                if (!isAdded()) return;
+
+                if (resp.isSuccessful()) {
+                    Toast.makeText(requireContext(), "Reto rechazado", Toast.LENGTH_SHORT).show();
+                    // Actualizar la lista para quitar el reto rechazado
+                    cargar();
+                    // También actualizar la lista de oponentes si hay un FragmentReto visible
+                    actualizarListaOponentes();
+                } else {
+                    Toast.makeText(requireContext(), "No se pudo rechazar el reto", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BasicResponse> call, Throwable t) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(), "Error al rechazar: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /** Actualiza la lista de oponentes en FragmentReto si está visible */
+    private void actualizarListaOponentes() {
+        if (!isAdded() || getActivity() == null) return;
+
+        // Usar Handler para actualizar después de un pequeño delay
+        // Esto asegura que el backend haya procesado el rechazo antes de refrescar
+        new Handler().postDelayed(() -> {
+            if (!isAdded() || getActivity() == null) return;
+
+            // Buscar FragmentReto en el fragment manager
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            
+            // Buscar en todos los fragments del activity
+            List<Fragment> fragments = fm.getFragments();
+            for (Fragment f : fragments) {
+                if (f instanceof FragmentReto && f.isAdded()) {
+                    ((FragmentReto) f).cargarOponentes();
+                    return;
+                }
+            }
+
+            // También buscar en el parent fragment manager
+            Fragment parent = getParentFragment();
+            if (parent != null) {
+                FragmentManager childFm = parent.getChildFragmentManager();
+                List<Fragment> childFragments = childFm.getFragments();
+                for (Fragment childF : childFragments) {
+                    if (childF instanceof FragmentReto && childF.isAdded()) {
+                        ((FragmentReto) childF).cargarOponentes();
+                        return;
+                    }
+                }
+            }
+        }, 500); // 500ms de delay para asegurar que el backend procesó el rechazo
+    }
+
     private void mostrarCargando(boolean s) {
-        if (pb != null) pb.setVisibility(s ? View.VISIBLE : View.GONE);
+        // No mostrar el ProgressBar de carga (se ve feo según el usuario)
+        if (pb != null) pb.setVisibility(View.GONE);
     }
 }

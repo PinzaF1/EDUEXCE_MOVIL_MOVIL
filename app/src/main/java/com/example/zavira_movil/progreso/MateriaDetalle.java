@@ -15,4 +15,8 @@ public class MateriaDetalle {
     public String getNombre() { return nombre; }
     public int getPorcentaje() { return porcentaje; }
     public String getEtiqueta() { return etiqueta; }
+    
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setPorcentaje(int porcentaje) { this.porcentaje = porcentaje; }
+    public void setEtiqueta(String etiqueta) { this.etiqueta = etiqueta; }
 }

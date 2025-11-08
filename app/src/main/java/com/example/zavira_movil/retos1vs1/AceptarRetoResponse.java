@@ -14,6 +14,26 @@ public class AceptarRetoResponse {
     @SerializedName("preguntas")
     public List<Pregunta> preguntas;
 
+    @SerializedName("oponente")
+    public Oponente oponente;
+
+    public static class Oponente {
+        @SerializedName("id_usuario")
+        public Integer id_usuario;
+
+        @SerializedName("nombre")
+        public String nombre;
+
+        @SerializedName("grado")
+        public String grado;
+
+        @SerializedName("curso")
+        public String curso;
+
+        @SerializedName("foto_url")
+        public String foto_url;
+    }
+
     public static class Reto {
         @SerializedName("id_reto")
         public int id_reto;

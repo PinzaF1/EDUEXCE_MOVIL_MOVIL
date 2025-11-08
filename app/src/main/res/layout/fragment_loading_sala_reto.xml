@@ -147,19 +147,42 @@
                 android:id="@+id/btnEntrar"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Comenzar"
+                android:text="¡Comenzar Reto!"
                 android:layout_gravity="center_horizontal"
                 android:visibility="gone"
-                android:layout_marginTop="12dp"/>
+                android:layout_marginTop="12dp"
+                android:background="@drawable/btn_lobby_white"
+                android:textColor="#FF7A39"
+                android:textStyle="bold"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"/>
 
-            <!-- loader -->
-            <ProgressBar
-                android:id="@+id/pb"
-                android:layout_width="wrap_content"
+            <!-- Mensaje de espera (sin spinner) -->
+            <TextView
+                android:id="@+id/tvMensajeEspera"
+                android:text="Debes esperar que tu oponente te acepte"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:indeterminate="true"
-                android:indeterminateTint="@android:color/white"
+                android:visibility="gone"/>
+            
+            <!-- Botón Abandonar Reto (solo para retador) -->
+            <Button
+                android:id="@+id/btnAbandonar"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="¡Abandonar!"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_lobby_white"
+                android:backgroundTint="@null"
+                android:textColor="#FF7A39"
+                android:textStyle="bold"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
                 android:visibility="gone"/>
         </LinearLayout>
     </ScrollView>

@@ -110,7 +110,7 @@ public interface ApiService {
     );
 
     @POST("quizz/cerrar")
-    Call<ResponseBody> cerrar(
+    Call<com.example.zavira_movil.QuizCerrarResponse> cerrar(
             @Header("Authorization") String bearerToken,
             @Body QuizCerrarRequest request
     );
@@ -142,6 +142,8 @@ public interface ApiService {
     @POST("movil/simulacro")
     Call<SimulacroResponse> crearSimulacro(@Body SimulacroRequest request);
 
+    @POST("movil/simulacro/cerrar")
+    Call<com.example.zavira_movil.niveleshome.CerrarResponse> cerrarSimulacro(@Body com.example.zavira_movil.niveleshome.CerrarRequest request);
 
     @POST("movil/isla/simulacro")
     Call<IslaSimulacroResponse> iniciarIslaSimulacro(@Body IslaSimulacroRequest body);
@@ -192,6 +194,9 @@ public interface ApiService {
         @Body Map<String, Object> syncData
     );
 
+    @POST("movil/retos/{id}/rechazar")
+    Call<BasicResponse> rechazarReto(@Path("id") String idReto);
+
     @POST("movil/retos/ronda")
     Call<RondaResponse> responderRonda(@Body RondaRequest body);
 
@@ -199,10 +204,13 @@ public interface ApiService {
     Call<EstadoRetoResponse> estadoReto(@Path("id") String idReto);
 
     @GET("movil/retos")
-    Call<List<RetoListItem>> listarRetos();
+    Call<List<RetoListItem>> listarRetos(@Query("tipo") String tipo);
 
     @GET("movil/retos/oponentes")
     Call<List<OpponentBackend>> listarOponentes();
+    
+    @DELETE("movil/retos/{id}/abandonar")
+    Call<ResponseBody> abandonarReto(@Path("id") String idReto);
 
 
     // Marcador por usuario (token)
@@ -245,8 +253,17 @@ public interface ApiService {
 
     @POST("estudiante/recuperar/restablecer")
     Call<BasicResponse> restablecerPassword(@Body com.example.zavira_movil.resetpassword.RestablecerPasswordRequest body);
-    
-    // ---------- Notificaciones FCM ----------
-    @POST("movil/fcm-token")
-    Call<Void> registerFCMToken(@Body okhttp3.RequestBody body);
+
+    // ---------- Sincronización de Progreso (Niveles y Vidas) ----------
+    @GET("movil/sincronizacion/progreso")
+    Call<com.example.zavira_movil.sincronizacion.SincronizacionResponse> obtenerProgresoSincronizacion();
+
+    @POST("movil/sincronizacion/nivel")
+    Call<BasicResponse> actualizarNivelDesbloqueado(@Body com.example.zavira_movil.sincronizacion.ActualizarNivelRequest body);
+
+    @POST("movil/sincronizacion/vidas")
+    Call<BasicResponse> actualizarVidas(@Body com.example.zavira_movil.sincronizacion.ActualizarVidasRequest body);
+
+    @POST("movil/sincronizacion/todo")
+    Call<BasicResponse> sincronizarProgreso(@Body com.example.zavira_movil.sincronizacion.SincronizarTodoRequest body);
 }

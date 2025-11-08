@@ -28,6 +28,9 @@ public class ProgresoFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
         super.onViewCreated(v, b);
+        
+        // Ocultar logo EduExce y campana en la Activity principal
+        v.post(() -> ocultarTopBar());
 
         TabLayout tabLayout = v.findViewById(R.id.tabLayout);
         ViewPager2 viewPager = v.findViewById(R.id.viewPager);
@@ -46,5 +49,52 @@ public class ProgresoFragment extends Fragment {
 
         // Si quieres que abra directamente la pestaña de Diagnóstico:
         // viewPager.setCurrentItem(1, false);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Asegurar que el topBar esté oculto
+        if (getView() != null) {
+            getView().post(() -> ocultarTopBar());
+        }
+    }
+    
+    @Override
+    public void onDestroyView() {
+        // Restaurar logo EduExce y campana al salir del fragmento
+        restaurarTopBar();
+        super.onDestroyView();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Asegurar que se restaure al pausar también
+        restaurarTopBar();
+    }
+    
+    /**
+     * Oculta el topBar (logo EduExce y campana) de HomeActivity
+     */
+    private void ocultarTopBar() {
+        if (getActivity() != null && isAdded()) {
+            View topBar = getActivity().findViewById(R.id.topBar);
+            if (topBar != null) {
+                topBar.setVisibility(View.GONE);
+            }
+        }
+    }
+    
+    /**
+     * Restaura la visibilidad del topBar (logo EduExce y campana) de HomeActivity
+     */
+    private void restaurarTopBar() {
+        if (getActivity() != null && isAdded()) {
+            View topBar = getActivity().findViewById(R.id.topBar);
+            if (topBar != null) {
+                topBar.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }
