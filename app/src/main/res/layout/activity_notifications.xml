@@ -12,152 +12,70 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="55dp"
-        android:gravity="center"
-        android:padding="12dp">
-
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:elevation="4dp"
+        android:background="@android:color/white">
 
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_arrow_back"
-            android:contentDescription="Atrás"
-            />
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Volver atrás" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Notificaciones"
-            android:layout_gravity="center"
-            android:textColor="#111111"
-            android:textSize="20sp"
+            android:textColor="#1F2937"
+            android:textSize="22sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ScrollView
+    <!-- RecyclerView para notificaciones -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewNotifications"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never">
+        android:overScrollMode="never"
+        android:paddingTop="8dp"
+        android:clipToPadding="false" />
 
-        <LinearLayout
-            android:id="@+id/notificationsContainer"
-            android:orientation="vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <!-- Mensaje cuando no hay notificaciones -->
+    <LinearLayout
+        android:id="@+id/emptyState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone">
 
-            <!-- Sección 1 -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Últimos 7 días"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:textColor="#374151"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp" />
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/iconoeduexce"
+            android:alpha="0.3" />
 
-            <!-- Ejemplo de notificación -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp"
-                android:gravity="center_vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="No tienes notificaciones"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#6B7280" />
 
-                <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/usuario"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/bg_circle_gray"
-                    android:layout_marginEnd="10dp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tu rendimiento ha sido exito durante estos días."
-                        android:textSize="14sp"
-                        android:textColor="#111111" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="3 d"
-                        android:textSize="12sp"
-                        android:textColor="#9CA3AF" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Otra sección -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Últimos 30 días"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:textColor="#374151"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Ejemplo con botón -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/usuario"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/bg_circle_gray"
-                    android:layout_marginEnd="10dp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bajo rendimiento en el era de ingles porfavor ."
-                        android:textSize="14sp"
-                        android:textColor="#111111" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1 sem"
-                        android:textSize="12sp"
-                        android:textColor="#9CA3AF" />
-                </LinearLayout>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:text="Seguir también"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="#1D4ED8"
-                    android:paddingHorizontal="12dp"
-                    android:minWidth="0dp"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Aquí aparecerán tus notificaciones de rendimiento y logros"
+            android:textSize="14sp"
+            android:textColor="#9CA3AF"
+            android:gravity="center"
+            android:textAlignment="center" />
+    </LinearLayout>
 </LinearLayout>

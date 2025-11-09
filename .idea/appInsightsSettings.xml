@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.zavira_movil" />
+                  <option name="mobileSdkAppId" value="1:623020199567:android:612e92510e0b89ff836afa" />
+                  <option name="projectId" value="eduexce-b1296" />
+                  <option name="projectNumber" value="623020199567" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
