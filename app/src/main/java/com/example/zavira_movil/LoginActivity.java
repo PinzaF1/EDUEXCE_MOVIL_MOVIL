@@ -17,6 +17,7 @@ import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.LoginRequest;
 import com.example.zavira_movil.model.LoginResponse;
 import com.example.zavira_movil.model.KolbResultado;
+import com.example.zavira_movil.notifications.NotificationHelper;
 import com.example.zavira_movil.progreso.DiagnosticoInicial;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
