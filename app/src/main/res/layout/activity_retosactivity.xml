@@ -2,74 +2,134 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <!-- Contenido principal -->
+    <!-- Contenido principal con scroll -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@color/bg_page"
+        android:fitsSystemWindows="true">
+
     <LinearLayout
         android:id="@+id/mainContent"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/bg_page">
+        android:layout_height="wrap_content"
+        android:background="@color/bg_page"
+        android:paddingTop="0dp">
 
-        <!-- Sección Métricas (solo 2) -->
+        <!-- Header con degradado naranja a rojo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_header_retos"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp"
+            android:paddingHorizontal="16dp">
+
+            <!-- Título y subtítulo centrados -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Retos 1 vs 1"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¡Desafía a tus compañeros!"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Sección Métricas (Victorias y Derrotas) - Tarjeta blanca -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
-            android:layout_marginTop="12dp"
-            android:paddingVertical="8dp"
+            android:layout_marginTop="20dp"
+            android:paddingVertical="16dp"
             android:paddingHorizontal="12dp"
-            android:background="@drawable/bg_orange_pink"
+            android:background="@drawable/bg_card_round_white"
             android:orientation="horizontal"
-            android:gravity="center_horizontal">
+            android:gravity="center_vertical"
+            android:elevation="2dp">
 
             <!-- Victorias -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:gravity="center">
 
                 <TextView
                     android:id="@+id/tvVictorias"
-                    style="@style/MetricNumber"
-                    android:text="0" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50" />
 
                 <TextView
-                    style="@style/MetricLabel"
-                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Victorias"
-                    android:textColor="@color/black" />
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
 
-            <!-- Ícono Espadas -->
+            <!-- Ícono Espadas en el centro -->
             <ImageView
                 android:id="@+id/iconSwords"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginHorizontal="12dp"
-                android:src="@drawable/espadaa" />
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginHorizontal="16dp"
+                android:src="@drawable/espadaa"
+                android:scaleType="fitCenter" />
 
             <!-- Derrotas -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:gravity="center">
 
                 <TextView
                     android:id="@+id/tvDerrotas"
-                    style="@style/MetricNumber"
-                    android:text="0" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#F44336" />
 
                 <TextView
-                    style="@style/MetricLabel"
-                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Derrotas"
-                    android:textColor="@color/black" />
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -83,16 +143,19 @@
             app:tabSelectedTextColor="@color/brand_orange"
             app:tabIndicatorColor="@color/brand_orange"
             app:tabIndicatorHeight="3dp"
-            android:layout_marginHorizontal="12dp" />
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="16dp" />
 
         <!-- ViewPager -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
 
     </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Overlay Quiz / Resultados -->
     <FrameLayout

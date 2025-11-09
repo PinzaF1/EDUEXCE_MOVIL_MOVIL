@@ -57,6 +57,9 @@ public class RankingLogrosFragment extends Fragment {
         RetrofitClient.init(requireContext());
         api = RetrofitClient.getInstance(requireContext()).create(ApiService.class);
 
+        // Ocultar logo EduExce y campana en la Activity principal
+        v.post(() -> ocultarTopBar());
+
         bindViews(v);
         setupRecycler();
         setupTabs();
@@ -68,6 +71,53 @@ public class RankingLogrosFragment extends Fragment {
         v.post(() -> initIndicator(tabRanking, false));
 
         loadRanking();
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Asegurar que el topBar esté oculto
+        if (getView() != null) {
+            getView().post(() -> ocultarTopBar());
+        }
+    }
+    
+    @Override
+    public void onDestroyView() {
+        // Restaurar logo EduExce y campana al salir del fragmento
+        restaurarTopBar();
+        super.onDestroyView();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Asegurar que se restaure al pausar también
+        restaurarTopBar();
+    }
+    
+    /**
+     * Oculta el topBar (logo EduExce y campana) de HomeActivity
+     */
+    private void ocultarTopBar() {
+        if (getActivity() != null && isAdded()) {
+            View topBar = getActivity().findViewById(R.id.topBar);
+            if (topBar != null) {
+                topBar.setVisibility(View.GONE);
+            }
+        }
+    }
+    
+    /**
+     * Restaura la visibilidad del topBar (logo EduExce y campana) de HomeActivity
+     */
+    private void restaurarTopBar() {
+        if (getActivity() != null && isAdded()) {
+            View topBar = getActivity().findViewById(R.id.topBar);
+            if (topBar != null) {
+                topBar.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void bindViews(View root) {

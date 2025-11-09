@@ -64,12 +64,43 @@ public class TokenManager {
             String payloadJson = new String(Base64.decode(parts[1], Base64.URL_SAFE));
             JSONObject payload = new JSONObject(payloadJson);
 
+            // Manejar id_usuario como string o número
             if (payload.has("id_usuario")) {
-                return payload.getInt("id_usuario");
+                try {
+                    // Intentar primero como número
+                    return payload.getInt("id_usuario");
+                } catch (Exception e) {
+                    // Si falla, intentar como string y parsear
+                    try {
+                        String idStr = payload.getString("id_usuario");
+                        return Integer.parseInt(idStr);
+                    } catch (Exception e2) {
+                        // Si también falla, retornar -1
+                        return -1;
+                    }
+                }
             } else if (payload.has("userId")) {
-                return payload.getInt("userId");
+                try {
+                    return payload.getInt("userId");
+                } catch (Exception e) {
+                    try {
+                        String idStr = payload.getString("userId");
+                        return Integer.parseInt(idStr);
+                    } catch (Exception e2) {
+                        return -1;
+                    }
+                }
             } else if (payload.has("sub")) {
-                return payload.getInt("sub");
+                try {
+                    return payload.getInt("sub");
+                } catch (Exception e) {
+                    try {
+                        String idStr = payload.getString("sub");
+                        return Integer.parseInt(idStr);
+                    } catch (Exception e2) {
+                        return -1;
+                    }
+                }
             }
             return -1;
         } catch (Exception e) {

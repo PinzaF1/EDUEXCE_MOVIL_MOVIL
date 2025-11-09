@@ -87,10 +87,16 @@ public class SubjectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         h.card.setCardBackgroundColor(Color.TRANSPARENT);
         h.card.setRippleColor(ColorStateList.valueOf(Color.parseColor("#1F29371A"))); // sutil
 
-        // Click → abre simulacro
+        // Click → abre simulacro usando el callback para validar
         h.itemView.setOnClickListener(v -> {
             Intent i = new Intent(ctx, IslaSimulacroActivity.class);
-            ctx.startActivity(i);
+            // Usar el callback para que HomeActivity pueda validar antes de abrir
+            if (onStartActivity != null) {
+                onStartActivity.launch(i);
+            } else {
+                // Fallback: abrir directamente si no hay callback (pero esto no debería pasar)
+                ctx.startActivity(i);
+            }
         });
     }
 
@@ -164,7 +170,19 @@ public class SubjectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (h.rvInner.getLayoutManager() == null) {
             h.rvInner.setLayoutManager(new LinearLayoutManager(ctx));
         }
-        h.rvInner.setAdapter(new LevelMiniAdapter(s.levels, s, onStartActivity));
+        
+        // CRÍTICO: Reutilizar adapter existente si existe, sino crear uno nuevo
+        // Esto asegura que los cambios en ProgressLockManager se reflejen
+        RecyclerView.Adapter adapterActual = h.rvInner.getAdapter();
+        if (adapterActual instanceof LevelMiniAdapter) {
+            // Si ya existe, notificar cambios para refrescar la UI
+            adapterActual.notifyDataSetChanged();
+            android.util.Log.d("SubjectAdapter", "Adapter interno actualizado con notifyDataSetChanged() para " + s.title);
+        } else {
+            // Si no existe, crear uno nuevo
+            h.rvInner.setAdapter(new LevelMiniAdapter(s.levels, s, onStartActivity));
+            android.util.Log.d("SubjectAdapter", "Nuevo adapter interno creado para " + s.title);
+        }
     }
 
     // ---- Helper: fija un ImageView centerCrop dentro de flHeader ----

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:clipToPadding="false"
-    android:paddingBottom="140dp">
+    android:background="@color/bg_surface"
+    android:scrollbars="vertical"
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="0dp"
-        android:background="@color/bg_surface">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="160dp">
 
         <!-- CARD: Progreso Global (igual que tenías) -->
         <com.google.android.material.card.MaterialCardView
@@ -109,7 +109,7 @@
         <!-- Título "Materias" (sin card contenedor) -->
         <TextView
             android:id="@+id/tvTituloMateriasResumen"
-            android:layout_width="96dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="16dp"
@@ -122,21 +122,16 @@
             android:textStyle="bold" />
 
         <!-- Lista a ancho completo; cada ítem ya tiene sus propios márgenes -->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerNiveles"
-            android:layout_width="339dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:layout_gravity="center_horizontal"
-
-        android:nestedScrollingEnabled="false"
+            android:nestedScrollingEnabled="false"
             android:overScrollMode="never"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
             android:paddingTop="0dp"
-            android:paddingBottom="12dp" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp"/>
+            android:paddingBottom="0dp" />
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

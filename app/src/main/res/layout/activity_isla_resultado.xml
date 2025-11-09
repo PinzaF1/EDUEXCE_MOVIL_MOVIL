@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F1FF">
+    android:background="#F8F8FC">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,6 +21,16 @@
             android:layout_marginBottom="12dp"
             android:clipToPadding="false"
             android:clipToOutline="false">
+
+            <!-- Trofeo (solo visible si ganó) -->
+            <ImageView
+                android:id="@+id/ivTrophyGif"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                android:contentDescription="Trofeo" />
 
             <TextView
                 android:id="@+id/tvTituloPct"
@@ -52,9 +62,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="0%"
-                android:textColor="#7C3AED"
+                android:textColor="#957DAD"
                 android:textStyle="bold"
-                android:textSize="42sp" />
+                android:textSize="56sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -121,17 +131,31 @@
                 android:textColor="#666666" />
         </LinearLayout>
 
-        <!-- Botón Finalizar -->
+        <!-- Botones -->
         <Button
             android:id="@+id/btnFinalizar"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="56dp"
             android:layout_marginTop="16dp"
             android:text="Finalizar"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:backgroundTint="#1E88E5" />
+            android:textSize="16sp"
+            android:backgroundTint="#957DAD" />
+
+        <Button
+            android:id="@+id/btnRepetir"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:text="Repetir Simulacro"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="#222222"
+            android:textSize="16sp"
+            android:backgroundTint="#E5E7EB" />
 
     </LinearLayout>
 </ScrollView>
