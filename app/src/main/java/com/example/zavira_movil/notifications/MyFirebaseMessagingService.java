@@ -258,7 +258,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 jsonBody.toString()
             );
             
-            ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+            ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
             Call<Void> call = apiService.registerFCMToken(body);
             
             call.enqueue(new Callback<Void>() {
