@@ -15,7 +15,20 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class RetrofitClient {
 
+    // ⚠️ VOLVIENDO A NGROK (local tiene problemas de firewall/configuración)
     private static final String BASE_URL = "https://gillian-semiluminous-blubberingly.ngrok-free.dev/";
+    
+    // DEBUG LOCAL (comentado hasta resolver firewall):
+    // private static final String BASE_URL = "http://192.168.1.5:3333/";
+    
+    // EMULADOR: Descomentar si usas emulador
+    // private static final String BASE_URL = "http://10.0.2.2:3333/";
+    
+    // DISPOSITIVO FÍSICO: Descomenta y reemplaza con IP de tu PC
+    // private static final String BASE_URL = "http://192.168.X.X:3333/";
+    
+    // PRODUCCIÓN/NGROK: URL original (restaurar después del debugging)
+    // private static final String BASE_URL = "https://gillian-semiluminous-blubberingly.ngrok-free.dev/";
     private static Retrofit retrofit;
     private static Context appContext; // para leer el token
 

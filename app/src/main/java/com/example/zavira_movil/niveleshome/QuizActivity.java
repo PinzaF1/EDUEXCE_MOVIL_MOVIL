@@ -23,6 +23,13 @@ import com.example.zavira_movil.local.UserSession;
 import com.example.zavira_movil.model.Question;
 import com.example.zavira_movil.remote.ApiService;
 import com.example.zavira_movil.remote.RetrofitClient;
+import com.example.zavira_movil.niveleshome.ApiQuestion;
+import com.example.zavira_movil.niveleshome.ApiQuestionMapper;
+import com.example.zavira_movil.niveleshome.CerrarRequest;
+import com.example.zavira_movil.niveleshome.CerrarResponse;
+import com.example.zavira_movil.niveleshome.MapeadorArea;
+import com.example.zavira_movil.niveleshome.ParadaRequest;
+import com.example.zavira_movil.niveleshome.ParadaResponse;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.IOException;
@@ -105,10 +112,6 @@ public class QuizActivity extends AppCompatActivity {
         binding.btnEnviar.setEnabled(true);
     }
 
-    private static Integer toIntOrNull(String s) {
-        try { return (s == null) ? null : Integer.parseInt(s); } catch (Exception e) { return null; }
-    }
-
     /** Crea sesión y pinta preguntas (máximo 10). */
     private void crearParadaYMostrar() {
         setLoading(true);
@@ -125,6 +128,8 @@ public class QuizActivity extends AppCompatActivity {
                 1
         );
 
+        logIAEvent("Solicitando preguntas a la API de generación de IA/OpenAI", idSesion, areaApi, subtemaApi, nivel, 0);
+
         api.crearParada(req).enqueue(new Callback<ParadaResponse>() {
             @Override public void onResponse(Call<ParadaResponse> call, Response<ParadaResponse> resp) {
                 setLoading(false);
@@ -133,6 +138,7 @@ public class QuizActivity extends AppCompatActivity {
                     Toast.makeText(QuizActivity.this,
                             "No se pudo crear la sesión (HTTP " + resp.code() + ")",
                             Toast.LENGTH_LONG).show();
+                    logIAEvent("Fallo al solicitar preguntas a la API (HTTP " + resp.code() + ")", idSesion, areaApi, subtemaApi, nivel, 0);
                     finish();
                     return;
                 }
@@ -142,11 +148,12 @@ public class QuizActivity extends AppCompatActivity {
                     Toast.makeText(QuizActivity.this,
                             "Servidor respondió " + resp.code() + " sin cuerpo JSON.",
                             Toast.LENGTH_LONG).show();
+                    logIAEvent("Respuesta sin cuerpo JSON de la API", idSesion, areaApi, subtemaApi, nivel, 0);
                     finish();
                     return;
                 }
 
-                if (pr.sesion != null) idSesion = toIntOrNull(pr.sesion.idSesion);
+                if (pr.sesion != null) idSesion = pr.sesion.idSesion;
 
                 ArrayList<ApiQuestion> apiQs = new ArrayList<>();
                 if (pr.preguntas != null) apiQs.addAll(pr.preguntas);
@@ -156,10 +163,23 @@ public class QuizActivity extends AppCompatActivity {
                     if (pr.sesion.preguntasPorSubtema != null) apiQs.addAll(pr.sesion.preguntasPorSubtema);
                 }
 
+                // Log para saber si las preguntas son de IA o banco local
+                if (!apiQs.isEmpty()) {
+                    boolean esIA = apiQs.get(0).id_pregunta == null;
+                    if (esIA) {
+                        logIAEvent("✅ Preguntas generadas por IA (OpenAI)", idSesion, areaApi, subtemaApi, nivel, apiQs.size());
+                    } else {
+                        logIAEvent("📦 Preguntas obtenidas del banco local", idSesion, areaApi, subtemaApi, nivel, apiQs.size());
+                    }
+                } else {
+                    logIAEvent("⚠️ No se recibieron preguntas de la API", idSesion, areaApi, subtemaApi, nivel, 0);
+                }
+
                 ArrayList<Question> preguntas = ApiQuestionMapper.toAppList(apiQs);
                 if (preguntas.size() > 10) preguntas = new ArrayList<>(preguntas.subList(0, 10));
                 if (preguntas.isEmpty()) {
                     Toast.makeText(QuizActivity.this, "No hay preguntas para este subtema.", Toast.LENGTH_LONG).show();
+                    logIAEvent("No hay preguntas para este subtema", idSesion, areaApi, subtemaApi, nivel, 0);
                     finish();
                     return;
                 }
@@ -279,7 +299,16 @@ public class QuizActivity extends AppCompatActivity {
         for (int i = 0; i < todasLasRespuestas.size(); i++) {
             String respuesta = todasLasRespuestas.get(i);
             if (respuesta != null) {
-                rs.add(new CerrarRequest.Respuesta(i + 1, respuesta));
+                // Obtener id_pregunta de la pregunta correspondiente
+                Integer idPregunta = null;
+                if (i < allQuestions.size() && allQuestions.get(i).id_pregunta != null) {
+                    try {
+                        idPregunta = Integer.parseInt(allQuestions.get(i).id_pregunta);
+                    } catch (NumberFormatException e) {
+                        // id_pregunta es null o no es numérico, se mantiene como null
+                    }
+                }
+                rs.add(new CerrarRequest.Respuesta(i + 1, idPregunta, respuesta));
             }
         }
 
@@ -858,5 +887,18 @@ public class QuizActivity extends AppCompatActivity {
     private static String readErr(ResponseBody eb) {
         if (eb == null) return null;
         try { return eb.string(); } catch (IOException ignored) { return null; }
+    }
+
+    /**
+     * Log utilitario para eventos de IA y preguntas.
+     */
+    private void logIAEvent(String mensaje, Integer idSesion, String area, String subtema, int nivel, int cantidadPreguntas) {
+        String logMsg = "[IA_EVENT] " + mensaje +
+                " | idSesion=" + (idSesion != null ? idSesion : "null") +
+                ", área=" + (area != null ? area : "null") +
+                ", subtema=" + (subtema != null ? subtema : "null") +
+                ", nivel=" + nivel +
+                ", preguntas=" + cantidadPreguntas;
+        android.util.Log.d("QuizActivity", logMsg);
     }
 }

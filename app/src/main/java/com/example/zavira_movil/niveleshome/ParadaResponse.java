@@ -17,7 +17,7 @@ public class ParadaResponse implements Serializable {
     public Sesion sesion;
 
     public static class Sesion implements Serializable {
-        @SerializedName("idSesion") public String idSesion;
+        @SerializedName("idSesion") public Integer idSesion;  // ← Cambiado de String a Integer
         @SerializedName("preguntas") public List<ApiQuestion> preguntas;
         @SerializedName("preguntasPorSubtema") public List<ApiQuestion> preguntasPorSubtema;
     }

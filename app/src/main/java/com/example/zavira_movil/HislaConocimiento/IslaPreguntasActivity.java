@@ -625,7 +625,7 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         for (int i = 0; i < todasLasRespuestasFinal.size(); i++) {
             String respuesta = todasLasRespuestasFinal.get(i);
             if (respuesta != null) {
-                resps.add(new com.example.zavira_movil.niveleshome.CerrarRequest.Respuesta(i + 1, respuesta));
+                resps.add(new com.example.zavira_movil.niveleshome.CerrarRequest.Respuesta(i + 1, null, respuesta));
             }
         }
         
