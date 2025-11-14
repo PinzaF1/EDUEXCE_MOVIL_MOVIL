@@ -3,7 +3,18 @@
     <style name="Base.Theme.ZAVIRA_MOVIL" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Color de la status bar por defecto: azul (#3988FF) -->
+        <item name="android:statusBarColor">@color/nav_blue</item>
+        <!-- Asegurar que Material3 use el color azul -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="Theme.ZAVIRA_MOVIL" parent="Base.Theme.ZAVIRA_MOVIL" />
+    
+    <!-- ThemeOverlay para BottomNavigationView sin fondo en items -->
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <item name="itemBackground">@null</item>
+        <item name="itemActiveIndicatorStyle">@null</item>
+        <item name="itemRippleColor">@android:color/transparent</item>
+    </style>
 </resources>

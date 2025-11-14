@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:background="@drawable/bg_dialog_conocimiento_rounded"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@drawable/bg_dialog_white_rounded_yellow_border"
+        android:clipToOutline="true">
+
+        <!-- Imagen de conocimiento -->
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/conocimiento"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Subtítulo -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="¡Pon a prueba tus conocimientos en todas las áreas con simulacros completos!"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFC107"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- ¿Cómo funciona? -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardUseCompatPadding="true"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#E5FFFFFF"
+            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¿Cómo funciona?"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="6dp"/>
+
+                <!-- Item 1: Preguntas -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="6dp">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_circle_blue">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_question_blue"
+                            android:scaleType="fitCenter"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:text="25 preguntas en total (5 por cada área: Matemáticas, Lenguaje, Ciencias, Sociales e Inglés)"
+                        android:textColor="#374151"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <!-- Item 2: Resultados -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_circle_green">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chart_green"
+                            android:scaleType="fitCenter"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:text="Obtendrás un resultado por área y un porcentaje global"
+                        android:textColor="#374151"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <!-- Item 3: Modalidad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp">
+
+                    <LinearLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_circle_purple">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_timer_purple"
+                            android:scaleType="fitCenter"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:text="Elige entre modalidad fácil (sin límite de tiempo) o difícil (1 minuto por pregunta)"
+                        android:textColor="#374151"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Botón Siguiente -->
+        <Button
+            android:id="@+id/btnSiguiente"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Siguiente"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:background="@drawable/bg_button_yellow"
+            android:backgroundTint="@null"
+            app:backgroundTint="@null"/>
+    </LinearLayout>
+</ScrollView>
+

@@ -31,6 +31,18 @@ public class IslaModalityActivity extends AppCompatActivity {
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Si viene con modalidad desde el intent Y viene con autoIniciar=true, abrir directamente el simulacro
+        String modalidadIntent = getIntent() != null ? getIntent().getStringExtra("modalidad") : null;
+        boolean autoIniciar = getIntent() != null && getIntent().getBooleanExtra("autoIniciar", false);
+        
+        if (modalidadIntent != null && ("facil".equals(modalidadIntent) || "dificil".equals(modalidadIntent)) && autoIniciar) {
+            android.util.Log.d("IslaModalityActivity", "Modalidad recibida desde intent con autoIniciar=true: " + modalidadIntent);
+            // Iniciar directamente el simulacro sin mostrar la pantalla de selección
+            iniciar(modalidadIntent);
+            return;
+        }
+        
         setContentView(R.layout.activity_isla_modality);
 
         cardFacil   = findViewById(R.id.cardFacil);
@@ -41,6 +53,10 @@ public class IslaModalityActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             modalidadSeleccionada = savedInstanceState.getString(STATE_MODO);
+        } else if (modalidadIntent != null && ("facil".equals(modalidadIntent) || "dificil".equals(modalidadIntent))) {
+            // Si viene modalidad pero sin autoIniciar, pre-seleccionar la modalidad
+            android.util.Log.d("IslaModalityActivity", "Pre-seleccionando modalidad desde intent: " + modalidadIntent);
+            modalidadSeleccionada = modalidadIntent;
         }
         aplicarSeleccion(modalidadSeleccionada);
 

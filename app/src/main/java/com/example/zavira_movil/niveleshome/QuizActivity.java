@@ -2,6 +2,7 @@ package com.example.zavira_movil.niveleshome;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.os.Handler;
+import android.os.Looper;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -59,6 +62,11 @@ public class QuizActivity extends AppCompatActivity {
     private int currentQuestionIndex = 0; // Índice de la pregunta actual
     private List<Question> allQuestions = new ArrayList<>(); // Todas las preguntas
     private List<String> todasLasRespuestas = new ArrayList<>(); // Respuestas guardadas mientras avanza
+    
+    // Sistema de vidas
+    private Handler handlerVidas;
+    private Runnable runnableVidas;
+    private static final long INTERVALO_ACTUALIZACION_VIDAS = 1000L; // Actualizar cada segundo
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +108,35 @@ public class QuizActivity extends AppCompatActivity {
         
         binding.btnEnviar.setOnClickListener(v -> siguientePregunta());
 
+        // Inicializar sistema de vidas (solo para niveles 2+)
+        if (nivel > 1) {
+            inicializarSistemaVidas();
+        }
+
         crearParadaYMostrar();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Si volvemos de ver el detalle, intentar recargar media vida
+        if (nivel > 1) {
+            verificarRecargaPorDetalle();
+            actualizarVidas();
+            iniciarActualizacionVidas();
+        }
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        detenerActualizacionVidas();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detenerActualizacionVidas();
     }
 
     private void setLoading(boolean b) {
@@ -114,6 +150,24 @@ public class QuizActivity extends AppCompatActivity {
 
     /** Crea sesión y pinta preguntas (máximo 10). */
     private void crearParadaYMostrar() {
+        // IMPORTANTE: Verificar que no haya vidas parciales en la ÚLTIMA vida antes de iniciar el quiz
+        // Solo bloquear si tiene la última vida en la mitad (las otras están vacías)
+        if (nivel > 1) {
+            int userIdInt = com.example.zavira_movil.local.TokenManager.getUserId(this);
+            if (userIdInt > 0) {
+                String userId = String.valueOf(userIdInt);
+                int vidas = LivesManager.getLivesWithAutoRecharge(this, userId, areaUi, nivel);
+                float partialLives = LivesManager.getPartialLives(this, userId, areaUi, nivel);
+                
+                // Solo bloquear si tiene la última vida en la mitad (vidas == 0 y partialLives > 0)
+                if (vidas == 0 && partialLives > 0) {
+                    // Mostrar diálogo emergente indicando que debe esperar
+                    mostrarDialogoEsperarMediaVida(userId);
+                    return;
+                }
+            }
+        }
+        
         setLoading(true);
 
         final String areaApi    = MapeadorArea.toApiArea(areaUi);
@@ -513,10 +567,20 @@ public class QuizActivity extends AppCompatActivity {
         TextView tvSubtitulo = dialogView.findViewById(R.id.tvSubtitulo);
         LinearLayout llCorazones = dialogView.findViewById(R.id.llCorazones);
         TextView tvVidasRestantes = dialogView.findViewById(R.id.tvVidasRestantes);
+        TextView tvTiempoRecarga = dialogView.findViewById(R.id.tvTiempoRecarga);
         TextView tvRegeneracion = dialogView.findViewById(R.id.tvRegeneracion);
         TextView tvMensajeFinal = dialogView.findViewById(R.id.tvMensajeFinal);
+        TextView tvMensajeDetalle = dialogView.findViewById(R.id.tvMensajeDetalle);
+        MaterialButton btnVerDetalle = dialogView.findViewById(R.id.btnVerDetalle);
         MaterialButton btnUsarVida = dialogView.findViewById(R.id.btnUsarVida);
         MaterialButton btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        
+        // Obtener userId
+        int userIdInt = com.example.zavira_movil.local.TokenManager.getUserId(this);
+        String userId = userIdInt > 0 ? String.valueOf(userIdInt) : "";
+        
+        // Verificar si se puede recargar por detalle
+        boolean puedeRecargarPorDetalle = nivel > 1 && LivesManager.puedeRecargarPorDetalle(this, userId, areaUi, nivel);
         
         // Configurar icono y título según el ejemplo
         if (sinVidas) {
@@ -557,20 +621,50 @@ public class QuizActivity extends AppCompatActivity {
             llCorazones.addView(ivCorazon);
         }
         
-        // Configurar vidas restantes
+        // Configurar vidas restantes y tiempo de recarga
         if (sinVidas) {
             tvVidasRestantes.setVisibility(View.GONE);
+            tvTiempoRecarga.setVisibility(View.GONE);
             tvRegeneracion.setVisibility(View.VISIBLE);
             tvRegeneracion.setTextColor(areaColor); // Color del área para el mensaje de regeneración
+            tvRegeneracion.setText("Sin vidas - Regeneran en 5 minutos");
             tvMensajeFinal.setVisibility(View.VISIBLE);
             tvMensajeFinal.setTextColor(areaColor); // Color del área para el mensaje final
+            tvMensajeFinal.setText("Sin vidas disponibles. Las vidas se recargan cada 5 minutos.");
+            tvMensajeDetalle.setVisibility(View.GONE);
+            btnVerDetalle.setVisibility(View.GONE);
             btnUsarVida.setVisibility(View.GONE);
         } else {
             tvVidasRestantes.setText("Te quedan " + vidasRestantes + " vidas");
             tvVidasRestantes.setTextColor(areaColor); // Color del área para vidas restantes
             tvRegeneracion.setVisibility(View.GONE);
             tvMensajeFinal.setVisibility(View.GONE);
-            btnUsarVida.setText("Usar 1 Vida (" + vidasRestantes + " restantes)");
+            
+            // Mostrar tiempo de recarga
+            long tiempoRestante = LivesManager.getTiempoRestanteRecarga(this, userId, areaUi, nivel);
+            if (tiempoRestante > 0) {
+                String tiempoFormateado = LivesManager.formatearTiempoRestante(tiempoRestante);
+                tvTiempoRecarga.setText("La vida se recarga en " + tiempoFormateado);
+                tvTiempoRecarga.setTextColor(areaColor);
+                tvTiempoRecarga.setVisibility(View.VISIBLE);
+            } else {
+                tvTiempoRecarga.setVisibility(View.GONE);
+            }
+            
+            // Mostrar opción de recarga por detalle si está disponible
+            if (puedeRecargarPorDetalle) {
+                tvMensajeDetalle.setVisibility(View.VISIBLE);
+                tvMensajeDetalle.setText("¿Quieres ver el detalle para recargar media vida?");
+                btnVerDetalle.setVisibility(View.VISIBLE);
+                btnVerDetalle.setText("Ver Detalle (Recarga media vida)");
+                btnVerDetalle.setBackgroundTintList(android.content.res.ColorStateList.valueOf(areaColor));
+                btnVerDetalle.setIconResource(android.R.drawable.ic_menu_view);
+            } else {
+                tvMensajeDetalle.setVisibility(View.GONE);
+                btnVerDetalle.setVisibility(View.GONE);
+            }
+            
+            btnUsarVida.setText("Reintentar");
             btnUsarVida.setBackgroundTintList(android.content.res.ColorStateList.valueOf(areaColor));
             btnUsarVida.setIconResource(android.R.drawable.ic_menu_revert);
         }
@@ -592,13 +686,45 @@ public class QuizActivity extends AppCompatActivity {
             );
         }
         
-        btnUsarVida.setOnClickListener(v -> {
+        // Botón para ver detalle (recarga media vida)
+        btnVerDetalle.setOnClickListener(v -> {
             dialog.dismiss();
-            // Reiniciar el nivel para volver a intentar
-            setResult(RESULT_OK); // Notificar que hubo cambios para actualizar la UI
-            finish();
+            // Ir al detalle del intento
+            if (idSesion != null && idSesion > 0) {
+                irAlDetalle(idSesion);
+            } else {
+                Toast.makeText(this, "No se pudo obtener el ID de la sesión", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            }
         });
         
+        // Botón para usar vida (volver a intentar)
+        btnUsarVida.setOnClickListener(v -> {
+            dialog.dismiss();
+            
+            // IMPORTANTE: Si el usuario presiona "Reintentar", limpiar vidas parciales
+            // y crear un nuevo timestamp para la vida vacía (5 minutos desde ahora)
+            if (nivel > 1 && userIdInt > 0) {
+                // Limpiar vidas parciales ANTES de reiniciar
+                LivesManager.limpiarVidasParcialesYCrearTimestamp(this, userId, areaUi, nivel);
+                android.util.Log.d("QuizActivity", "Vidas parciales limpiadas al presionar Reintentar");
+                
+                // Forzar actualización inmediata de vidas para mostrar vida vacía
+                actualizarVidas();
+            }
+            
+            // Reiniciar el quiz: limpiar estado y crear nueva sesión
+            idSesion = null;
+            allQuestions.clear();
+            todasLasRespuestas.clear();
+            currentQuestionIndex = 0;
+            
+            // Crear nueva sesión/parada para reiniciar el quiz
+            crearParadaYMostrar();
+        });
+        
+        // Botón cancelar
         btnCancelar.setOnClickListener(v -> {
             dialog.dismiss();
             setResult(RESULT_OK); // Notificar que hubo cambios para actualizar la UI
@@ -606,6 +732,190 @@ public class QuizActivity extends AppCompatActivity {
         });
         
         dialog.show();
+    }
+    
+    /**
+     * Muestra un diálogo emergente cuando el usuario intenta iniciar el quiz
+     * pero tiene la última vida en la mitad (las otras están vacías).
+     * Debe esperar a que se complete la media vida antes de poder intentar.
+     */
+    private void mostrarDialogoEsperarMediaVida(String userId) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_vidas_nivel, null);
+        
+        // Obtener color del área
+        int areaColor = obtenerColorArea(areaUi);
+        
+        // Configurar color de la tarjeta del diálogo
+        com.google.android.material.card.MaterialCardView cardDialog = dialogView.findViewById(R.id.cardDialog);
+        if (cardDialog != null) {
+            cardDialog.setCardBackgroundColor(Color.WHITE);
+            cardDialog.setStrokeColor(areaColor);
+            cardDialog.setStrokeWidth(dp(3));
+        }
+        
+        // Configurar elementos del diálogo
+        ImageView ivIcono = dialogView.findViewById(R.id.ivIconoVida);
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTitulo);
+        TextView tvSubtitulo = dialogView.findViewById(R.id.tvSubtitulo);
+        LinearLayout llCorazones = dialogView.findViewById(R.id.llCorazones);
+        TextView tvVidasRestantes = dialogView.findViewById(R.id.tvVidasRestantes);
+        TextView tvTiempoRecarga = dialogView.findViewById(R.id.tvTiempoRecarga);
+        TextView tvRegeneracion = dialogView.findViewById(R.id.tvRegeneracion);
+        TextView tvMensajeFinal = dialogView.findViewById(R.id.tvMensajeFinal);
+        TextView tvMensajeDetalle = dialogView.findViewById(R.id.tvMensajeDetalle);
+        MaterialButton btnVerDetalle = dialogView.findViewById(R.id.btnVerDetalle);
+        MaterialButton btnUsarVida = dialogView.findViewById(R.id.btnUsarVida);
+        MaterialButton btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        
+        // Configurar icono y título
+        ivIcono.setImageResource(android.R.drawable.ic_menu_revert);
+        ivIcono.setColorFilter(areaColor);
+        tvTitulo.setText("Espera a que se Complete la Vida");
+        tvTitulo.setTextColor(Color.parseColor("#1F2937"));
+        
+        // Configurar subtítulo
+        tvSubtitulo.setText("Tienes una vida en la mitad. Debes esperar a que se complete antes de intentar.");
+        
+        // Configurar corazones: 2 vacías + 1 media vida
+        llCorazones.removeAllViews();
+        float partialLives = LivesManager.getPartialLives(this, userId, areaUi, nivel);
+        for (int i = 0; i < 3; i++) {
+            if (i == 0 && partialLives > 0) {
+                // Primera vida: media vida
+                android.widget.FrameLayout frameCorazon = new android.widget.FrameLayout(this);
+                LinearLayout.LayoutParams frameParams = new LinearLayout.LayoutParams(
+                    dp(28), dp(28)
+                );
+                frameParams.setMargins(dp(4), 0, dp(4), 0);
+                frameCorazon.setLayoutParams(frameParams);
+                
+                // Corazón vacío de fondo
+                ImageView ivCorazonVacio = new ImageView(this);
+                android.widget.FrameLayout.LayoutParams paramsVacio = new android.widget.FrameLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                );
+                ivCorazonVacio.setLayoutParams(paramsVacio);
+                ivCorazonVacio.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                ivCorazonVacio.setImageResource(R.drawable.ic_heart_empty);
+                ivCorazonVacio.setColorFilter(Color.parseColor("#CCCCCC"), android.graphics.PorterDuff.Mode.SRC_IN);
+                
+                // Corazón lleno (mitad inferior)
+                ImageView ivCorazonLleno = new ImageView(this);
+                android.widget.FrameLayout.LayoutParams paramsLleno = new android.widget.FrameLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                );
+                ivCorazonLleno.setLayoutParams(paramsLleno);
+                ivCorazonLleno.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                ivCorazonLleno.setImageResource(R.drawable.ic_heart_filled);
+                ivCorazonLleno.setColorFilter(areaColor, android.graphics.PorterDuff.Mode.SRC_IN);
+                
+                ivCorazonLleno.setClipToOutline(true);
+                final int heartSizePx = dp(28);
+                ivCorazonLleno.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                    @Override
+                    public void getOutline(android.view.View view, android.graphics.Outline outline) {
+                        int width = view.getWidth() > 0 ? view.getWidth() : heartSizePx;
+                        int height = view.getHeight() > 0 ? view.getHeight() : heartSizePx;
+                        outline.setRect(0, height / 2, width, height);
+                    }
+                });
+                
+                frameCorazon.addView(ivCorazonVacio);
+                frameCorazon.addView(ivCorazonLleno);
+                llCorazones.addView(frameCorazon);
+            } else {
+                // Corazón vacío
+                ImageView ivCorazon = new ImageView(this);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    dp(28), dp(28)
+                );
+                params.setMargins(dp(4), 0, dp(4), 0);
+                ivCorazon.setLayoutParams(params);
+                ivCorazon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                ivCorazon.setImageResource(R.drawable.ic_heart_empty);
+                ivCorazon.setColorFilter(Color.parseColor("#CCCCCC"), android.graphics.PorterDuff.Mode.SRC_IN);
+                llCorazones.addView(ivCorazon);
+            }
+        }
+        
+        // Configurar mensajes
+        tvVidasRestantes.setVisibility(View.GONE);
+        tvRegeneracion.setVisibility(View.GONE);
+        tvMensajeFinal.setVisibility(View.GONE);
+        tvMensajeDetalle.setVisibility(View.GONE);
+        btnVerDetalle.setVisibility(View.GONE);
+        btnUsarVida.setVisibility(View.GONE);
+        
+        // Mostrar tiempo de recarga
+        long tiempoRestante = LivesManager.getTiempoRestanteRecarga(this, userId, areaUi, nivel);
+        if (tiempoRestante > 0) {
+            String tiempoFormateado = LivesManager.formatearTiempoRestante(tiempoRestante);
+            tvTiempoRecarga.setText("La vida se completará en " + tiempoFormateado);
+            tvTiempoRecarga.setTextColor(areaColor);
+            tvTiempoRecarga.setVisibility(View.VISIBLE);
+        } else {
+            tvTiempoRecarga.setVisibility(View.GONE);
+        }
+        
+        // Crear y mostrar diálogo
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+        
+        // Configurar ventana del diálogo
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_overlay_oscuro);
+            dialog.getWindow().setLayout(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            );
+        }
+        
+        // Botón cancelar - cerrar la actividad
+        btnCancelar.setOnClickListener(v -> {
+            dialog.dismiss();
+            setResult(RESULT_OK);
+            finish();
+        });
+        
+        dialog.show();
+    }
+    
+    /**
+     * Navega al detalle del simulacro para recargar media vida.
+     * Recarga media vida ANTES de navegar al detalle.
+     * Cierra QuizActivity y navega a HomeActivity con el fragment de detalle.
+     */
+    private void irAlDetalle(int idSesion) {
+        // Obtener userId
+        int userIdInt = com.example.zavira_movil.local.TokenManager.getUserId(this);
+        if (userIdInt <= 0) {
+            Toast.makeText(this, "No se pudo obtener el ID del usuario", Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK);
+            finish();
+            return;
+        }
+        String userId = String.valueOf(userIdInt);
+        
+        // Recargar media vida ANTES de navegar (solo si está disponible)
+        boolean recargado = LivesManager.recargarPorDetalle(this, userId, areaUi, nivel);
+        if (recargado) {
+            android.util.Log.d("QuizActivity", "Media vida recargada por detalle antes de navegar");
+            Toast.makeText(this, "¡Media vida recargada!", Toast.LENGTH_SHORT).show();
+        }
+        
+        // Crear Intent para navegar a HomeActivity con el fragment de detalle
+        Intent intent = new Intent(this, com.example.zavira_movil.Home.HomeActivity.class);
+        intent.putExtra("action", "show_detalle");
+        intent.putExtra("id_sesion", idSesion);
+        intent.putExtra("materia", areaUi);
+        intent.putExtra("initial_tab", 1); // Abrir en la pestaña "Preguntas"
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
     
     private void mostrarDialogoExplicacionVidas(String area) {
@@ -637,7 +947,7 @@ public class QuizActivity extends AppCompatActivity {
             // Fondo blanco con borde sutil del color del área
             cardDialog.setCardBackgroundColor(Color.WHITE);
             cardDialog.setStrokeColor(areaColor);
-            cardDialog.setStrokeWidth(3);
+            cardDialog.setStrokeWidth(dp(3));
         }
         
         ImageView ivIcono = dialogView.findViewById(R.id.ivIconoVida);
@@ -712,7 +1022,7 @@ public class QuizActivity extends AppCompatActivity {
         if (cardDialog != null) {
             cardDialog.setCardBackgroundColor(Color.WHITE);
             cardDialog.setStrokeColor(areaColor);
-            cardDialog.setStrokeWidth(3);
+            cardDialog.setStrokeWidth(dp(3));
         }
         
         TextView tvTitulo = dialogView.findViewById(R.id.tvTitulo);
@@ -778,7 +1088,7 @@ public class QuizActivity extends AppCompatActivity {
         if (cardDialog != null) {
             cardDialog.setCardBackgroundColor(Color.WHITE);
             cardDialog.setStrokeColor(areaColor);
-            cardDialog.setStrokeWidth(3);
+            cardDialog.setStrokeWidth(dp(3));
         }
         
         ImageView ivIcono = dialogView.findViewById(R.id.ivIconoVida);
@@ -850,6 +1160,12 @@ public class QuizActivity extends AppCompatActivity {
         if (area == null) return Color.parseColor("#B6B9C2");
         String a = area.toLowerCase().trim();
         
+        // Isla del Conocimiento / Todas las áreas - Amarillo
+        if (a.contains("conocimiento") || a.contains("isla") || 
+            (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+            return ContextCompat.getColor(this, R.color.area_conocimiento);
+        }
+        
         if (a.contains("matem")) return ContextCompat.getColor(this, R.color.area_matematicas);
         if (a.contains("lengua") || a.contains("lectura") || a.contains("espa") || a.contains("critica")) 
             return ContextCompat.getColor(this, R.color.area_lenguaje);
@@ -900,5 +1216,227 @@ public class QuizActivity extends AppCompatActivity {
                 ", nivel=" + nivel +
                 ", preguntas=" + cantidadPreguntas;
         android.util.Log.d("QuizActivity", logMsg);
+    }
+
+    // ========== Sistema de Vidas ==========
+    
+    /**
+     * Inicializa el sistema de vidas (solo para niveles 2+).
+     */
+    private void inicializarSistemaVidas() {
+        if (nivel <= 1) return;
+        
+        // Obtener userId
+        int userIdInt = com.example.zavira_movil.local.TokenManager.getUserId(this);
+        if (userIdInt <= 0) {
+            android.util.Log.e("QuizActivity", "ERROR: userId inválido en inicializarSistemaVidas");
+            return;
+        }
+        String userId = String.valueOf(userIdInt);
+        
+        // Inicializar vidas si no están inicializadas
+        int vidas = LivesManager.getLives(this, userId, areaUi, nivel);
+        if (vidas == -1) {
+            LivesManager.resetLives(this, userId, areaUi, nivel);
+            vidas = LivesManager.getLives(this, userId, areaUi, nivel);
+        }
+        
+        // Mostrar vidas en la pantalla
+        actualizarVidas();
+        
+        // Iniciar actualización periódica
+        iniciarActualizacionVidas();
+    }
+    
+    /**
+     * Actualiza la visualización de vidas en la pantalla.
+     */
+    private void actualizarVidas() {
+        if (nivel <= 1) {
+            // Ocultar vidas para nivel 1
+            if (binding.llVidasContainer != null) {
+                binding.llVidasContainer.setVisibility(View.GONE);
+            }
+            return;
+        }
+        
+        // Obtener userId
+        int userIdInt = com.example.zavira_movil.local.TokenManager.getUserId(this);
+        if (userIdInt <= 0) {
+            return;
+        }
+        String userId = String.valueOf(userIdInt);
+        
+        // Obtener vidas con recarga automática
+        int vidas = LivesManager.getLivesWithAutoRecharge(this, userId, areaUi, nivel);
+        if (vidas == -1) {
+            // No inicializado, ocultar vidas
+            if (binding.llVidasContainer != null) {
+                binding.llVidasContainer.setVisibility(View.GONE);
+            }
+            return;
+        }
+        
+        // Obtener vidas parciales (media vida)
+        float partialLives = LivesManager.getPartialLives(this, userId, areaUi, nivel);
+        
+        // Mostrar contenedor de vidas
+        if (binding.llVidasContainer != null) {
+            binding.llVidasContainer.setVisibility(View.VISIBLE);
+        }
+        
+        // Obtener color del área
+        int areaColor = obtenerColorArea(areaUi);
+        
+        // Limpiar corazones existentes
+        LinearLayout llVidas = binding.llVidas;
+        if (llVidas != null) {
+            llVidas.removeAllViews();
+            
+            // Agregar corazones (3 máximo)
+            for (int i = 0; i < 3; i++) {
+                ImageView ivCorazon = new ImageView(this);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    dp(24), dp(24)
+                );
+                params.setMargins(dp(6), 0, 0, 0);
+                ivCorazon.setLayoutParams(params);
+                ivCorazon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                
+                if (i < vidas) {
+                    // Corazón lleno del color del área
+                    ivCorazon.setImageResource(R.drawable.ic_heart_filled);
+                    ivCorazon.setColorFilter(areaColor, android.graphics.PorterDuff.Mode.SRC_IN);
+                    llVidas.addView(ivCorazon);
+                } else if (i == vidas && partialLives > 0) {
+                    // Media vida: mostrar corazón medio lleno
+                    // La silueta del corazón vacío debe verse completa, solo la mitad inferior del corazón lleno debe estar visible
+                    android.widget.FrameLayout frameCorazon = new android.widget.FrameLayout(this);
+                    LinearLayout.LayoutParams frameParams = new LinearLayout.LayoutParams(
+                        dp(24), dp(24)
+                    );
+                    frameParams.setMargins(dp(6), 0, 0, 0);
+                    frameCorazon.setLayoutParams(frameParams);
+                    
+                    // Corazón vacío de fondo (silueta completa visible)
+                    ImageView ivCorazonVacio = new ImageView(this);
+                    android.widget.FrameLayout.LayoutParams paramsVacio = new android.widget.FrameLayout.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                    );
+                    ivCorazonVacio.setLayoutParams(paramsVacio);
+                    ivCorazonVacio.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    ivCorazonVacio.setImageResource(R.drawable.ic_heart_empty);
+                    ivCorazonVacio.setColorFilter(Color.parseColor("#CCCCCC"), android.graphics.PorterDuff.Mode.SRC_IN);
+                    
+                    // Corazón lleno que solo se mostrará en la mitad inferior
+                    ImageView ivCorazonLleno = new ImageView(this);
+                    android.widget.FrameLayout.LayoutParams paramsLleno = new android.widget.FrameLayout.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                    );
+                    ivCorazonLleno.setLayoutParams(paramsLleno);
+                    ivCorazonLleno.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    ivCorazonLleno.setImageResource(R.drawable.ic_heart_filled);
+                    ivCorazonLleno.setColorFilter(areaColor, android.graphics.PorterDuff.Mode.SRC_IN);
+                    
+                    // Aplicar clip para mostrar solo la mitad inferior del corazón lleno
+                    // Usar un ViewOutlineProvider estable que calcule el outline de forma consistente
+                    // Esto evita el parpadeo al mantener el outline estable entre actualizaciones
+                    ivCorazonLleno.setClipToOutline(true);
+                    final int heartSizePx = dp(24);
+                    final int halfHeartSizePx = heartSizePx / 2;
+                    ivCorazonLleno.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                        @Override
+                        public void getOutline(android.view.View view, android.graphics.Outline outline) {
+                            // Usar dimensiones de la vista si están disponibles, sino usar valores calculados
+                            int width = view.getWidth() > 0 ? view.getWidth() : heartSizePx;
+                            int height = view.getHeight() > 0 ? view.getHeight() : heartSizePx;
+                            // Clip para mostrar solo la mitad inferior
+                            outline.setRect(0, height / 2, width, height);
+                        }
+                    });
+                    
+                    // Agregar vistas: primero el vacío (fondo), luego el lleno (con clip)
+                    frameCorazon.addView(ivCorazonVacio);
+                    frameCorazon.addView(ivCorazonLleno);
+                    llVidas.addView(frameCorazon);
+                } else {
+                    // Corazón vacío
+                    ivCorazon.setImageResource(R.drawable.ic_heart_empty);
+                    ivCorazon.setColorFilter(Color.parseColor("#CCCCCC"), android.graphics.PorterDuff.Mode.SRC_IN);
+                    llVidas.addView(ivCorazon);
+                }
+            }
+        }
+        
+        // Actualizar tiempo de recarga
+        long tiempoRestante = LivesManager.getTiempoRestanteRecarga(this, userId, areaUi, nivel);
+        TextView tvTiempoRecarga = binding.tvTiempoRecarga;
+        if (tvTiempoRecarga != null) {
+            if (tiempoRestante > 0 && (vidas < 3 || partialLives > 0)) {
+                String tiempoFormateado = LivesManager.formatearTiempoRestante(tiempoRestante);
+                tvTiempoRecarga.setText("Recarga en: " + tiempoFormateado);
+                tvTiempoRecarga.setVisibility(View.VISIBLE);
+            } else {
+                tvTiempoRecarga.setVisibility(View.GONE);
+            }
+        }
+    }
+    
+    /**
+     * Inicia la actualización periódica de vidas (cada segundo).
+     */
+    private void iniciarActualizacionVidas() {
+        if (nivel <= 1) return;
+        
+        detenerActualizacionVidas();
+        
+        handlerVidas = new Handler(Looper.getMainLooper());
+        runnableVidas = new Runnable() {
+            @Override
+            public void run() {
+                actualizarVidas();
+                // Programar siguiente actualización
+                if (handlerVidas != null && runnableVidas != null) {
+                    handlerVidas.postDelayed(runnableVidas, INTERVALO_ACTUALIZACION_VIDAS);
+                }
+            }
+        };
+        handlerVidas.post(runnableVidas);
+    }
+    
+    /**
+     * Detiene la actualización periódica de vidas.
+     */
+    private void detenerActualizacionVidas() {
+        if (handlerVidas != null && runnableVidas != null) {
+            handlerVidas.removeCallbacks(runnableVidas);
+            runnableVidas = null;
+        }
+    }
+    
+    /**
+     * Verifica si se puede recargar por detalle cuando vuelve de ver el detalle.
+     */
+    private void verificarRecargaPorDetalle() {
+        if (nivel <= 1) return;
+        
+        // Obtener userId
+        int userIdInt = com.example.zavira_movil.local.TokenManager.getUserId(this);
+        if (userIdInt <= 0) {
+            return;
+        }
+        String userId = String.valueOf(userIdInt);
+        
+        // Intentar recargar por detalle
+        boolean recargado = LivesManager.recargarPorDetalle(this, userId, areaUi, nivel);
+        if (recargado) {
+            android.util.Log.d("QuizActivity", "Media vida recargada por detalle");
+            // Mostrar mensaje
+            Toast.makeText(this, "¡Media vida recargada por ver el detalle!", Toast.LENGTH_SHORT).show();
+            // Actualizar vidas en la pantalla
+            actualizarVidas();
+        }
     }
 }

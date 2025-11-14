@@ -143,6 +143,13 @@ public class DiagnosticoAdapter extends RecyclerView.Adapter<DiagnosticoAdapter.
 
     private int colorForArea(String nombre, Context c) {
         String a = norm(nombre);
+        
+        // Isla del Conocimiento / Todas las áreas - Amarillo
+        if (a.contains("conocimiento") || a.contains("isla") || 
+            (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+            return ContextCompat.getColor(c, R.color.area_conocimiento);
+        }
+        
         if (a.startsWith("mate")) return ContextCompat.getColor(c, R.color.area_matematicas);
         if (a.startsWith("leng") || a.startsWith("lect")) return ContextCompat.getColor(c, R.color.area_lenguaje);
         if (a.startsWith("cien")) return ContextCompat.getColor(c, R.color.area_ciencias);

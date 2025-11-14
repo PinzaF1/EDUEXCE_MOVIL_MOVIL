@@ -34,7 +34,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/ic_checkmark_green"
+        android:src="@drawable/ic_checkmark_gray"
         android:visibility="gone" />
 
     <RadioButton

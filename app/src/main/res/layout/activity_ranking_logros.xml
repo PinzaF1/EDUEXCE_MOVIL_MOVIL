@@ -113,16 +113,44 @@
                     android:orientation="horizontal"
                     android:paddingTop="10dp">
 
-                    <TextView
-                        android:id="@+id/tvUserInitials"
+                    <!-- Contenedor para medalla o iniciales -->
+                    <FrameLayout
+                        android:id="@+id/containerMedalOrInitials"
                         android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_estilo2"
-                        android:gravity="center"
-                        android:text="JP"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_height="44dp">
+                        
+                        <!-- ImageView para medalla (visible solo para posiciones 1-3) -->
+                        <ImageView
+                            android:id="@+id/ivMedal"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+                        
+                        <!-- TextView para número en medalla (visible solo para posiciones 1-3) -->
+                        <TextView
+                            android:id="@+id/tvMedalNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+                        
+                        <!-- TextView para iniciales (visible solo para posición 4+) -->
+                        <TextView
+                            android:id="@+id/tvUserInitials"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:gravity="center"
+                            android:background="@drawable/bg_estilo2"
+                            android:text="JP"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -175,15 +203,6 @@
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <TextView
-                android:text="🏅 Colección de Insignias"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="#1F2937"
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBadges"
