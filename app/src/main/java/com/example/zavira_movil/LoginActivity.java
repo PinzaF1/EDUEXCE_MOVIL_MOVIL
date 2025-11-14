@@ -161,6 +161,10 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(LoginActivity.this, "¡Bienvenido/a!", Toast.LENGTH_SHORT).show();
+
+                    // ✅ Registrar token FCM después del login exitoso
+                    registerFCMToken();
+
                     // La sincronización se hará en goToHome() después de verificar los tests
                     goToHome();
 
@@ -334,8 +338,13 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 
-                Log.d("FCM_TOKEN", "📱 Token FCM obtenido: " + token.substring(0, 20) + "...");
-                
+                // ⚠️ TEMPORAL: Mostrar token completo para testing con Firebase Console
+                Log.d("FCM_TOKEN", "📱 Token FCM completo: " + token);
+                Log.d("FCM_TOKEN", "===================================");
+                Log.d("FCM_TOKEN", "COPIA ESTE TOKEN PARA FIREBASE CONSOLE:");
+                Log.d("FCM_TOKEN", token);
+                Log.d("FCM_TOKEN", "===================================");
+
                 // Verificar autenticación
                 String authToken = TokenManager.getToken(LoginActivity.this);
                 if (authToken == null) {
@@ -357,8 +366,8 @@ public class LoginActivity extends AppCompatActivity {
                     jsonBody.put("platform", "android");
                     
                     RequestBody body = RequestBody.create(
-                        MediaType.parse("application/json"),
-                        jsonBody.toString()
+                        jsonBody.toString(),
+                        MediaType.parse("application/json")
                     );
                     
                     Log.d("FCM_TOKEN", "📤 Enviando token al servidor...");

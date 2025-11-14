@@ -106,15 +106,31 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             // Indicador de no leído
             if (notification.isRead()) {
                 unreadIndicator.setVisibility(View.GONE);
-                itemView.setAlpha(0.85f);
+                itemView.setAlpha(0.7f); // Más transparente para notificaciones leídas
+                itemView.setBackgroundResource(android.R.color.transparent);
             } else {
                 unreadIndicator.setVisibility(View.VISIBLE);
-                itemView.setAlpha(1.0f);
+                itemView.setAlpha(1.0f); // Opaco para notificaciones no leídas
+                itemView.setBackgroundResource(R.drawable.bg_notification_unread);
             }
             
-            // Click listener
+            // Click listener con animación
             itemView.setOnClickListener(v -> {
                 if (listener != null) {
+                    // Animación de feedback
+                    itemView.animate()
+                        .scaleX(0.95f)
+                        .scaleY(0.95f)
+                        .setDuration(100)
+                        .withEndAction(() -> {
+                            itemView.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(100)
+                                .start();
+                        })
+                        .start();
+
                     listener.onNotificationClick(notification, position);
                 }
             });

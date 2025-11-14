@@ -268,6 +268,6 @@ public interface ApiService {
     Call<BasicResponse> sincronizarProgreso(@Body com.example.zavira_movil.sincronizacion.SincronizarTodoRequest body);
 
     // ---------- Notificaciones FCM ----------
-    @POST("movil/fcm/register")
+    @POST("movil/fcm-token")
     Call<Void> registerFCMToken(@Body okhttp3.RequestBody body);
 }

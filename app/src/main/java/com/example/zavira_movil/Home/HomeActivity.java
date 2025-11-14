@@ -1,5 +1,6 @@
 package com.example.zavira_movil.Home;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
@@ -229,6 +230,27 @@ public class HomeActivity extends AppCompatActivity {
             });
         }
         
+        // Configurar click listener para el ícono de notificaciones
+        ImageView ivNotifications = findViewById(R.id.ivNotifications);
+        if (ivNotifications != null) {
+            ivNotifications.setOnClickListener(v -> {
+                Intent intentNotifications = new Intent(HomeActivity.this, NotificationsActivity.class);
+                startActivity(intentNotifications);
+            });
+        }
+
+        // Configurar badge de notificaciones no leídas
+        updateNotificationBadge();
+
+        // Registrar receiver para actualizar el badge de notificaciones
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .registerReceiver(new android.content.BroadcastReceiver() {
+                @Override
+                public void onReceive(android.content.Context context, android.content.Intent intent) {
+                    updateNotificationBadge();
+                }
+            }, new android.content.IntentFilter("com.example.zavira_movil.UPDATE_NOTIFICATION_BADGE"));
+
         // Registrar receiver para sincronización (solo si no está registrado)
         if (syncReceiver == null) {
             syncReceiver = new android.content.BroadcastReceiver() {
@@ -260,7 +282,14 @@ public class HomeActivity extends AppCompatActivity {
                 android.content.IntentFilter filter = new android.content.IntentFilter();
                 filter.addAction("com.example.zavira_movil.SYNC_COMPLETED");
                 filter.addAction("com.example.zavira_movil.FOTO_ACTUALIZADA");
-                registerReceiver(syncReceiver, filter);
+
+                // Android 13+ requiere especificar RECEIVER_EXPORTED o RECEIVER_NOT_EXPORTED
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    registerReceiver(syncReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+                } else {
+                    registerReceiver(syncReceiver, filter);
+                }
+
                 android.util.Log.d("HomeActivity", "BroadcastReceiver registrado para SYNC_COMPLETED y FOTO_ACTUALIZADA");
             } catch (Exception e) {
                 android.util.Log.e("HomeActivity", "Error al registrar BroadcastReceiver", e);
@@ -379,6 +408,9 @@ public class HomeActivity extends AppCompatActivity {
         // Recargar foto del usuario en el header
         cargarNombreUsuario();
         
+        // Actualizar badge de notificaciones
+        updateNotificationBadge();
+
         // La barra de navegación del sistema se mantiene visible (comportamiento por defecto)
         // No se modifica para que muestre la hora, batería, etc. normalmente
         
@@ -1255,6 +1287,25 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
     
+    /**
+     * Actualiza el badge de notificaciones no leídas
+     */
+    private void updateNotificationBadge() {
+        TextView tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
+        if (tvNotificationBadge != null) {
+            com.example.zavira_movil.notifications.NotificationStorage storage =
+                new com.example.zavira_movil.notifications.NotificationStorage(this);
+            int unreadCount = storage.getUnreadCount();
+
+            if (unreadCount > 0) {
+                tvNotificationBadge.setVisibility(View.VISIBLE);
+                tvNotificationBadge.setText(String.valueOf(Math.min(unreadCount, 99))); // Máximo 99
+            } else {
+                tvNotificationBadge.setVisibility(View.GONE);
+            }
+        }
+    }
+
     /**
      * Formatea el nombre completo para mostrar nombre y apellido
      * Si tiene más de dos palabras, toma las primeras dos (nombre y apellido)

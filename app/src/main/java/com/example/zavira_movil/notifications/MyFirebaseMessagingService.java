@@ -221,6 +221,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             
             notificationStorage.saveNotification(item);
             Log.d(TAG, "✅ Notificación guardada en el historial");
+
+            // Enviar broadcast para actualizar el badge en HomeActivity
+            Intent intent = new Intent("com.example.zavira_movil.UPDATE_NOTIFICATION_BADGE");
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
         } catch (Exception e) {
             Log.e(TAG, "❌ Error al guardar notificación en historial", e);
         }
@@ -254,8 +259,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             jsonBody.put("platform", "android");
             
             RequestBody body = RequestBody.create(
-                MediaType.parse("application/json"),
-                jsonBody.toString()
+                jsonBody.toString(),
+                MediaType.parse("application/json")
             );
             
             ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);

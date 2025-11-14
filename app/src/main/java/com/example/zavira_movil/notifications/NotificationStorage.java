@@ -109,6 +109,20 @@ public class NotificationStorage {
     }
     
     /**
+     * Marca todas las notificaciones como leídas
+     */
+    public void markAllAsRead() {
+        List<NotificationItem> notifications = getAllNotifications();
+
+        for (NotificationItem notification : notifications) {
+            notification.setRead(true);
+        }
+
+        String json = gson.toJson(notifications);
+        prefs.edit().putString(KEY_NOTIFICATIONS, json).apply();
+    }
+
+    /**
      * Elimina todas las notificaciones
      */
     public void clearAll() {
