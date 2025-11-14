@@ -89,6 +89,12 @@ public class ProgresoAdapter extends RecyclerView.Adapter<ProgresoAdapter.ViewHo
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+","")
                 .trim().toLowerCase();
 
+        // Isla del Conocimiento / Todas las áreas - Amarillo
+        if (a.contains("conocimiento") || a.contains("isla") || 
+            (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+            return ContextCompat.getColor(v.getContext(), R.color.area_conocimiento);
+        }
+
         if (a.startsWith("mate"))   return ContextCompat.getColor(v.getContext(), R.color.area_matematicas);
         if (a.startsWith("leng"))   return ContextCompat.getColor(v.getContext(), R.color.area_lenguaje);
         if (a.startsWith("cien"))   return ContextCompat.getColor(v.getContext(), R.color.area_ciencias);

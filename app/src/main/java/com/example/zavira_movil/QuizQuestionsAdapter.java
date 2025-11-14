@@ -133,12 +133,12 @@ public class QuizQuestionsAdapter extends RecyclerView.Adapter<QuizQuestionsAdap
         
         // Aplicar estilos según selección
         if (isSelected) {
-            // Verde cuando está seleccionada
+            // Gris cuando está seleccionada
             optionLayout.setSelected(true);
             optionLayout.setBackgroundResource(R.drawable.bg_option_selected_green);
             circle.setBackgroundResource(R.drawable.bg_option_circle_selected_green);
             circle.setTextColor(Color.WHITE);
-            text.setTextColor(Color.parseColor("#22C55E"));
+            text.setTextColor(Color.parseColor("#6B7280"));
         } else {
             // Gris cuando no está seleccionada
             optionLayout.setSelected(false);

@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@android:color/white">  <!-- evita transparencia -->
+        android:background="@android:color/white">
 
         <!-- HEADER -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="56dp"
             android:background="@drawable/bg_header_reading"
             android:paddingStart="16dp"
-            android:paddingEnd="12dp">
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
             <ImageView
                 android:id="@+id/ivHeaderIcon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_edit"
                 app:tint="@android:color/white" />
@@ -32,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/ivHeaderIcon"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -41,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:text="Editar Perfil"
                     android:textStyle="bold"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textColor="@android:color/white" />
 
                 <TextView
@@ -49,8 +55,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Actualiza tu información de contacto"
-                    android:textSize="12sp"
-                    android:textColor="#EDE9FE" />
+                    android:textSize="11sp"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
         </RelativeLayout>
 
@@ -59,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="12dp">
 
             <!-- Correo -->
             <TextView
@@ -67,8 +73,8 @@
                 android:layout_height="wrap_content"
                 android:text="Correo Electrónico"
                 android:textSize="12sp"
-                android:textColor="#6B7280"
-                android:layout_marginBottom="6dp"/>
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="4dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -78,14 +84,18 @@
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#2563EB"
+                app:boxStrokeWidth="2dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCorreo"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:inputType="textEmailAddress"
-                    android:hint="correo@ejemplo.com" />
+                    android:textColor="@android:color/black"
+                    android:hint="correo@ejemplo.com"
+                    android:textColorHint="#9CA3AF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Teléfono -->
@@ -94,9 +104,9 @@
                 android:layout_height="wrap_content"
                 android:text="Teléfono"
                 android:textSize="12sp"
-                android:textColor="#6B7280"
-                android:layout_marginTop="14dp"
-                android:layout_marginBottom="6dp"/>
+                android:textColor="@android:color/black"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -106,14 +116,18 @@
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#2563EB"
+                app:boxStrokeWidth="2dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTelefono"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:inputType="phone"
-                    android:hint="+57 300 000 0000" />
+                    android:textColor="@android:color/black"
+                    android:hint="+57 300 000 0000"
+                    android:textColorHint="#9CA3AF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Dirección -->
@@ -122,9 +136,9 @@
                 android:layout_height="wrap_content"
                 android:text="Dirección"
                 android:textSize="12sp"
-                android:textColor="#6B7280"
-                android:layout_marginTop="14dp"
-                android:layout_marginBottom="6dp"/>
+                android:textColor="@android:color/black"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -134,14 +148,18 @@
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#2563EB"
+                app:boxStrokeWidth="2dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDireccion"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:inputType="textPostalAddress"
-                    android:hint="Calle 45 #23-67, Ciudad, País" />
+                    android:textColor="@android:color/black"
+                    android:hint="Calle 45 #23-67, Ciudad, País"
+                    android:textColorHint="#9CA3AF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Botonera -->
@@ -150,16 +168,18 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="end"
-                android:layout_marginTop="18dp">
+                android:layout_marginTop="12dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancelar"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:text="Cancelar"
-                    android:textColor="@android:color/black"/>
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="#DC2626"
+                    app:cornerRadius="12dp" />
 
                 <Space
                     android:layout_width="12dp"
@@ -172,9 +192,10 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:text="Guardar"
-                    android:textColor="@android:color/black"
-                    app:backgroundTint="@color/blue"/>
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="#2563EB"
+                    app:cornerRadius="12dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</ScrollView>
+</com.google.android.material.card.MaterialCardView>

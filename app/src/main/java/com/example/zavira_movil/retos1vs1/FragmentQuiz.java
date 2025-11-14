@@ -66,6 +66,7 @@ public class FragmentQuiz extends Fragment {
     private Handler soundHandler; // Handler para controlar los sonidos
     private Runnable soundRunnable; // Runnable para reproducir sonidos periódicamente
     private boolean isLast10Seconds = false; // Flag para saber si estamos en los últimos 10 segundos
+    private android.content.BroadcastReceiver fotoActualizadaReceiver; // Receiver para actualizar foto
 
     @Nullable
     @Override
@@ -133,6 +134,9 @@ public class FragmentQuiz extends Fragment {
         
         // Cargar foto del usuario actual
         cargarFotoUsuario();
+        
+        // Registrar receiver para actualizar foto cuando se cambia
+        registrarReceiverFoto();
 
         if (TextUtils.isEmpty(aceptarJson) || idSesion <= 0 || TextUtils.isEmpty(idReto)) {
             requireActivity().onBackPressed();
@@ -219,7 +223,28 @@ public class FragmentQuiz extends Fragment {
     private void cargarFotoUsuario() {
         if (ivFotoUsuario == null) return;
         
-        // Obtener foto del usuario actual desde el perfil
+        // Primero intentar cargar desde archivo local (más rápido y actualizado)
+        Integer userId = TokenManager.getUserId(requireContext());
+        if (userId != null) {
+            String prefsKey = "foto_path_" + userId;
+            android.content.SharedPreferences sp = requireContext().getSharedPreferences("perfil_prefs", android.content.Context.MODE_PRIVATE);
+            String localPath = sp.getString(prefsKey, null);
+            
+            if (localPath != null) {
+                java.io.File localFile = new java.io.File(localPath);
+                if (localFile.exists()) {
+                    Glide.with(requireContext())
+                            .load(localFile)
+                            .placeholder(R.drawable.usuario)
+                            .error(R.drawable.usuario)
+                            .circleCrop()
+                            .into(ivFotoUsuario);
+                    return;
+                }
+            }
+        }
+        
+        // Si no hay archivo local, obtener desde el perfil
         api.getPerfilEstudiante().enqueue(new retrofit2.Callback<Estudiante>() {
             @Override
             public void onResponse(retrofit2.Call<Estudiante> call, retrofit2.Response<Estudiante> response) {
@@ -273,6 +298,37 @@ public class FragmentQuiz extends Fragment {
         super.onResume();
         // Asegurar que el topBar esté oculto
         ocultarTopBar();
+        // Recargar foto del usuario por si se actualizó
+        cargarFotoUsuario();
+    }
+    
+    private void registrarReceiverFoto() {
+        if (fotoActualizadaReceiver == null) {
+            fotoActualizadaReceiver = new android.content.BroadcastReceiver() {
+                @Override
+                public void onReceive(android.content.Context context, android.content.Intent intent) {
+                    if (intent != null && "com.example.zavira_movil.FOTO_ACTUALIZADA".equals(intent.getAction())) {
+                        // Recargar foto del usuario cuando se actualiza
+                        if (getActivity() != null && ivFotoUsuario != null) {
+                            getActivity().runOnUiThread(() -> {
+                                // Limpiar cache de Glide para forzar recarga
+                                Glide.with(requireContext()).clear(ivFotoUsuario);
+                                // Recargar foto
+                                cargarFotoUsuario();
+                            });
+                        }
+                    }
+                }
+            };
+            try {
+                android.content.IntentFilter filter = new android.content.IntentFilter("com.example.zavira_movil.FOTO_ACTUALIZADA");
+                if (getActivity() != null) {
+                    getActivity().registerReceiver(fotoActualizadaReceiver, filter);
+                }
+            } catch (Exception e) {
+                // Ignorar errores de registro
+            }
+        }
     }
     
     private void ocultarTopBar() {
@@ -606,6 +662,14 @@ public class FragmentQuiz extends Fragment {
         if (toneGenerator != null) {
             toneGenerator.release();
             toneGenerator = null;
+        }
+        // Desregistrar receiver cuando el fragment se destruye
+        if (fotoActualizadaReceiver != null && getActivity() != null) {
+            try {
+                getActivity().unregisterReceiver(fotoActualizadaReceiver);
+            } catch (Exception e) {
+                // Ignorar si ya está desregistrado
+            }
         }
         // Restaurar topBar al salir
         restaurarTopBar();

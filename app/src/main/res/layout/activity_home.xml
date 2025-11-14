@@ -2,204 +2,299 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-    <!-- BACKDROP SOLO EN EL HEADER (recortado al área visible de EduExce) -->
-    <FrameLayout
-        android:id="@+id/backdropHost"
+    <!-- Imagen de fondo debajo del header (SOLO visible en Home) -->
+    <ImageView
+        android:id="@+id/mapBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/topbar_mask"
-        android:clipToOutline="true"
-        app:layout_constraintBottom_toBottomOf="@id/topBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Imagen tenue que se “asoma” SOLO dentro del header -->
-        <ImageView
-            android:id="@+id/ivParallax"
-            android:layout_width="427dp"
-            android:layout_height="match_parent"
-            android:alpha="0.08"
-            android:scaleType="centerCrop"
-            android:src="@drawable/fondoconocimiento" />
-
-        <!-- Degradado MUY sutil pegado al borde inferior del header -->
-        <View
-            android:id="@+id/overlayFade"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_gravity="bottom"
-            android:alpha="0"
-            android:background="@drawable/fade_header_overlay" />
-    </FrameLayout>
-
-    <!-- Top bar (misma estructura, con campana a la derecha) -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/topBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="0dp"
-        app:cardUseCompatPadding="false"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:strokeWidth="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- ancho ajustado para que quepa la campana -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
-
-            <ImageView
-                android:id="@+id/ivAppLogo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/iconoeduexce" />
-
-            <!-- El texto ocupa el espacio disponible -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:paddingStart="12dp"
-                android:paddingTop="14dp">
-
-                <TextView
-                    android:id="@+id/tvBrand"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="EduExce"
-                    android:textColor="#1E293B"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <!-- Saludo con nombre del usuario -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:orientation="horizontal"
-                    android:background="@android:color/transparent">
-
-                    <TextView
-                        android:id="@+id/tvGreeting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="¡Hola,"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvUserName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Usuario!"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:paddingStart="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🫶🏻"
-                        android:textSize="14sp"
-                        android:paddingStart="4dp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Campana de notificación -->
-
-            <FrameLayout
-                android:id="@+id/btnBell"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true">
-
-                <!-- Badge opcional (oculto por defecto) -->
-                <TextView
-                    android:id="@+id/badgeBell"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="end|top"
-                    android:layout_marginEnd="2dp"
-                    android:layout_marginTop="2dp"
-                    android:background="@drawable/bg_badge_dot"
-                    android:gravity="center"
-                    android:text="3"
-                    android:textColor="@android:color/white"
-                    android:textSize="10sp"
-                    android:visibility="gone"/>
-
-                <ImageView
-                    android:id="@+id/ivBell"
-                    android:layout_width="51dp"
-                    android:layout_height="47dp"
-                    android:contentDescription="@string/app_name"
-                    android:padding="10dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/notif" />
-            </FrameLayout>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- RecyclerView ÚNICO (simulacro + materias) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSubjects"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        android:scaleType="centerCrop"
+        android:src="@drawable/fondo"
+        android:contentDescription="Mapa de islas"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/header_container"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Contenedor de hotspots (por encima del fondo, captura los clics) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/hotspotsContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:elevation="10dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        app:layout_constraintTop_toBottomOf="@id/header_container"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Hotspot Isla del Conocimiento - Centrado sobre islandConocimiento -->
+        <View
+            android:id="@+id/hotspotConocimiento"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.036" />
+
+        <!-- Hotspot Isla de Lectura - Centrado sobre islandLectura -->
+
+        <!-- Hotspot Isla de Sociales - Centrado sobre islandSociales -->
+        <View
+            android:id="@+id/hotspotLectura"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginStart="236dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.382" />
+
+        <View
+            android:id="@+id/hotspotSociales"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginStart="36dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.312" />
+
+        <!-- Hotspot Isla de Ciencias - Centrado sobre islandCiencias -->
+        <View
+            android:id="@+id/hotspotCiencias"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.061"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <!-- Hotspot Isla de Matemáticas - Centrado sobre islandMatematicas -->
+
+        <!-- Hotspot Isla de Inglés - Centrado sobre islandIngles -->
+        <View
+            android:id="@+id/hotspotMatematicas"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.839"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.84" />
+
+        <View
+            android:id="@+id/hotspotIngles"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginEnd="244dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.663" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <!-- Contenedor de Fragments (para otras pestañas) -->
+    <!-- IMPORTANTE: Este contenedor debe estar por encima de la imagen de fondo -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Header Container (blanco con difuminado oscuro debajo de la foto, se extiende detrás de la status bar) - SOLO en Home -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_header_blur_dark"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:fitsSystemWindows="false"
+        android:minHeight="96dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/header_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Avatar circular (44dp) con fondo azul -->
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_avatar_circle_blue">
+                
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Avatar del usuario"
+                    android:src="@drawable/usuario" />
+            </FrameLayout>
+
+            <!-- Saludo con nombre del usuario -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¡Hola,"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Usuario!"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingStart="4dp" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/corazon"
+                    android:contentDescription="Corazón"
+                    android:paddingStart="4dp"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+            
+            <!-- Contenedor de icono de notificaciones con badge -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp">
+
+                <!-- Icono de notificaciones en color azul -->
+                <ImageView
+                    android:id="@+id/ivNotifications"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_bell_24"
+                    android:contentDescription="Notificaciones"
+                    android:tint="@color/nav_blue"
+                    android:scaleType="fitCenter" />
+
+                <!-- Badge con contador de notificaciones no leídas -->
+                <TextView
+                    android:id="@+id/tvNotificationBadge"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginTop="-4dp"
+                    android:layout_marginEnd="-4dp"
+                    android:background="@drawable/bg_notification_badge"
+                    android:gravity="center"
+                    android:text="9"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Top bar (mantener referencia para compatibilidad) -->
+    <View
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Hotspots invisibles sobre el fondo (SOLO en Home) -->
+    <!-- Áreas clickeables invisibles que detectan toques en el fondo -->
+    <!-- IMPORTANTE: Este contenedor debe estar por encima de mapBackground para interceptar toques -->
+    <!-- CRÍTICO: Este debe estar DESPUÉS de mapBackground en el XML para estar por encima visualmente -->
 
     <!-- BottomNavigationView -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
-        android:layout_height="105dp"
-        android:background="@android:color/white"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bottom_nav_rounded"
+        android:theme="@style/ThemeOverlay.App.BottomNavigationView"
         android:paddingTop="4dp"
-        android:paddingBottom="6dp"
+        android:paddingBottom="0dp"
+        android:minHeight="60dp"
         app:itemIconSize="22dp"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/bnv_tint"
+        app:itemIconTint="@color/nav_blue"
+        app:itemTextColor="@color/nav_blue"
+        app:itemBackground="@null"
+        app:itemActiveIndicatorStyle="@null"
+        app:itemRippleColor="@android:color/transparent"
         app:itemHorizontalTranslationEnabled="false"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/menu_bottom_nav"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" >
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

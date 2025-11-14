@@ -5,5 +5,8 @@
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
         <item name="colorControlHighlight">@color/ripple_neutral</item>
         <item name="android:colorControlHighlight">@color/ripple_neutral</item>
+        <!-- Color de la status bar por defecto: azul (#3988FF) también en modo oscuro -->
+        <item name="android:statusBarColor">@color/nav_blue</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

@@ -15,10 +15,12 @@ public class CerrarRequest implements Serializable {
 
     public static class Respuesta implements Serializable {
         @SerializedName("orden")  public int orden;
+        @SerializedName("id_pregunta") public Integer idPregunta;  // Nullable
         @SerializedName("opcion") public String opcion;
 
-        public Respuesta(int orden, String opcion) {
+        public Respuesta(int orden, Integer idPregunta, String opcion) {
             this.orden = orden;
+            this.idPregunta = idPregunta;
             this.opcion = opcion;
         }
     }

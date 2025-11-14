@@ -625,7 +625,7 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         for (int i = 0; i < todasLasRespuestasFinal.size(); i++) {
             String respuesta = todasLasRespuestasFinal.get(i);
             if (respuesta != null) {
-                resps.add(new com.example.zavira_movil.niveleshome.CerrarRequest.Respuesta(i + 1, respuesta));
+                resps.add(new com.example.zavira_movil.niveleshome.CerrarRequest.Respuesta(i + 1, null, respuesta));
             }
         }
         
@@ -858,10 +858,9 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         // Configurar color de la tarjeta del diálogo
         com.google.android.material.card.MaterialCardView cardDialog = dialogView.findViewById(R.id.cardDialog);
         if (cardDialog != null) {
-            int colorClaro = Color.argb(20, Color.red(areaColor), Color.green(areaColor), Color.blue(areaColor));
-            cardDialog.setCardBackgroundColor(colorClaro);
+            cardDialog.setCardBackgroundColor(Color.WHITE);
             cardDialog.setStrokeColor(areaColor);
-            cardDialog.setStrokeWidth(2);
+            cardDialog.setStrokeWidth(dp(3));
         }
         
         ImageView ivIcono = dialogView.findViewById(R.id.ivIconoVida);
@@ -959,7 +958,7 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         if (cardDialog != null) {
             cardDialog.setCardBackgroundColor(Color.WHITE);
             cardDialog.setStrokeColor(areaColor);
-            cardDialog.setStrokeWidth(3);
+            cardDialog.setStrokeWidth(dp(3));
         }
         
         TextView tvTitulo = dialogView.findViewById(R.id.tvTitulo);
@@ -1059,58 +1058,103 @@ public class IslaPreguntasActivity extends AppCompatActivity {
         
         int areaColor = obtenerColorArea(area);
         
-        // Configurar color de la tarjeta del diálogo
-        com.google.android.material.card.MaterialCardView cardDialog = dialogView.findViewById(R.id.cardDialog);
-        if (cardDialog != null) {
-            cardDialog.setCardBackgroundColor(Color.WHITE);
-            cardDialog.setStrokeColor(areaColor);
-            cardDialog.setStrokeWidth(3);
+        // Obtener información de la insignia según el área
+        String nombreInsignia = "Isla completa: " + area;
+        String descripcionInsignia = "Completaste todas las paradas del área de " + area + ".";
+        
+        // Configurar borde de color según el área
+        View rootBadge = dialogView.findViewById(R.id.rootBadge);
+        if (rootBadge != null) {
+            String areaLower = area != null ? area.toLowerCase() : "";
+            int borderDrawable = R.drawable.bg_badge_pendiente;
+            
+            if (areaLower.contains("leng") || areaLower.contains("lectura")) {
+                borderDrawable = R.drawable.bg_badge_card_lenguaje;
+            } else if (areaLower.contains("ciencia")) {
+                borderDrawable = R.drawable.bg_badge_card_ciencias;
+            } else if (areaLower.contains("social")) {
+                borderDrawable = R.drawable.bg_badge_card_sociales;
+            } else if (areaLower.contains("matem")) {
+                borderDrawable = R.drawable.bg_badge_card_matematicas;
+            } else if (areaLower.contains("ingl")) {
+                borderDrawable = R.drawable.bg_badge_card_ingles;
+            }
+            
+            rootBadge.setBackgroundResource(borderDrawable);
         }
         
+        // Configurar icono de la insignia según el área
         ImageView ivIcono = dialogView.findViewById(R.id.ivIconoInsignia);
-        TextView tvTitulo = dialogView.findViewById(R.id.tvTitulo);
-        TextView tvMensaje = dialogView.findViewById(R.id.tvMensaje);
+        if (ivIcono != null) {
+            String areaLower = area != null ? area.toLowerCase() : "";
+            if (areaLower.contains("leng") || areaLower.contains("lectura")) {
+                ivIcono.setImageResource(R.drawable.insignialectura);
+            } else if (areaLower.contains("ciencia")) {
+                ivIcono.setImageResource(R.drawable.insigniaciencia);
+            } else if (areaLower.contains("social")) {
+                ivIcono.setImageResource(R.drawable.insigniasociales);
+            } else if (areaLower.contains("matem")) {
+                ivIcono.setImageResource(R.drawable.insigniamatematicas);
+            } else if (areaLower.contains("ingl")) {
+                ivIcono.setImageResource(R.drawable.insigniaingles);
+            } else {
+                ivIcono.setImageResource(android.R.drawable.star_big_on);
+            }
+        }
+        
+        // Configurar nombre y descripción de la insignia
+        TextView tvNombreInsignia = dialogView.findViewById(R.id.tvNombreInsignia);
+        TextView tvDescripcionInsignia = dialogView.findViewById(R.id.tvDescripcionInsignia);
         MaterialButton btnContinuar = dialogView.findViewById(R.id.btnContinuar);
         
-        if (ivIcono != null) {
-            // Usar un ícono de medalla o trofeo
-            ivIcono.setImageResource(android.R.drawable.star_big_on);
-            ivIcono.setColorFilter(areaColor);
+        if (tvNombreInsignia != null) {
+            tvNombreInsignia.setText(nombreInsignia);
         }
         
-        tvTitulo.setText("¡Insignia Obtenida!");
-        tvTitulo.setTextColor(Color.parseColor("#1F2937"));
+        if (tvDescripcionInsignia != null) {
+            tvDescripcionInsignia.setText(descripcionInsignia);
+        }
         
-        tvMensaje.setText("¡Felicitaciones! Has aprobado el Examen Final de " + area + 
-                         " con " + resultado.correctas + " de 25 respuestas correctas. " +
-                         "Has obtenido una insignia por tu excelente desempeño.");
-        
-        btnContinuar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(areaColor));
+        // Configurar botón con color del área
+        if (btnContinuar != null) {
+            btnContinuar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(areaColor));
+        }
         
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(dialogView)
                 .setCancelable(false)
                 .create();
         
-        btnContinuar.setOnClickListener(v -> {
-            dialog.dismiss();
-            // Usar el tiempo total que ya viene como parámetro (ya está calculado)
-            // Si no viene calculado y es modalidad fácil, recalcular
-            long tiempoFinal = tiempoTotalSegundos;
-            if (tiempoFinal == 0 && "facil".equalsIgnoreCase(modalidad)) {
-                long tiempoTotalMs = SystemClock.elapsedRealtime() - inicioSimulacroElapsed;
-                tiempoFinal = tiempoTotalMs / 1000;
-            }
-            // Continuar con el diálogo de éxito normal
-            mostrarDialogoExito("¡Felicitaciones! Aprobaste el Examen Final", area, resultado, tiempoFinal);
-        });
+        if (btnContinuar != null) {
+            btnContinuar.setOnClickListener(v -> {
+                dialog.dismiss();
+                // Usar el tiempo total que ya viene como parámetro (ya está calculado)
+                // Si no viene calculado y es modalidad fácil, recalcular
+                long tiempoFinal = tiempoTotalSegundos;
+                if (tiempoFinal == 0 && "facil".equalsIgnoreCase(modalidad)) {
+                    long tiempoTotalMs = SystemClock.elapsedRealtime() - inicioSimulacroElapsed;
+                    tiempoFinal = tiempoTotalMs / 1000;
+                }
+                // Continuar con el diálogo de éxito normal
+                mostrarDialogoExito("¡Felicitaciones! Aprobaste el Examen Final", area, resultado, tiempoFinal);
+            });
+        }
         
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_overlay_oscuro);
-            dialog.getWindow().setLayout(
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
-            );
+        // Configurar el diálogo para que sea pequeño y centrado (como el de Isla del Conocimiento)
+        android.view.Window window = dialog.getWindow();
+        if (window != null) {
+            // Fondo transparente para que se vean los bordes redondeados
+            window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            
+            // Configurar tamaño pequeño y centrado (similar a Isla del Conocimiento)
+            android.view.WindowManager.LayoutParams layoutParams = window.getAttributes();
+            layoutParams.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.85f); // 85% del ancho
+            layoutParams.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
+            layoutParams.gravity = android.view.Gravity.CENTER;
+            window.setAttributes(layoutParams);
+            
+            // Overlay oscuro de fondo
+            window.setDimAmount(0.6f);
         }
         
         dialog.show();

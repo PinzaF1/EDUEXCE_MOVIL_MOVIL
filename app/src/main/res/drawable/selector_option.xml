@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Seleccionado -->
+    <!-- Seleccionado: fondo gris claro -->
     <item android:state_selected="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/quizBlue"/>
+            <solid android:color="#F3F4F6"/>
+            <stroke android:width="2dp" android:color="#6B7280"/>
             <corners android:radius="12dp"/>
         </shape>
     </item>
 
-    <!-- Presionado (feedback táctil) -->
+    <!-- Presionado (feedback táctil): fondo gris claro -->
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/quizBlue"/>
+            <solid android:color="#F3F4F6"/>
+            <stroke android:width="2dp" android:color="#6B7280"/>
             <corners android:radius="12dp"/>
         </shape>
     </item>

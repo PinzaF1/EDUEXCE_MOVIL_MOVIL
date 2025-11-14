@@ -1,6 +1,8 @@
 package com.example.zavira_movil.ui.ranking;
 
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,24 +96,73 @@ public class BadgesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         void bind(LogrosResponse.Badge b, boolean obtenida) {
             tvNombre.setText(b.getNombre());
             tvDescripcion.setText(b.getDescripcion());
-            tvArea.setText(b.getArea());
+            if (tvArea != null) {
+                tvArea.setText(b.getArea());
+            }
 
-            // Asigna iconos por área
-            String area = b.getArea() != null ? b.getArea().toLowerCase() : "";
-            if (area.contains("leng")) ivIcon.setImageResource(R.drawable.lenguajee);
-            else if (area.contains("ciencia")) ivIcon.setImageResource(R.drawable.naturales);
-            else if (area.contains("social")) ivIcon.setImageResource(R.drawable.socialess);
-            else if (area.contains("matem")) ivIcon.setImageResource(R.drawable.matematicass);
-            else if (area.contains("ingl")) ivIcon.setImageResource(R.drawable.ingless);
-            else ivIcon.setVisibility(View.GONE);
-
-            // Colores de fondo
+            // Asigna iconos y colores de borde por área
+            String area = b.getArea() != null ? b.getArea().toLowerCase().trim() : "";
+            int borderDrawable;
+            
             if (obtenida) {
-                root.setBackgroundResource(R.drawable.bg_badge_obtenida);
+                // Si está obtenida, usar el color según el área
+                if (area.contains("leng") || area.contains("lectura")) {
+                    ivIcon.setImageResource(R.drawable.insignialectura);
+                    borderDrawable = R.drawable.bg_badge_card_lenguaje;
+                } else if (area.contains("ciencia")) {
+                    ivIcon.setImageResource(R.drawable.insigniaciencia);
+                    borderDrawable = R.drawable.bg_badge_card_ciencias;
+                } else if (area.contains("social")) {
+                    ivIcon.setImageResource(R.drawable.insigniasociales);
+                    borderDrawable = R.drawable.bg_badge_card_sociales;
+                } else if (area.contains("matem")) {
+                    ivIcon.setImageResource(R.drawable.insigniamatematicas);
+                    borderDrawable = R.drawable.bg_badge_card_matematicas;
+                } else if (area.contains("ingl")) {
+                    ivIcon.setImageResource(R.drawable.insigniaingles);
+                    borderDrawable = R.drawable.bg_badge_card_ingles;
+                } else if (area.contains("conocimiento") || area.contains("conocim")) {
+                    ivIcon.setImageResource(R.drawable.insigniaconocimiento);
+                    borderDrawable = R.drawable.bg_badge_card_lenguaje;
+                } else {
+                    ivIcon.setVisibility(View.GONE);
+                    borderDrawable = R.drawable.bg_badge_card_gris;
+                }
+                // Quitar filtro de color cuando está obtenida (mostrar colores originales)
+                ivIcon.clearColorFilter();
+            } else {
+                // Si está pendiente, usar gris para borde y fondo
+                if (area.contains("leng") || area.contains("lectura")) {
+                    ivIcon.setImageResource(R.drawable.insignialectura);
+                } else if (area.contains("ciencia")) {
+                    ivIcon.setImageResource(R.drawable.insigniaciencia);
+                } else if (area.contains("social")) {
+                    ivIcon.setImageResource(R.drawable.insigniasociales);
+                } else if (area.contains("matem")) {
+                    ivIcon.setImageResource(R.drawable.insigniamatematicas);
+                } else if (area.contains("ingl")) {
+                    ivIcon.setImageResource(R.drawable.insigniaingles);
+                } else if (area.contains("conocimiento") || area.contains("conocim")) {
+                    ivIcon.setImageResource(R.drawable.insigniaconocimiento);
+                } else {
+                    ivIcon.setVisibility(View.GONE);
+                }
+                borderDrawable = R.drawable.bg_badge_card_gris;
+                // Aplicar filtro gris a la imagen cuando está pendiente (convertir a escala de grises)
+                ColorMatrix colorMatrix = new ColorMatrix();
+                colorMatrix.setSaturation(0); // Convertir a escala de grises
+                ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+                ivIcon.setColorFilter(filter);
+            }
+
+            // Aplicar borde y fondo según el estado
+            root.setBackgroundResource(borderDrawable);
+
+            // Estado
+            if (obtenida) {
                 tvEstado.setText("✅ Obtenida");
                 tvEstado.setTextColor(Color.parseColor("#2E7D32"));
             } else {
-                root.setBackgroundResource(R.drawable.bg_badge_pendiente);
                 tvEstado.setText("Pendiente");
                 tvEstado.setTextColor(Color.parseColor("#9CA3AF"));
             }
