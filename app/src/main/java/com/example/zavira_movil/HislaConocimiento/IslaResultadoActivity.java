@@ -247,11 +247,17 @@ public class IslaResultadoActivity extends AppCompatActivity {
         if (area == null) return 0xFFB6B9C2;
         String a = area.toLowerCase().trim();
         
+        // Isla del Conocimiento / Todas las áreas - Amarillo
+        if (a.contains("conocimiento") || a.contains("isla") || 
+            (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+            return 0xFFFFC107; // Amarillo
+        }
+        
         if (a.contains("matem")) return 0xFFE53935;
         if (a.contains("lengua") || a.contains("lectura") || a.contains("espa") || a.contains("critica")) 
             return 0xFF2196F3;
         if (a.contains("social") || a.contains("ciudad")) 
-            return 0xFF9C27B0;
+            return 0xFFFB8C00; // Naranja para Sociales
         if (a.contains("cien") || a.contains("biolo") || a.contains("fis") || a.contains("quim")) 
             return 0xFF4CAF50;
         if (a.contains("ingl")) 

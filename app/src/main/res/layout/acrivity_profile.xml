@@ -11,44 +11,13 @@
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="40dp"
         app:title="Perfil"
         app:titleCentered="true"
-        app:titleTextColor="@android:color/black" />
-
-    <!-- TABS: texto + subrayado azul del ancho del texto -->
+        app:titleTextColor="@android:color/black"
+        app:navigationIconTint="@color/black" />
 
     <!-- Contenedor de fragmentos -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="362dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:paddingTop="1dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="10dp"
-        app:tabGravity="center"
-        app:tabIndicatorColor="@color/azul"
-        app:tabIndicatorFullWidth="false"
-        app:tabIndicatorHeight="4dp"
-        app:tabInlineLabel="true"
-        app:tabMode="fixed"
-        app:tabRippleColor="@android:color/transparent"
-        app:tabTextColor="@android:color/black">
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabPerfil"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Perfil" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabConfig"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Configuración" />
-    </com.google.android.material.tabs.TabLayout>
-
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"

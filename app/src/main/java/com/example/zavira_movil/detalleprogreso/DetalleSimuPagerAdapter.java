@@ -10,6 +10,7 @@ public class DetalleSimuPagerAdapter extends FragmentStateAdapter {
     private final FragmentDetalleResumen resumen = new FragmentDetalleResumen();
     private final FragmentDetallePreguntas preguntas = new FragmentDetallePreguntas();
     private final FragmentDetalleAnalisis analisis = new FragmentDetalleAnalisis();
+    private String materia;
 
     public DetalleSimuPagerAdapter(@NonNull FragmentActivity fa) { super(fa); }
 
@@ -25,5 +26,10 @@ public class DetalleSimuPagerAdapter extends FragmentStateAdapter {
         resumen.setData(data);
         preguntas.setData(data);
         analisis.setData(data);
+    }
+    
+    public void setMateria(String materia) {
+        this.materia = materia;
+        resumen.setMateria(materia);
     }
 }

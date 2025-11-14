@@ -3,18 +3,24 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardDialog"
-    android:layout_width="280dp"
+    android:layout_width="260dp"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
+    android:clipToOutline="true"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/white">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+        
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:padding="16dp"
         android:gravity="center_horizontal">
 
         <!-- Icono circular con fondo -->
@@ -22,14 +28,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_icono_circular"
-            android:padding="10dp"
-            android:layout_marginBottom="12dp"
+            android:padding="8dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center">
             
             <ImageView
                 android:id="@+id/ivIconoVida"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_heart_filled"/>
         </LinearLayout>
@@ -40,22 +46,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="¡Sistema de Vidas!"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#1F2937"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="6dp"/>
 
         <!-- Mensaje explicativo -->
         <TextView
             android:id="@+id/tvMensaje"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="A partir del Nivel 2, tendrás 3 intentos (vidas) para pasar al siguiente nivel.\n\nSi pierdes los 3 intentos, retrocederás un nivel y recuperarás tus 3 vidas.\n\nSi pasas al siguiente nivel, comenzarás con 3 vidas nuevas."
-            android:textSize="13sp"
+            android:text="A partir del Nivel 2, tendrás 3 intentos (vidas) para pasar al siguiente nivel.\n\nSi pierdes un intento, la vida se recarga automáticamente después de 5 minutos.\n\nTambién puedes recargar media vida viendo el detalle de tu intento fallido (solo una vez por intento).\n\nSi pierdes los 3 intentos, retrocederás un nivel y recuperarás tus 3 vidas.\n\nSi pasas al siguiente nivel, comenzarás con 3 vidas nuevas."
+            android:textSize="11sp"
             android:textColor="#4B5563"
             android:gravity="center"
             android:lineSpacingExtra="2dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="12dp"/>
 
         <!-- Sección de vidas - diseño mejorado -->
         <LinearLayout
@@ -63,18 +69,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="12dp"
+            android:padding="10dp"
             android:background="#F9FAFB"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tus vidas:"
-                android:textSize="13sp"
+                android:textSize="11sp"
                 android:textColor="#6B7280"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="6dp"/>
 
             <LinearLayout
                 android:id="@+id/llCorazones"
@@ -88,14 +94,16 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEntendido"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:text="Entendido"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textStyle="bold"
-            app:cornerRadius="10dp"
+            app:cornerRadius="12dp"
             android:elevation="2dp"/>
 
     </LinearLayout>
+    
+    </ScrollView>
 
 </com.google.android.material.card.MaterialCardView>

@@ -385,6 +385,14 @@ public class ResultadoAcademicoActivity extends AppCompatActivity {
     
     private int obtenerColorArea(String claveArea) {
         if (claveArea == null) return 0xFFB6B9C2;
+        String a = claveArea.toLowerCase().trim();
+        
+        // Isla del Conocimiento / Todas las áreas - Amarillo
+        if (a.contains("conocimiento") || a.contains("isla") || 
+            (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+            return 0xFFFFC107; // Amarillo
+        }
+        
         switch (claveArea) {
             case "Matematicas": return 0xFFE53935; // Rojo
             case "Lenguaje": return 0xFF1E88E5; // Azul

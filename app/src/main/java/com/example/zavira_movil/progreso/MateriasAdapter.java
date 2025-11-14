@@ -14,6 +14,7 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +92,13 @@ public class MateriasAdapter extends RecyclerView.Adapter<MateriasAdapter.VH> {
                 h.pb.setProgressDrawable(d);
             }
         }
+        
+        // === Aplicar borde del color del área al card ===
+        if (h.itemView instanceof MaterialCardView) {
+            MaterialCardView card = (MaterialCardView) h.itemView;
+            card.setStrokeWidth(2);
+            card.setStrokeColor(color);
+        }
     }
 
     @Override public int getItemCount() { return lista.size(); }
@@ -120,6 +128,12 @@ public class MateriasAdapter extends RecyclerView.Adapter<MateriasAdapter.VH> {
         String a = java.text.Normalizer.normalize(area, java.text.Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+","")
                 .trim().toLowerCase();
+
+        // Isla del Conocimiento / Todas las áreas - Amarillo
+        if (a.contains("conocimiento") || a.contains("isla") || 
+            (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+            return ContextCompat.getColor(v.getContext(), R.color.area_conocimiento);
+        }
 
         if (a.startsWith("mate"))   return ContextCompat.getColor(v.getContext(), R.color.area_matematicas);
         if (a.startsWith("leng"))   return ContextCompat.getColor(v.getContext(), R.color.area_lenguaje);

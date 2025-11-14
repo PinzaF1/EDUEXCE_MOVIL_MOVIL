@@ -2,26 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_islas"
-        android:icon="@drawable/ic_home_24"
-        android:title="Inicio"/>
-
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/nav_home" />
     <item
         android:id="@+id/nav_progreso"
-        android:icon="@drawable/ic_stats_24"
-        android:title="Progreso"/>
-
+        android:icon="@drawable/ic_nav_progress"
+        android:title="@string/nav_progress" />
     <item
         android:id="@+id/nav_logros"
-        android:icon="@drawable/ic_trophy_24"
-        android:title="Logros"/>
-
+        android:icon="@drawable/ic_nav_achievements"
+        android:title="@string/nav_achievements" />
     <item
         android:id="@+id/nav_retos"
-        android:icon="@drawable/ic_swords_24"
-        android:title="Retos"/>
-
+        android:icon="@drawable/ic_nav_challenges"
+        android:title="@string/nav_challenges" />
     <item
-        android:id="@+id/nav_perfil"
-        android:icon="@drawable/ic_profile_24"
-        android:title="Perfil"/>
+        android:id="@+id/nav_ra"
+        android:icon="@drawable/ic_nav_ra"
+        android:title="RA" />
 </menu>

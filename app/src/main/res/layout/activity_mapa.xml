@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <!-- Imagen del mapa completo - Ocupa toda la pantalla -->
+    <!-- CRÍTICO: NO debe interceptar toques - debe permitir que los hotspots capturen los clics -->
+    <ImageView
+        android:id="@+id/ivMapa"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Mapa de la materia"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:longClickable="false"
+        android:fitsSystemWindows="false"
+        android:elevation="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Header con botón de regreso - Flotante sobre el mapa, con efecto blur -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerMapa"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_header_blur"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:elevation="10dp"
+        android:minHeight="56dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Botón de regreso -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back_24"
+            android:contentDescription="Volver"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@android:color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Título del mapa -->
+        <TextView
+            android:id="@+id/tvMapaTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Mapa"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Contenedor de hotspots de niveles - Invisible sobre el mapa -->
+    <!-- IMPORTANTE: Este contenedor debe estar DESPUÉS de headerMapa en el XML para estar por encima del mapa -->
+    <!-- CRÍTICO: Máxima elevación y NO interceptar toques para que los hotspots individuales capturen los clics -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/hotspotsLevelsContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:elevation="30dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <!-- Hotspot Nivel 1 - Abajo a la derecha (casa con número 1) -->
+
+        <!-- Hotspot Nivel 2 - Abajo a la izquierda, cerca del estanque (casa con número 2) -->
+
+        <!-- Hotspot Nivel 3 - Centro-derecha (casa con número 3) -->
+
+        <!-- Hotspot Nivel 4 - Centro-izquierda (casa con número 4) -->
+        <!-- CRÍTICO: Debe tener constraints a Start Y End para que horizontalBias funcione correctamente -->
+
+        <!-- Hotspot Nivel 5 - Arriba a la derecha, antes del edificio final (casa con número 5) -->
+
+        <!-- Hotspot Examen Final - Edificio grande en la parte superior (centro) -->
+
+        <View
+            android:id="@+id/hotspotLevel1"
+            android:layout_width="208dp"
+            android:layout_height="66dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.945"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.885" />
+
+        <View
+            android:id="@+id/hotspotLevel2"
+            android:layout_width="236dp"
+            android:layout_height="77dp"
+            android:layout_marginStart="16dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.75" />
+
+        <View
+            android:id="@+id/hotspotLevel3"
+            android:layout_width="244dp"
+            android:layout_height="80dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.934"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.605" />
+
+        <View
+            android:id="@+id/hotspotLevel4"
+            android:layout_width="190dp"
+            android:layout_height="76dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:elevation="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.463" />
+
+        <View
+            android:id="@+id/hotspotLevel5"
+            android:layout_width="220dp"
+            android:layout_height="84dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.94"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.282" />
+
+        <View
+            android:id="@+id/hotspotExamenFinal"
+            android:layout_width="146dp"
+            android:layout_height="79dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.597"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.055" />
+
+        <!-- Hotspots de Conocimiento - FÁCIL y DIFÍCIL (solo para mapa de Conocimiento) -->
+        <!-- Las posiciones se aplican dinámicamente desde getHotspotPositionsConocimiento() -->
+        <!-- FÁCIL: Parte inferior del mapa (isla pequeña) -->
+        <View
+            android:id="@+id/hotspotConocimientoFacil"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- DIFÍCIL: Parte superior del mapa (arriba a la derecha del edificio naranja) -->
+        <View
+            android:id="@+id/hotspotConocimientoDificil"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
