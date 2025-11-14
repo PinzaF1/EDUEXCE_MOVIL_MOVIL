@@ -1,70 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rootBadge"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/bg_badge_pendiente"
-    android:gravity="center_vertical">
+    android:layout_margin="8dp">
 
-    <!-- Icono más pequeño -->
-    <ImageView
-        android:id="@+id/ivIcon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/bg_acomodador"
-        android:contentDescription="@string/app_name" />
+    <View
+        android:id="@+id/rootBadge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_badge_pendiente" />
 
-    <!-- Contenedor de textos -->
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginStart="10dp">
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
 
+        <!-- Icono grande centrado -->
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/bg_acomodador"
+            android:contentDescription="@string/app_name"
+            android:scaleType="fitCenter" />
+
+        <!-- Nombre/Título -->
         <TextView
             android:id="@+id/tvNombre"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:textStyle="bold"
             android:textColor="#1F2937"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:gravity="center"
+            android:maxLines="3" />
 
+        <!-- Descripción -->
         <TextView
             android:id="@+id/tvDescripcion"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="12sp"
-            android:textColor="#666" />
-
-        <TextView
-            android:id="@+id/tvArea"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:textSize="11sp"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/bg_pill"
-            android:textColor="#4b5563"/>
-    </LinearLayout>
+            android:textColor="#666"
+            android:gravity="center"
+            android:maxLines="4" />
 
-    <!-- Estado compacto -->
-    <TextView
-        android:id="@+id/tvEstado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pendiente"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        android:padding="4dp"/>
-</LinearLayout>
+        <!-- Estado -->
+        <TextView
+            android:id="@+id/tvEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Pendiente"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:background="@drawable/bg_pill" />
+    </LinearLayout>
+</FrameLayout>
 
 
 

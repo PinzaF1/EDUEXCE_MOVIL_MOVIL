@@ -1,8 +1,10 @@
 package com.example.zavira_movil.detalleprogreso;
 
+import android.graphics.Color;
 import android.view.*;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.zavira_movil.R;
@@ -21,10 +23,26 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.VH> {
     }
 
     @Override public void onBindViewHolder(@NonNull VH h, int pos) {
-        if (pos == 0) { h.title.setText("Preguntas respondidas"); h.value.setText(String.valueOf(total)); }
-        else if (pos == 1) { h.title.setText("Respuestas correctas"); h.value.setText(String.valueOf(correctas)); }
-        else if (pos == 2) { h.title.setText("Respuestas incorrectas"); h.value.setText(String.valueOf(incorrectas)); }
-        else { h.title.setText("Tiempo empleado"); h.value.setText(toMin(tiempoSeg)); }
+        if (pos == 0) { 
+            h.title.setText("Preguntas respondidas"); 
+            h.value.setText(String.valueOf(total));
+            h.value.setTextColor(Color.BLACK);
+        }
+        else if (pos == 1) { 
+            h.title.setText("Respuestas correctas"); 
+            h.value.setText(String.valueOf(correctas));
+            h.value.setTextColor(ContextCompat.getColor(h.itemView.getContext(), R.color.green_success));
+        }
+        else if (pos == 2) { 
+            h.title.setText("Respuestas incorrectas"); 
+            h.value.setText(String.valueOf(incorrectas));
+            h.value.setTextColor(ContextCompat.getColor(h.itemView.getContext(), R.color.red_error));
+        }
+        else { 
+            h.title.setText("Tiempo empleado"); 
+            h.value.setText(toMin(tiempoSeg));
+            h.value.setTextColor(ContextCompat.getColor(h.itemView.getContext(), R.color.blue_time));
+        }
     }
 
     @Override public int getItemCount() { return 4; }

@@ -438,15 +438,25 @@ public class SubjectDetailActivity extends AppCompatActivity {
             if (area == null) return Color.parseColor("#B6B9C2");
             String a = area.toLowerCase().trim();
             
-            if (a.contains("matem")) return ContextCompat.getColor(context, R.color.area_matematicas);
-            if (a.contains("lengua") || a.contains("lectura") || a.contains("espa")) 
-                return ContextCompat.getColor(context, R.color.area_lenguaje);
-            if (a.contains("social") || a.contains("ciudad")) 
-                return ContextCompat.getColor(context, R.color.area_sociales);
-            if (a.contains("cien") || a.contains("biolo") || a.contains("fis") || a.contains("quim")) 
-                return ContextCompat.getColor(context, R.color.area_ciencias);
-            if (a.contains("ingl")) 
-                return ContextCompat.getColor(context, R.color.area_ingles);
+            // Isla del Conocimiento / Todas las áreas - Amarillo
+            if (a.contains("conocimiento") || a.contains("isla") || 
+                (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+                return ContextCompat.getColor(context, R.color.area_conocimiento);
+            }
+            
+            try {
+                if (a.contains("matem")) return ContextCompat.getColor(context, R.color.area_matematicas);
+                if (a.contains("lengua") || a.contains("lectura") || a.contains("espa") || a.contains("critica")) 
+                    return ContextCompat.getColor(context, R.color.area_lenguaje);
+                if (a.contains("social") || a.contains("ciudad")) 
+                    return ContextCompat.getColor(context, R.color.area_sociales);
+                if (a.contains("cien") || a.contains("biolo") || a.contains("fis") || a.contains("quim")) 
+                    return ContextCompat.getColor(context, R.color.area_ciencias);
+                if (a.contains("ingl")) 
+                    return ContextCompat.getColor(context, R.color.area_ingles);
+            } catch (Exception e) {
+                return Color.parseColor("#B6B9C2");
+            }
             
             return Color.parseColor("#B6B9C2");
         }

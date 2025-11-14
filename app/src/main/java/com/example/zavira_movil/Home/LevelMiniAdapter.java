@@ -278,6 +278,12 @@ public class LevelMiniAdapter extends RecyclerView.Adapter<LevelMiniAdapter.Hold
         String a = area.toLowerCase().trim();
         
         try {
+            // Isla del Conocimiento / Todas las áreas - Amarillo
+            if (a.contains("conocimiento") || a.contains("isla") || 
+                (a.contains("todas") && (a.contains("area") || a.contains("área")))) {
+                return ContextCompat.getColor(context, R.color.area_conocimiento);
+            }
+            
             if (a.contains("matem")) return ContextCompat.getColor(context, R.color.area_matematicas);
             if (a.contains("lengua") || a.contains("lectura") || a.contains("espa") || a.contains("critica")) 
                 return ContextCompat.getColor(context, R.color.area_lenguaje);

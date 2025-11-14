@@ -1,79 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardDialog"
-    android:layout_width="280dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="20dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
-    app:cardBackgroundColor="@android:color/white">
+    android:layout_margin="20dp">
+
+    <!-- Fondo con borde de color (se aplica dinámicamente) -->
+    <View
+        android:id="@+id/rootBadge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_badge_pendiente" />
 
     <LinearLayout
         android:id="@+id/dialogRoot"
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:background="@android:color/white">
 
-        <!-- Icono circular con fondo -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_icono_circular"
-            android:padding="10dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center">
+        <!-- Icono grande de la insignia -->
+        <ImageView
+            android:id="@+id/ivIconoInsignia"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="Icono de insignia"
+            android:layout_marginBottom="12dp"/>
 
-            <ImageView
-                android:id="@+id/ivIconoInsignia"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:scaleType="fitCenter"
-                android:src="@android:drawable/star_big_on"
-                android:contentDescription="Icono de insignia"/>
-        </LinearLayout>
-
-        <!-- Título -->
+        <!-- Nombre de la insignia -->
         <TextView
-            android:id="@+id/tvTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="¡Insignia Obtenida!"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#1F2937"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Mensaje -->
-        <TextView
-            android:id="@+id/tvMensaje"
+            android:id="@+id/tvNombreInsignia"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="¡Felicitaciones! Has aprobado el Examen Final y has obtenido una insignia por tu excelente desempeño."
-            android:textSize="13sp"
-            android:textColor="#4B5563"
+            android:text="Isla completa: Matemáticas"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937"
             android:gravity="center"
-            android:lineSpacingExtra="2dp"
+            android:maxLines="2"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Descripción -->
+        <TextView
+            android:id="@+id/tvDescripcionInsignia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Completaste todas las paradas del área de Matemáticas."
+            android:textSize="12sp"
+            android:textColor="#666"
+            android:gravity="center"
+            android:maxLines="3"
             android:layout_marginBottom="16dp"/>
 
         <!-- Botón Continuar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnContinuar"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:text="Continuar"
             android:textColor="@android:color/white"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:cornerRadius="10dp"
+            app:cornerRadius="12dp"
             android:elevation="2dp"/>
 
     </LinearLayout>
+    
+    <!-- No hay overlay gris en el diálogo porque siempre se muestra cuando se gana la insignia -->
 
-</com.google.android.material.card.MaterialCardView>
+</FrameLayout>
 
 
 

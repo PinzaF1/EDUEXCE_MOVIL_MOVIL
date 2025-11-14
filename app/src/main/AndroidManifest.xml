@@ -50,6 +50,9 @@
             android:name=".niveleshome.SubjectDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".niveleshome.MapaActivity"
+            android:exported="false" />
+        <activity
             android:name=".niveleshome.QuizActivity"
             android:exported="false" />
         <activity
@@ -61,6 +64,9 @@
             android:exported="false" />
         <activity
             android:name=".Perfil.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Perfil.Modelo3DRAActivity"
             android:exported="false" /> <!-- Islas / Simulacros -->
         <activity
             android:name=".HislaConocimiento.IslaSimulacroActivity"

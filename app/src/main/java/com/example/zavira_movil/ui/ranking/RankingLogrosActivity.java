@@ -1,14 +1,17 @@
 package com.example.zavira_movil.ui.ranking;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +36,8 @@ public class RankingLogrosActivity extends AppCompatActivity {
     private RecyclerView rvTop;
     private RecyclerView rvBadges;          // NUEVO
     private TextView tvUserInitials, tvUserName, tvUserRank, tvUserPoints;
+    private ImageView ivMedal;
+    private TextView tvMedalNumber;
 
     // Data
     private final List<RankingResponse.Item> top = new ArrayList<>();
@@ -74,6 +79,8 @@ public class RankingLogrosActivity extends AppCompatActivity {
         tvUserName     = findViewById(R.id.tvUserName);
         tvUserRank     = findViewById(R.id.tvUserRank);
         tvUserPoints   = findViewById(R.id.tvUserPoints);
+        ivMedal        = findViewById(R.id.ivMedal);
+        tvMedalNumber  = findViewById(R.id.tvMedalNumber);
     }
 
     private void setupTabs() {
@@ -99,9 +106,17 @@ public class RankingLogrosActivity extends AppCompatActivity {
         rvTop.setAdapter(adapter);
 
         // Mis Logros
-        rvBadges.setLayoutManager(new LinearLayoutManager(this));
-        rvBadges.setNestedScrollingEnabled(false);
         badgesAdapter = new BadgesAdapter();
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                // Headers ocupan 2 columnas, items ocupan 1
+                return badgesAdapter.getItemViewType(position) == BadgesAdapter.Row.TYPE_HEADER ? 2 : 1;
+            }
+        });
+        rvBadges.setLayoutManager(gridLayoutManager);
+        rvBadges.setNestedScrollingEnabled(false);
         rvBadges.setAdapter(badgesAdapter);
     }
 
@@ -133,20 +148,68 @@ public class RankingLogrosActivity extends AppCompatActivity {
                     if (me == null) me = data.getPosiciones().get(0);
 
                     String nombre = me.getNombre() == null ? "Estudiante" : me.getNombre();
-                    tvUserName.setText(nombre);
-                    tvUserRank.setText("Puesto #" + (me.getPosicion() == null ? data.getPosicion() : me.getPosicion())
-                            + " en el ranking general");
+                    // Formatear nombre para mostrar solo primer nombre y primer apellido
+                    String nombreFormateado = formatearNombre(nombre);
+                    tvUserName.setText(nombreFormateado);
+                    
+                    // Obtener posición
+                    int posicion = me.getPosicion() != null ? me.getPosicion() : 
+                                   (data.getPosicion() != null ? data.getPosicion() : 0);
+                    
+                    // Configurar texto según posición
+                    String textoRanking;
+                    if (posicion == 1) {
+                        textoRanking = "Estás en el primer lugar del ranking";
+                    } else if (posicion == 2) {
+                        textoRanking = "Estás en el segundo lugar del ranking";
+                    } else if (posicion == 3) {
+                        textoRanking = "Estás en el tercer lugar del ranking";
+                    } else {
+                        textoRanking = "Estás en el lugar #" + posicion + " del ranking";
+                    }
+                    tvUserRank.setText(textoRanking);
                     tvUserPoints.setText(String.valueOf(me.getPromedio()));
 
-                    // Iniciales
-                    String ini = "JP";
-                    String[] parts = nombre.trim().split("\\s+");
-                    if (parts.length >= 2) {
-                        ini = (parts[0].substring(0,1) + parts[parts.length-1].substring(0,1)).toUpperCase();
-                    } else if (parts.length == 1 && parts[0].length() >= 1) {
-                        ini = parts[0].substring(0,1).toUpperCase();
+                    // Configurar visualización según posición
+                    if (posicion >= 1 && posicion <= 3) {
+                        // Mostrar medalla con número para posiciones 1-3
+                        // Ocultar iniciales
+                        tvUserInitials.setVisibility(View.GONE);
+                        
+                        // Mostrar medalla y número
+                        ivMedal.setVisibility(View.VISIBLE);
+                        tvMedalNumber.setVisibility(View.VISIBLE);
+                        tvMedalNumber.setText(String.valueOf(posicion));
+                        
+                        // Aplicar medalla según posición
+                        if (posicion == 1) {
+                            // Oro - primer lugar
+                            ivMedal.setImageResource(R.drawable.medallaoro);
+                        } else if (posicion == 2) {
+                            // Plata - segundo lugar
+                            ivMedal.setImageResource(R.drawable.medallaplata);
+                        } else if (posicion == 3) {
+                            // Bronce - tercer lugar
+                            ivMedal.setImageResource(R.drawable.medallabronce);
+                        }
+                    } else {
+                        // Mostrar iniciales para posición 4+
+                        // Ocultar medalla
+                        ivMedal.setVisibility(View.GONE);
+                        tvMedalNumber.setVisibility(View.GONE);
+                        
+                        // Mostrar iniciales
+                        tvUserInitials.setVisibility(View.VISIBLE);
+                        String ini = "JP";
+                        String[] parts = nombreFormateado.trim().split("\\s+");
+                        if (parts.length >= 2) {
+                            ini = (parts[0].substring(0,1) + parts[parts.length-1].substring(0,1)).toUpperCase();
+                        } else if (parts.length == 1 && parts[0].length() >= 1) {
+                            ini = parts[0].substring(0,1).toUpperCase();
+                        }
+                        tvUserInitials.setText(ini);
+                        tvUserInitials.setBackgroundResource(R.drawable.bg_estilo2);
                     }
-                    tvUserInitials.setText(ini);
                 }
             }
 
@@ -178,7 +241,6 @@ public class RankingLogrosActivity extends AppCompatActivity {
                         rows.add(BadgesAdapter.Row.item(b, true));
                     }
                 }
-                rows.add(BadgesAdapter.Row.header("Pendientes"));
                 if (data.getPendientes() != null) {
                     for (LogrosResponse.Badge b : data.getPendientes()) {
                         rows.add(BadgesAdapter.Row.item(b, false));
@@ -195,6 +257,31 @@ public class RankingLogrosActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Formatea el nombre completo para mostrar solo primer nombre y primer apellido
+     */
+    private String formatearNombre(String nombreCompleto) {
+        if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
+            return "Estudiante";
+        }
+        
+        String nombre = nombreCompleto.trim();
+        String[] partes = nombre.split("\\s+");
+        
+        if (partes.length == 0) {
+            return "Estudiante";
+        } else if (partes.length == 1) {
+            return partes[0];
+        } else if (partes.length == 2) {
+            // Si hay 2 palabras: primera es nombre, segunda es apellido
+            return partes[0] + " " + partes[1];
+        } else {
+            // Si hay 3 o más palabras: primera es primer nombre, tercera es primer apellido
+            // (asumiendo estructura: Nombre SegundoNombre Apellido1 Apellido2)
+            return partes[0] + " " + partes[2];
+        }
+    }
     // -----------------------------------------------------
 
     /* -------- Adaptador simple para Top 5 -------- */
@@ -203,23 +290,84 @@ public class RankingLogrosActivity extends AppCompatActivity {
         TopAdapter(List<RankingResponse.Item> d) { this.data = d; }
 
         static class VH extends RecyclerView.ViewHolder {
-            TextView tvTitle, tvRight;
+            TextView tvRank, tvName, tvPointsSmall, tvPointsRight;
+            ImageView ivMedal;
+            TextView tvMedalNumber;
+            View bgRow;
             VH(@NonNull View v) {
                 super(v);
-                tvTitle = v.findViewById(android.R.id.text1);
-                tvRight = v.findViewById(android.R.id.text2);
+                tvRank        = v.findViewById(R.id.tvRank);
+                tvName        = v.findViewById(R.id.tvName);
+                tvPointsSmall = v.findViewById(R.id.tvPointsSmall);
+                tvPointsRight = v.findViewById(R.id.tvPointsRight);
+                ivMedal       = v.findViewById(R.id.ivMedal);
+                tvMedalNumber = v.findViewById(R.id.tvMedalNumber);
+                bgRow         = v.findViewById(R.id.bgRow);
             }
         }
 
         @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int viewType) {
-            View v = View.inflate(p.getContext(), android.R.layout.simple_list_item_2, null);
+            View v = LayoutInflater.from(p.getContext())
+                    .inflate(R.layout.item_top_student, p, false);
             return new VH(v);
         }
 
         @Override public void onBindViewHolder(@NonNull VH h, int pos) {
             RankingResponse.Item it = data.get(pos);
-            h.tvTitle.setText((pos + 1) + ". " + (it.getNombre() == null ? "—" : it.getNombre()));
-            h.tvRight.setText(it.getPromedio() + " pts");
+            int rank = pos + 1;
+            
+            // Configurar visualización según posición
+            if (rank >= 1 && rank <= 3) {
+                // Mostrar medalla con número para posiciones 1-3
+                // Ocultar TextView de rank normal
+                h.tvRank.setVisibility(View.GONE);
+                
+                // Mostrar medalla y número
+                h.ivMedal.setVisibility(View.VISIBLE);
+                h.tvMedalNumber.setVisibility(View.VISIBLE);
+                h.tvMedalNumber.setText(String.valueOf(rank));
+                
+                // Aplicar medalla según posición
+                if (rank == 1) {
+                    // Oro - primer lugar
+                    h.ivMedal.setImageResource(R.drawable.medallaoro);
+                    if (h.bgRow != null) {
+                        h.bgRow.setBackgroundResource(R.drawable.bg_card_border_oro);
+                    }
+                } else if (rank == 2) {
+                    // Plata - segundo lugar
+                    h.ivMedal.setImageResource(R.drawable.medallaplata);
+                    if (h.bgRow != null) {
+                        h.bgRow.setBackgroundResource(R.drawable.bg_card_border_plata);
+                    }
+                } else if (rank == 3) {
+                    // Bronce - tercer lugar
+                    h.ivMedal.setImageResource(R.drawable.medallabronce);
+                    if (h.bgRow != null) {
+                        h.bgRow.setBackgroundResource(R.drawable.bg_card_border_bronce);
+                    }
+                }
+            } else {
+                // Mostrar número normal para posición 4+
+                // Ocultar medalla
+                h.ivMedal.setVisibility(View.GONE);
+                h.tvMedalNumber.setVisibility(View.GONE);
+                
+                // Mostrar TextView de rank normal
+                h.tvRank.setVisibility(View.VISIBLE);
+                h.tvRank.setText(String.valueOf(rank));
+                
+                // Borde blanco para posición 4+
+                if (h.bgRow != null) {
+                    h.bgRow.setBackgroundResource(R.drawable.bg_card_white);
+                }
+            }
+            
+            String nombre = (it.getNombre() == null || it.getNombre().trim().isEmpty()) ? "—" : it.getNombre();
+            h.tvName.setText(nombre);
+
+            int puntos = it.getPromedio();
+            h.tvPointsRight.setText(String.valueOf(puntos));
         }
 
         @Override public int getItemCount() { return data.size(); }

@@ -3,18 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardDialog"
-    android:layout_width="280dp"
+    android:layout_width="260dp"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
+    android:clipToOutline="true"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:padding="16dp"
         android:gravity="center_horizontal">
 
         <!-- Icono circular con fondo -->
@@ -22,14 +23,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_icono_circular"
-            android:padding="10dp"
-            android:layout_marginBottom="12dp"
+            android:padding="8dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center">
             
             <ImageView
                 android:id="@+id/ivIconoVida"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_revert"
                 android:contentDescription="Icono de vida"
                 android:tint="#FF9800"/>
@@ -41,10 +42,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Necesitas Practicar Más"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#1F2937"
-            android:layout_marginBottom="6dp"/>
+            android:layout_marginBottom="4dp"/>
 
         <!-- Subtítulo -->
         <TextView
@@ -52,9 +53,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Obtuviste 0 de 5 respuestas correctas"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textColor="#4B5563"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="12dp"/>
 
         <!-- Sección de vidas - diseño mejorado -->
         <LinearLayout
@@ -62,18 +63,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="12dp"
+            android:padding="10dp"
             android:background="#F9FAFB"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vidas en:"
-                android:textSize="13sp"
+                android:textSize="11sp"
                 android:textColor="#6B7280"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="6dp"/>
 
             <LinearLayout
                 android:id="@+id/llCorazones"
@@ -88,21 +89,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Te quedan 2 vidas"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#6B7280"
                 android:textStyle="bold"/>
         </LinearLayout>
+
+        <!-- Mensaje de tiempo de recarga (cuando hay vidas pero se perdió una) -->
+        <TextView
+            android:id="@+id/tvTiempoRecarga"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="La vida se recarga en 5 minutos"
+            android:textSize="11sp"
+            android:textColor="#6B7280"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"/>
 
         <!-- Mensaje de regeneración (solo cuando no hay vidas) -->
         <TextView
             android:id="@+id/tvRegeneracion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sin vidas - Regeneran en 24h"
-            android:textSize="12sp"
+            android:text="Sin vidas - Regeneran en 5 minutos"
+            android:textSize="11sp"
             android:textColor="#6B7280"
             android:textStyle="bold"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="4dp"
             android:visibility="gone"/>
 
         <!-- Mensaje final (solo cuando no hay vidas) -->
@@ -110,39 +124,69 @@
             android:id="@+id/tvMensajeFinal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sin vidas disponibles. Las vidas se regeneran cada 24 horas."
-            android:textSize="12sp"
+            android:text="Sin vidas disponibles. Las vidas se recargan cada 5 minutos."
+            android:textSize="11sp"
             android:textColor="#6B7280"
             android:gravity="center"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"/>
+        
+        <!-- Mensaje de recarga por detalle -->
+        <TextView
+            android:id="@+id/tvMensajeDetalle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Quieres ver el detalle para recargar media vida?"
+            android:textSize="12sp"
+            android:textColor="#4B5563"
+            android:gravity="center"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"/>
+
+        <!-- Botón para ir al detalle (solo si no se ha usado) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerDetalle"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:text="Ver Detalle (Recarga media vida)"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:icon="@android:drawable/ic_menu_view"
+            app:iconTint="@android:color/white"
+            app:iconSize="16dp"
+            app:cornerRadius="12dp"
+            android:elevation="2dp"
+            android:layout_marginTop="2dp"
             android:visibility="gone"/>
 
         <!-- Botón de acción -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnUsarVida"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Usar 1 Vida (2 restantes)"
+            android:layout_height="42dp"
+            android:text="Reintentar"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             app:icon="@android:drawable/ic_menu_revert"
             app:iconTint="@android:color/white"
-            app:cornerRadius="10dp"
+            app:iconSize="16dp"
+            app:cornerRadius="12dp"
             android:elevation="2dp"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="2dp"/>
 
         <!-- Botón cancelar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelar"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:text="Cancelar"
             android:textColor="#6B7280"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:backgroundTint="@android:color/transparent"
-            app:cornerRadius="10dp"
-            android:layout_marginTop="4dp"/>
+            app:cornerRadius="12dp"
+            android:layout_marginTop="2dp"/>
 
     </LinearLayout>
 

@@ -5,11 +5,33 @@
 
         <TextView android:id="@+id/tvMensaje"
             android:text="¡Buen trabajo!" android:textSize="16sp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_width="match_parent" 
+            android:layout_height="wrap_content"/>
 
-        <TextView android:id="@+id/tvNivelActual"
-            android:text="Nivel actual: -" android:layout_marginTop="6dp"
-            android:textColor="#666" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:id="@+id/llNivelActual"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:layout_marginTop="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView android:id="@+id/tvNivelActual"
+                android:text="Nivel actual: -" 
+                android:textColor="#000000" 
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/tvNivelActualValue"
+                android:text="-"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStats"

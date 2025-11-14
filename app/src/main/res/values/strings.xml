@@ -15,5 +15,12 @@
     <string name="default_notification_channel_name">Notificaciones de EduExce</string>
     <string name="notification_title">Nueva notificación</string>
     <string name="notification_message">Tienes una nueva notificación</string>
+    
+    <!-- Navegación inferior -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_progress">Progreso</string>
+    <string name="nav_achievements">Logros</string>
+    <string name="nav_challenges">Retos</string>
+    <string name="nav_profile">Perfil</string>
 
 </resources>

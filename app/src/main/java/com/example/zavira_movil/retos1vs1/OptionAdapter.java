@@ -54,10 +54,10 @@ public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.VH> {
 
         // Aplicar estilos según si está seleccionada o no
         if (isSelected) {
-            // Fondo verde claro, texto verde oscuro, mostrar checkmark
+            // Fondo gris claro, texto gris oscuro, mostrar checkmark
             h.itemView.setSelected(true);
-            h.key.setTextColor(0xFF22C55E); // Verde oscuro
-            h.text.setTextColor(0xFF22C55E); // Verde oscuro
+            h.key.setTextColor(0xFF6B7280); // Gris oscuro
+            h.text.setTextColor(0xFF6B7280); // Gris oscuro
             h.checkmark.setVisibility(View.VISIBLE);
         } else {
             // Fondo gris claro, texto gris oscuro, ocultar checkmark

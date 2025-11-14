@@ -15,7 +15,7 @@
         android:paddingTop="48dp"
         android:paddingBottom="32dp">
 
-        <!-- Header con título y progreso -->
+        <!-- Header con título, progreso y vidas -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,6 +33,33 @@
                 android:textSize="16sp"
                 android:textColor="#111827"
                 android:gravity="center"/>
+
+            <!-- Contenedor de vidas (visible solo para niveles 2+) -->
+            <LinearLayout
+                android:id="@+id/llVidasContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/llVidas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvTiempoRecarga"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:visibility="gone"/>
+            </LinearLayout>
         </LinearLayout>
 
         <!-- ProgressBar oculto por defecto - NO mostrar pantalla de carga -->

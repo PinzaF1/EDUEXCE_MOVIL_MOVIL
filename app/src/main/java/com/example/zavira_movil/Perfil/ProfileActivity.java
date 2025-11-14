@@ -45,25 +45,11 @@ public class ProfileActivity extends AppCompatActivity {
             topAppBar.setNavigationOnClickListener(v -> finish());
         }
 
-        // Tabs (ya vienen en el XML con TabItem)
-        tabLayout = findViewById(R.id.tabLayout);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override public void onTabSelected(TabLayout.Tab tab) {
-                swapTo(tab.getPosition());
-            }
-            @Override public void onTabUnselected(TabLayout.Tab tab) { }
-            @Override public void onTabReselected(TabLayout.Tab tab) { }
-        });
-
-        // Estado inicial
+        // Estado inicial - solo mostrar PerfilFragment
         if (savedInstanceState == null) {
-            TabLayout.Tab t = tabLayout.getTabAt(TAB_PERFIL);
-            if (t != null) t.select();
             swapTo(TAB_PERFIL);
         } else {
             int last = savedInstanceState.getInt(KEY_SELECTED, TAB_PERFIL);
-            TabLayout.Tab t = tabLayout.getTabAt(last);
-            if (t != null) t.select();
             swapTo(last, /*force=*/false);
         }
     }

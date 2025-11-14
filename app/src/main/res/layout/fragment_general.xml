@@ -23,8 +23,8 @@
             app:cardUseCompatPadding="true"
             app:cardElevation="6dp"
             app:cardBackgroundColor="@color/card_surface"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/card_stroke_blue">
+            app:strokeWidth="2dp"
+            app:strokeColor="#2563EB">
 
             <LinearLayout
                 android:layout_width="match_parent"

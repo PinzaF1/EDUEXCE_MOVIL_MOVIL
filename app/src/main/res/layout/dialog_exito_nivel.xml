@@ -3,18 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardDialog"
-    android:layout_width="280dp"
+    android:layout_width="260dp"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
+    android:clipToOutline="true"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:padding="16dp"
         android:gravity="center_horizontal">
 
         <!-- Icono circular con fondo -->
@@ -22,16 +23,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_icono_circular"
-            android:padding="10dp"
-            android:layout_marginBottom="12dp"
+            android:padding="8dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center">
             
             <TextView
                 android:id="@+id/ivIconoVida"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:text="✓"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:gravity="center"
                 android:textColor="#43A047"
                 android:textStyle="bold"/>
@@ -43,10 +44,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="¡Felicitaciones!"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#1F2937"
-            android:layout_marginBottom="6dp"/>
+            android:layout_marginBottom="4dp"/>
 
         <!-- Mensaje -->
         <TextView
@@ -54,22 +55,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Pasaste al siguiente nivel"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textColor="#4B5563"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="12dp"/>
 
         <!-- Botón Continuar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnContinuar"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:text="Continuar"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textStyle="bold"
-            app:cornerRadius="10dp"
+            app:cornerRadius="12dp"
             android:elevation="2dp"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="2dp"/>
 
     </LinearLayout>
 
