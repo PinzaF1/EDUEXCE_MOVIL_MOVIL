@@ -71,6 +71,17 @@
             app:tabTextColor="@android:color/white"
             app:tabRippleColor="@android:color/transparent" />
 
+        <!-- ProgressBar de carga -->
+        <ProgressBar
+            android:id="@+id/progressRanking"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:visibility="gone" />
+
         <!-- Vista Ranking -->
         <LinearLayout
             android:id="@+id/viewRanking"

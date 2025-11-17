@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class RankingLogrosFragment extends Fragment {
     private TextView tvUserInitials, tvUserName, tvUserRank, tvUserPoints;
     private ImageView ivMedal;
     private TextView tvMedalNumber;
+    private ProgressBar progressRanking;
 
     private final List<RankingResponse.Item> top = new ArrayList<>();
     private TopAdapter adapter;
@@ -140,6 +142,7 @@ public class RankingLogrosFragment extends Fragment {
         tvUserPoints   = root.findViewById(R.id.tvUserPoints);
         ivMedal        = root.findViewById(R.id.ivMedal);
         tvMedalNumber  = root.findViewById(R.id.tvMedalNumber);
+        progressRanking = root.findViewById(R.id.progressRanking);
     }
 
     private void setupTabs() {
@@ -204,11 +207,42 @@ public class RankingLogrosFragment extends Fragment {
 
     /** Carga ranking y pinta la tarjeta del usuario */
     private void loadRanking() {
+        // Mostrar loading
+        if (progressRanking != null) progressRanking.setVisibility(View.VISIBLE);
+        if (viewRanking != null) viewRanking.setVisibility(View.GONE);
+
         api.getRanking().enqueue(new Callback<RankingResponse>() {
             @Override
             public void onResponse(@NonNull Call<RankingResponse> call, @NonNull Response<RankingResponse> resp) {
+                // Ocultar loading
+                if (progressRanking != null) progressRanking.setVisibility(View.GONE);
+                if (viewRanking != null) viewRanking.setVisibility(View.VISIBLE);
+
                 if (!resp.isSuccessful() || resp.body() == null) {
-                    Toast.makeText(requireContext(), "No se pudo cargar ranking", Toast.LENGTH_SHORT).show();
+                    // Usar ErrorHandler para mostrar error
+                    if (!resp.isSuccessful()) {
+                        com.example.zavira_movil.utils.ErrorHandler.handleHttpError(
+                            requireContext(),
+                            resp,
+                            () -> loadRanking() // Reintentar
+                        );
+                    } else {
+                        // Body es null
+                        com.example.zavira_movil.utils.ErrorHandler.ErrorInfo errorInfo =
+                            new com.example.zavira_movil.utils.ErrorHandler.ErrorInfo(
+                                com.example.zavira_movil.utils.ErrorHandler.ErrorType.SERVER_ERROR,
+                                "Error al Cargar Ranking",
+                                "El servidor no devolvió datos. Por favor, intenta más tarde.",
+                                "Response body is null",
+                                true,
+                                resp.code()
+                            );
+                        com.example.zavira_movil.utils.ErrorHandler.showErrorDialog(
+                            requireContext(),
+                            errorInfo,
+                            () -> loadRanking()
+                        );
+                    }
                     return;
                 }
                 RankingResponse data = resp.body();
@@ -314,7 +348,16 @@ public class RankingLogrosFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<RankingResponse> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "No se pudo cargar ranking", Toast.LENGTH_SHORT).show();
+                // Ocultar loading y mostrar contenido
+                if (progressRanking != null) progressRanking.setVisibility(View.GONE);
+                if (viewRanking != null) viewRanking.setVisibility(View.VISIBLE);
+
+                // Usar ErrorHandler para manejar excepción de red
+                com.example.zavira_movil.utils.ErrorHandler.handleNetworkException(
+                    requireContext(),
+                    t,
+                    () -> loadRanking() // Reintentar
+                );
             }
         });
     }
@@ -351,11 +394,42 @@ public class RankingLogrosFragment extends Fragment {
     }
 
     private void loadBadges() {
+        // Mostrar loading
+        if (progressRanking != null) progressRanking.setVisibility(View.VISIBLE);
+        if (viewLogros != null) viewLogros.setVisibility(View.GONE);
+
         api.getMisLogros().enqueue(new Callback<LogrosResponse>() {
             @Override
             public void onResponse(@NonNull Call<LogrosResponse> call, @NonNull Response<LogrosResponse> resp) {
+                // Ocultar loading
+                if (progressRanking != null) progressRanking.setVisibility(View.GONE);
+                if (viewLogros != null) viewLogros.setVisibility(View.VISIBLE);
+
                 if (!resp.isSuccessful() || resp.body() == null) {
-                    Toast.makeText(requireContext(), "No se pudo cargar logros", Toast.LENGTH_SHORT).show();
+                    // Usar ErrorHandler para mostrar error
+                    if (!resp.isSuccessful()) {
+                        com.example.zavira_movil.utils.ErrorHandler.handleHttpError(
+                            requireContext(),
+                            resp,
+                            () -> loadBadges() // Reintentar
+                        );
+                    } else {
+                        // Body es null
+                        com.example.zavira_movil.utils.ErrorHandler.ErrorInfo errorInfo =
+                            new com.example.zavira_movil.utils.ErrorHandler.ErrorInfo(
+                                com.example.zavira_movil.utils.ErrorHandler.ErrorType.SERVER_ERROR,
+                                "Error al Cargar Logros",
+                                "El servidor no devolvió datos. Por favor, intenta más tarde.",
+                                "Response body is null",
+                                true,
+                                resp.code()
+                            );
+                        com.example.zavira_movil.utils.ErrorHandler.showErrorDialog(
+                            requireContext(),
+                            errorInfo,
+                            () -> loadBadges()
+                        );
+                    }
                     return;
                 }
                 LogrosResponse data = resp.body();
@@ -372,7 +446,16 @@ public class RankingLogrosFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<LogrosResponse> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "No se pudo cargar logros", Toast.LENGTH_SHORT).show();
+                // Ocultar loading y mostrar contenido
+                if (progressRanking != null) progressRanking.setVisibility(View.GONE);
+                if (viewLogros != null) viewLogros.setVisibility(View.VISIBLE);
+
+                // Usar ErrorHandler para manejar excepción de red
+                com.example.zavira_movil.utils.ErrorHandler.handleNetworkException(
+                    requireContext(),
+                    t,
+                    () -> loadBadges() // Reintentar
+                );
             }
         });
     }

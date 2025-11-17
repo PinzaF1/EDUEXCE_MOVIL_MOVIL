@@ -139,13 +139,18 @@ public class QuizActivity extends AppCompatActivity {
         detenerActualizacionVidas();
     }
 
-    private void setLoading(boolean b) {
-        // NO mostrar pantalla de carga - mantener invisible siempre para mejor UX
+    private void setLoading(boolean isLoading) {
+        // Mostrar/ocultar ProgressBar según el estado
         if (binding.progress != null) {
-            binding.progress.setVisibility(View.GONE);
+            binding.progress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         }
-        // El botón se mantiene habilitado para mejor experiencia
-        binding.btnEnviar.setEnabled(true);
+        // Deshabilitar/habilitar botón durante la carga para mejor UX
+        binding.btnEnviar.setEnabled(!isLoading);
+        binding.btnEnviar.setAlpha(isLoading ? 0.5f : 1.0f);
+
+        // Deshabilitar interacción con el RecyclerView durante la carga
+        binding.rvQuestions.setEnabled(!isLoading);
+        binding.rvQuestions.setClickable(!isLoading);
     }
 
     /** Crea sesión y pinta preguntas (máximo 10). */
@@ -189,21 +194,36 @@ public class QuizActivity extends AppCompatActivity {
                 setLoading(false);
 
                 if (!resp.isSuccessful()) {
-                    Toast.makeText(QuizActivity.this,
-                            "No se pudo crear la sesión (HTTP " + resp.code() + ")",
-                            Toast.LENGTH_LONG).show();
                     logIAEvent("Fallo al solicitar preguntas a la API (HTTP " + resp.code() + ")", idSesion, areaApi, subtemaApi, nivel, 0);
-                    finish();
+
+                    // Usar ErrorHandler para mostrar error con opción de reintentar
+                    com.example.zavira_movil.utils.ErrorHandler.handleHttpError(
+                        QuizActivity.this,
+                        resp,
+                        () -> crearParadaYMostrar() // Callback para reintentar
+                    );
                     return;
                 }
 
                 ParadaResponse pr = resp.body();
                 if (pr == null) {
-                    Toast.makeText(QuizActivity.this,
-                            "Servidor respondió " + resp.code() + " sin cuerpo JSON.",
-                            Toast.LENGTH_LONG).show();
                     logIAEvent("Respuesta sin cuerpo JSON de la API", idSesion, areaApi, subtemaApi, nivel, 0);
-                    finish();
+
+                    // Error de servidor sin cuerpo
+                    com.example.zavira_movil.utils.ErrorHandler.ErrorInfo errorInfo =
+                        new com.example.zavira_movil.utils.ErrorHandler.ErrorInfo(
+                            com.example.zavira_movil.utils.ErrorHandler.ErrorType.SERVER_ERROR,
+                            "Error del Servidor",
+                            "El servidor respondió sin contenido. Por favor, intenta más tarde.",
+                            "HTTP " + resp.code() + " sin body",
+                            true,
+                            resp.code()
+                        );
+                    com.example.zavira_movil.utils.ErrorHandler.showErrorDialog(
+                        QuizActivity.this,
+                        errorInfo,
+                        () -> crearParadaYMostrar()
+                    );
                     return;
                 }
 
@@ -253,8 +273,13 @@ public class QuizActivity extends AppCompatActivity {
 
             @Override public void onFailure(Call<ParadaResponse> call, Throwable t) {
                 setLoading(false);
-                Toast.makeText(QuizActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                finish();
+
+                // Usar ErrorHandler para manejar excepción de red
+                com.example.zavira_movil.utils.ErrorHandler.handleNetworkException(
+                    QuizActivity.this,
+                    t,
+                    () -> crearParadaYMostrar() // Callback para reintentar
+                );
             }
         });
     }
@@ -401,27 +426,39 @@ public class QuizActivity extends AppCompatActivity {
                             if (resp2.isSuccessful() && resp2.body() != null) {
                                 onCierreOk(resp2.body());
                             } else {
-                                Toast.makeText(QuizActivity.this,
-                                        "No se pudo cerrar (compat) HTTP " + resp2.code(),
-                                        Toast.LENGTH_LONG).show();
+                                com.example.zavira_movil.utils.ErrorHandler.handleHttpError(
+                                    QuizActivity.this,
+                                    resp2,
+                                    () -> enviarTodasLasRespuestas() // Reintentar envío
+                                );
                             }
                         }
                         @Override public void onFailure(Call<CerrarResponse> call2, Throwable t) {
                             setLoading(false);
-                            Toast.makeText(QuizActivity.this, "Fallo compat: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                            com.example.zavira_movil.utils.ErrorHandler.handleNetworkException(
+                                QuizActivity.this,
+                                t,
+                                () -> enviarTodasLasRespuestas() // Reintentar envío
+                            );
                         }
                     });
                 } else {
                     setLoading(false);
-                    Toast.makeText(QuizActivity.this,
-                            "No se pudo cerrar la sesión (HTTP " + response.code() + ").",
-                            Toast.LENGTH_LONG).show();
+                    com.example.zavira_movil.utils.ErrorHandler.handleHttpError(
+                        QuizActivity.this,
+                        response,
+                        () -> enviarTodasLasRespuestas() // Reintentar envío
+                    );
                 }
             }
 
             @Override public void onFailure(Call<CerrarResponse> call, Throwable t) {
                 setLoading(false);
-                Toast.makeText(QuizActivity.this, "Fallo al cerrar: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                com.example.zavira_movil.utils.ErrorHandler.handleNetworkException(
+                    QuizActivity.this,
+                    t,
+                    () -> enviarTodasLasRespuestas() // Reintentar envío
+                );
             }
         });
     }
