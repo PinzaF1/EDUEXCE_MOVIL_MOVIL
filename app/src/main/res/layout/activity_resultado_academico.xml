@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
+            android:layout_marginTop="34dp"
             android:layout_marginBottom="14dp">
 
             <TextView
@@ -28,14 +29,14 @@
                 android:layout_height="wrap_content"
                 android:text="Resultados del Diagnóstico Inicial"
                 android:textStyle="bold"
-                android:textColor="#403E9A"
+                android:textColor="#1759F2"
                 android:textSize="20sp"/>
 
             <View
                 android:layout_width="42dp"
                 android:layout_height="3dp"
                 android:layout_marginTop="6dp"
-                android:background="#6A64FE"
+                android:background="#251DEF"
                 android:alpha="0.9"/>
         </LinearLayout>
 
@@ -228,7 +229,7 @@
             android:textColor="@android:color/white"
             android:padding="14dp"
             app:cornerRadius="26dp"
-            app:backgroundTint="#6A64FE"/>
+            app:backgroundTint="@color/primaryyy"/>
     </LinearLayout>
 </ScrollView>
 

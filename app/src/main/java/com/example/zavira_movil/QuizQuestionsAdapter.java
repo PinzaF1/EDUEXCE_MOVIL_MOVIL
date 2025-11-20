@@ -171,7 +171,7 @@ public class QuizQuestionsAdapter extends RecyclerView.Adapter<QuizQuestionsAdap
             tvEnunciado = v.findViewById(R.id.tvEnunciado);
             tvAreaNombre = v.findViewById(R.id.tvAreaNombre);
             tvNumeroArea = v.findViewById(R.id.tvNumeroArea);
-            cardPregunta = v.findViewById(R.id.cardPregunta);
+
             
             optionA = v.findViewById(R.id.optionA);
             optionB = v.findViewById(R.id.optionB);

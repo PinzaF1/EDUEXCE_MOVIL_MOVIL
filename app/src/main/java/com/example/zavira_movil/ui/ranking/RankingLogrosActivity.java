@@ -200,14 +200,14 @@ public class RankingLogrosActivity extends AppCompatActivity {
                         
                         // Mostrar iniciales
                         tvUserInitials.setVisibility(View.VISIBLE);
-                        String ini = "JP";
+                    String ini = "JP";
                         String[] parts = nombreFormateado.trim().split("\\s+");
-                        if (parts.length >= 2) {
-                            ini = (parts[0].substring(0,1) + parts[parts.length-1].substring(0,1)).toUpperCase();
-                        } else if (parts.length == 1 && parts[0].length() >= 1) {
-                            ini = parts[0].substring(0,1).toUpperCase();
-                        }
-                        tvUserInitials.setText(ini);
+                    if (parts.length >= 2) {
+                        ini = (parts[0].substring(0,1) + parts[parts.length-1].substring(0,1)).toUpperCase();
+                    } else if (parts.length == 1 && parts[0].length() >= 1) {
+                        ini = parts[0].substring(0,1).toUpperCase();
+                    }
+                    tvUserInitials.setText(ini);
                         tvUserInitials.setBackgroundResource(R.drawable.bg_estilo2);
                     }
                 }

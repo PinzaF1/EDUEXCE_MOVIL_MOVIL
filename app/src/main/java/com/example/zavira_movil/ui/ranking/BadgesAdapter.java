@@ -97,7 +97,7 @@ public class BadgesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             tvNombre.setText(b.getNombre());
             tvDescripcion.setText(b.getDescripcion());
             if (tvArea != null) {
-                tvArea.setText(b.getArea());
+            tvArea.setText(b.getArea());
             }
 
             // Asigna iconos y colores de borde por área
