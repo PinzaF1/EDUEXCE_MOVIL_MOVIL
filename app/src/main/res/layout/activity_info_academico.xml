@@ -79,16 +79,16 @@
         </LinearLayout>
 
         <!-- ===== Lista de áreas (5 ítems) ===== -->
-        <!-- Item helper: cada bloque es idéntico, cambian icono/título -->
         <!-- Matemáticas -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/acad_item_soft"
+            android:background="@drawable/bg_area_matematicas"
             android:padding="14dp"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
-            android:elevation="2dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <LinearLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -103,18 +103,18 @@
                 android:layout_marginLeft="12dp">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Matemáticas" android:textStyle="bold" android:textColor="#1B1B1B" android:textSize="15sp"/>
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Lenguaje -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/acad_item_soft"
+            android:background="@drawable/bg_area_lenguaje"
             android:padding="14dp"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
-            android:elevation="2dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <LinearLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -129,86 +129,57 @@
                 android:layout_marginLeft="12dp">
                 <TextView android:text="Lenguaje" android:textStyle="bold" android:textColor="#1B1B1B" android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Ciencias Naturales -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/acad_item_soft"
+            android:background="@drawable/bg_area_ciencias"
             android:padding="14dp"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
-            android:elevation="2dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <LinearLayout android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/naturales" android:gravity="center">
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginLeft="12dp">
                 <TextView android:text="Ciencias Naturales" android:textStyle="bold" android:textColor="#1B1B1B" android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Ciencias Sociales -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/acad_item_soft"
+            android:background="@drawable/bg_area_sociales"
             android:padding="14dp"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
-            android:elevation="2dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <LinearLayout android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/sociale" android:gravity="center">
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginLeft="12dp">
                 <TextView android:text="Ciencias Sociales" android:textStyle="bold" android:textColor="#1B1B1B" android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Inglés -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/acad_item_soft"
+            android:background="@drawable/bg_area_ingles"
             android:padding="14dp"
             android:orientation="horizontal"
             android:layout_marginBottom="12dp"
-            android:elevation="2dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <LinearLayout android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/ingles" android:gravity="center">
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginLeft="12dp">
                 <TextView android:text="Inglés" android:textStyle="bold" android:textColor="#1B1B1B" android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-+}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            mn
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Estadísticas (3 columnas) -->
@@ -224,7 +195,6 @@
                 <TextView android:text="25" android:textStyle="bold" android:textColor="#3C7BFF" android:textSize="18sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 <TextView android:text="Total preguntas" android:textColor="#7A8798" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
-
 
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
                 <TextView android:text="100%" android:textStyle="bold" android:textColor="#00A676" android:textSize="18sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>

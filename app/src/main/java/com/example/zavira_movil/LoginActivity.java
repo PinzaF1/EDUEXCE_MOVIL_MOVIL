@@ -1,11 +1,18 @@
 package com.example.zavira_movil;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
+import com.example.zavira_movil.R;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +52,30 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Configurar status bar blanca
+        getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().setStatusBarColor(android.graphics.Color.WHITE);
+        
+        // Ocultar barra de navegación
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            androidx.core.view.WindowInsetsControllerCompat windowInsetsController =
+                    androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+            if (windowInsetsController != null) {
+                windowInsetsController.setAppearanceLightStatusBars(true); // Texto oscuro sobre fondo blanco
+                windowInsetsController.hide(androidx.core.view.WindowInsetsCompat.Type.navigationBars());
+                windowInsetsController.setSystemBarsBehavior(
+                    androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                );
+            }
+        } else {
+            int flags = getWindow().getDecorView().getSystemUiVisibility();
+            flags = flags | android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            flags = flags | android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+            flags = flags | android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+        }
+
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -68,6 +99,217 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(this, com.example.zavira_movil.resetpassword.ResetPasswordActivity.class);
             startActivity(intent);
         });
+
+        // Configurar listeners de focus para los campos
+        setupFieldListeners();
+
+        // Iniciar animaciones de entrada
+        iniciarAnimaciones();
+    }
+
+    private void setupFieldListeners() {
+        // Configurar cursor azul para ambos campos
+        setCursorColor(binding.etDocumento, android.graphics.Color.parseColor("#2563EB"));
+        setCursorColor(binding.etPassword, android.graphics.Color.parseColor("#2563EB"));
+
+        // Listener para el campo de documento
+        binding.etDocumento.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                // Cuando tiene focus, aplicar borde azul
+                binding.etDocumento.setBackgroundResource(R.drawable.bg_input_focused);
+                clearFieldError(binding.etDocumento, binding.tilDocumento);
+            } else {
+                // Cuando pierde focus, volver al estado normal (si no hay error)
+                if (!isFieldInError(binding.etDocumento)) {
+                    binding.etDocumento.setBackgroundResource(R.drawable.bg_input_normal);
+                }
+            }
+        });
+
+        // Listener para el campo de contraseña
+        binding.etPassword.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                // Cuando tiene focus, aplicar borde azul
+                binding.etPassword.setBackgroundResource(R.drawable.bg_input_focused);
+                clearFieldError(binding.etPassword, binding.tilPassword);
+            } else {
+                // Cuando pierde focus, volver al estado normal (si no hay error)
+                if (!isFieldInError(binding.etPassword)) {
+                    binding.etPassword.setBackgroundResource(R.drawable.bg_input_normal);
+                }
+            }
+        });
+
+        // Limpiar errores cuando el usuario empiece a escribir
+        binding.etDocumento.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isFieldInError(binding.etDocumento)) {
+                    clearFieldError(binding.etDocumento, binding.tilDocumento);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        binding.etPassword.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isFieldInError(binding.etPassword)) {
+                    clearFieldError(binding.etPassword, binding.tilPassword);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+    }
+
+    private static final String TAG_ERROR_STATE = "field_error_state";
+
+    private void setCursorColor(android.widget.EditText editText, int color) {
+        try {
+            // Método para cambiar el color del cursor usando reflexión
+            java.lang.reflect.Field fCursorDrawableRes = 
+                android.widget.TextView.class.getDeclaredField("mCursorDrawableRes");
+            fCursorDrawableRes.setAccessible(true);
+            fCursorDrawableRes.setInt(editText, R.drawable.cursor_blue);
+
+            java.lang.reflect.Field fEditor = android.widget.TextView.class.getDeclaredField("mEditor");
+            fEditor.setAccessible(true);
+            Object editor = fEditor.get(editText);
+            
+            if (editor != null) {
+                String className = editor.getClass().getName();
+                if (className.equals("android.widget.Editor")) {
+                    java.lang.reflect.Field fCursorDrawable = editor.getClass().getDeclaredField("mCursorDrawable");
+                    fCursorDrawable.setAccessible(true);
+                    
+                    android.graphics.drawable.Drawable[] drawables = new android.graphics.drawable.Drawable[2];
+                    drawables[0] = getResources().getDrawable(R.drawable.cursor_blue);
+                    drawables[1] = getResources().getDrawable(R.drawable.cursor_blue);
+                    
+                    fCursorDrawable.set(editor, drawables);
+                }
+            }
+        } catch (Exception e) {
+            // Si falla, no hacer nada - el cursor usará el color por defecto
+            Log.d("CURSOR_COLOR", "No se pudo cambiar el color del cursor (esto es normal en algunas versiones de Android)");
+        }
+    }
+
+    private boolean isFieldInError(android.widget.EditText field) {
+        return field.getTag() != null && 
+               TAG_ERROR_STATE.equals(field.getTag().toString());
+    }
+
+    private void setFieldError(android.widget.EditText field, 
+                               com.google.android.material.textfield.TextInputLayout layout, 
+                               String errorMessage) {
+        field.setTag(TAG_ERROR_STATE);
+        field.setBackgroundResource(R.drawable.bg_input_error);
+        layout.setError(errorMessage);
+        layout.setErrorEnabled(true);
+    }
+
+    private void clearFieldError(android.widget.EditText field, 
+                                 com.google.android.material.textfield.TextInputLayout layout) {
+        field.setTag(null);
+        field.setBackgroundResource(R.drawable.bg_input_normal);
+        layout.setError(null);
+        layout.setErrorEnabled(false);
+    }
+
+    private void iniciarAnimaciones() {
+        // Ocultar todos los elementos inicialmente
+        binding.containerLogo.setAlpha(0f);
+        binding.containerLogo.setScaleX(0.5f);
+        binding.containerLogo.setScaleY(0.5f);
+        
+        binding.tvEduExce.setAlpha(0f);
+        binding.tvEduExce.setTranslationY(-30f);
+        
+        binding.tilDocumento.setAlpha(0f);
+        binding.tilDocumento.setTranslationY(30f);
+        
+        binding.tilPassword.setAlpha(0f);
+        binding.tilPassword.setTranslationY(30f);
+        
+        binding.btnLogin.setAlpha(0f);
+        binding.btnLogin.setScaleX(0.8f);
+        binding.btnLogin.setScaleY(0.8f);
+        
+        binding.tvOlvideContra.setAlpha(0f);
+
+        // Animación del logo (fade in + scale)
+        AnimatorSet logoAnim = new AnimatorSet();
+        ObjectAnimator logoFade = ObjectAnimator.ofFloat(binding.containerLogo, "alpha", 0f, 1f);
+        ObjectAnimator logoScaleX = ObjectAnimator.ofFloat(binding.containerLogo, "scaleX", 0.5f, 1f);
+        ObjectAnimator logoScaleY = ObjectAnimator.ofFloat(binding.containerLogo, "scaleY", 0.5f, 1f);
+        logoAnim.playTogether(logoFade, logoScaleX, logoScaleY);
+        logoAnim.setDuration(600);
+        logoAnim.setInterpolator(new DecelerateInterpolator());
+        logoAnim.start();
+
+        // Animación del texto "EduExce" (fade in + slide up)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            AnimatorSet textAnim = new AnimatorSet();
+            ObjectAnimator textFade = ObjectAnimator.ofFloat(binding.tvEduExce, "alpha", 0f, 1f);
+            ObjectAnimator textSlide = ObjectAnimator.ofFloat(binding.tvEduExce, "translationY", -30f, 0f);
+            textAnim.playTogether(textFade, textSlide);
+            textAnim.setDuration(500);
+            textAnim.setInterpolator(new DecelerateInterpolator());
+            textAnim.start();
+        }, 200);
+
+        // Animación del campo de documento (fade in + slide up)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            AnimatorSet docAnim = new AnimatorSet();
+            ObjectAnimator docFade = ObjectAnimator.ofFloat(binding.tilDocumento, "alpha", 0f, 1f);
+            ObjectAnimator docSlide = ObjectAnimator.ofFloat(binding.tilDocumento, "translationY", 30f, 0f);
+            docAnim.playTogether(docFade, docSlide);
+            docAnim.setDuration(500);
+            docAnim.setInterpolator(new DecelerateInterpolator());
+            docAnim.start();
+        }, 400);
+
+        // Animación del campo de contraseña (fade in + slide up)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            AnimatorSet passAnim = new AnimatorSet();
+            ObjectAnimator passFade = ObjectAnimator.ofFloat(binding.tilPassword, "alpha", 0f, 1f);
+            ObjectAnimator passSlide = ObjectAnimator.ofFloat(binding.tilPassword, "translationY", 30f, 0f);
+            passAnim.playTogether(passFade, passSlide);
+            passAnim.setDuration(500);
+            passAnim.setInterpolator(new DecelerateInterpolator());
+            passAnim.start();
+        }, 550);
+
+        // Animación del botón (fade in + scale)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            AnimatorSet btnAnim = new AnimatorSet();
+            ObjectAnimator btnFade = ObjectAnimator.ofFloat(binding.btnLogin, "alpha", 0f, 1f);
+            ObjectAnimator btnScaleX = ObjectAnimator.ofFloat(binding.btnLogin, "scaleX", 0.8f, 1f);
+            ObjectAnimator btnScaleY = ObjectAnimator.ofFloat(binding.btnLogin, "scaleY", 0.8f, 1f);
+            btnAnim.playTogether(btnFade, btnScaleX, btnScaleY);
+            btnAnim.setDuration(500);
+            btnAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+            btnAnim.start();
+        }, 700);
+
+        // Animación del enlace "¿Olvidaste tu contraseña?" (fade in)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            ObjectAnimator linkFade = ObjectAnimator.ofFloat(binding.tvOlvideContra, "alpha", 0f, 1f);
+            linkFade.setDuration(400);
+            linkFade.setInterpolator(new DecelerateInterpolator());
+            linkFade.start();
+        }, 850);
     }
 
     private void doLogin() {
@@ -125,6 +367,9 @@ public class LoginActivity extends AppCompatActivity {
                     
                     if (response.code() == 401) {
                         errorMessage = "Usuario o contraseña incorrectos";
+                        // Mostrar errores visuales en los campos
+                        setFieldError(binding.etDocumento, binding.tilDocumento, "Credenciales incorrectas");
+                        setFieldError(binding.etPassword, binding.tilPassword, "Credenciales incorrectas");
                     }
                     
                     Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();

@@ -1,222 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:id="@+id/cardPregunta"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:layout_marginBottom="16dp">
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#E3F2FD">
 
-    <!-- Card de pregunta con fondo pastel del área -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardPregunta"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="#F8F8FC">
+        android:padding="10dp">
 
+        <!-- Fila con número y área -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
 
-            <!-- Indicador de área con círculo y número -->
-            <LinearLayout
+            <!-- Cuadrado con número -->
+            <TextView
+                android:id="@+id/tvNumeroArea"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+
+            <!-- Nombre del área -->
+            <TextView
+                android:id="@+id/tvAreaNombre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
+                android:layout_marginStart="8dp"
+                android:text="Matemáticas"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvNumeroArea"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:gravity="center"
-                    android:text="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:background="@drawable/bg_option_circle_purple"/>
+        <!-- Enunciado de la pregunta -->
+        <TextView
+            android:id="@+id/tvEnunciado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enunciado"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp"
+            android:lineSpacingMultiplier="1.2"/>
 
-                <TextView
-                    android:id="@+id/tvAreaNombre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Matemáticas"
-                    android:textColor="#957DAD"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
+        <!-- Opciones de respuesta -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <!-- Enunciado de la pregunta -->
-            <TextView
-                android:id="@+id/tvEnunciado"
+            <LinearLayout
+                android:id="@+id/optionA"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Enunciado"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#111827"
-                android:lineSpacingMultiplier="1.2"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/selector_option_quiz"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
 
-    <!-- Opciones de respuesta -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+                <TextView
+                    android:id="@+id/circleA"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:text="A"
+                    android:textColor="#666666"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_option_circle_unselected_gray"/>
 
-        <LinearLayout
-            android:id="@+id/optionA"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/selector_option_quiz"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+                <TextView
+                    android:id="@+id/textA"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Opción A"
+                    android:textSize="12sp"
+                    android:textColor="#111827"/>
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/circleA"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="A"
-                android:textColor="#666666"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/bg_option_circle_unselected_gray"/>
-
-            <TextView
-                android:id="@+id/textA"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/optionB"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Opción A"
-                android:textSize="16sp"
-                android:textColor="#111827"
-                android:maxLines="10"
-                android:ellipsize="none"
-                android:scrollHorizontally="false"/>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/selector_option_quiz"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
 
-        <LinearLayout
-            android:id="@+id/optionB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/selector_option_quiz"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+                <TextView
+                    android:id="@+id/circleB"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:text="B"
+                    android:textColor="#666666"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_option_circle_unselected_gray"/>
 
-            <TextView
-                android:id="@+id/circleB"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="B"
-                android:textColor="#666666"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/bg_option_circle_unselected_gray"/>
+                <TextView
+                    android:id="@+id/textB"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Opción B"
+                    android:textSize="12sp"
+                    android:textColor="#111827"/>
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/textB"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/optionC"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Opción B"
-                android:textSize="16sp"
-                android:textColor="#111827"
-                android:maxLines="10"
-                android:ellipsize="none"
-                android:scrollHorizontally="false"/>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/selector_option_quiz"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
 
-        <LinearLayout
-            android:id="@+id/optionC"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/selector_option_quiz"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+                <TextView
+                    android:id="@+id/circleC"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:text="C"
+                    android:textColor="#666666"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_option_circle_unselected_gray"/>
 
-            <TextView
-                android:id="@+id/circleC"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="C"
-                android:textColor="#666666"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/bg_option_circle_unselected_gray"/>
+                <TextView
+                    android:id="@+id/textC"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Opción C"
+                    android:textSize="12sp"
+                    android:textColor="#111827"/>
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/textC"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/optionD"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Opción C"
-                android:textSize="16sp"
-                android:textColor="#111827"
-                android:maxLines="10"
-                android:ellipsize="none"
-                android:scrollHorizontally="false"/>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:background="@drawable/selector_option_quiz"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
 
-        <LinearLayout
-            android:id="@+id/optionD"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:background="@drawable/selector_option_quiz"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+                <TextView
+                    android:id="@+id/circleD"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:gravity="center"
+                    android:text="D"
+                    android:textColor="#666666"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_option_circle_unselected_gray"/>
 
-            <TextView
-                android:id="@+id/circleD"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="D"
-                android:textColor="#666666"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/bg_option_circle_unselected_gray"/>
-
-            <TextView
-                android:id="@+id/textD"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Opción D"
-                android:textSize="16sp"
-                android:textColor="#111827"
-                android:maxLines="10"
-                android:ellipsize="none"
-                android:scrollHorizontally="false"/>
+                <TextView
+                    android:id="@+id/textD"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Opción D"
+                    android:textSize="12sp"
+                    android:textColor="#111827"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>

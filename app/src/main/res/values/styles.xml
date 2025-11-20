@@ -39,6 +39,12 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <!-- Esquinas redondeadas para imágenes en tarjetas (12dp) -->
+    <style name="ShapeAppearanceOverlay_Rounded12">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
     <style name="Perfil_Field">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

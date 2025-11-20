@@ -1,6 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#4CAF50"
-        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM10,17l-5,-5 1.41,-1.41L10,14.17l7.59,-7.59L19,8l-9,9z"/>
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="28"
+    android:viewportHeight="28">
+    <!-- Círculo azul claro de fondo -->
+    <path
+        android:fillColor="#DBEAFE"
+        android:pathData="M14,0C6.27,0 0,6.27 0,14s6.27,14 14,14 14,-6.27 14,-14S21.73,0 14,0z"/>
+    <!-- Checkmark azul oscuro -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M11.5,17.5l-4,-4 1.41,-1.41L11.5,14.67l6.59,-6.59L19.5,9.5l-8,8z"/>
 </vector>

@@ -33,8 +33,8 @@ public class TestAcademico extends AppCompatActivity {
     private Button btnEnviar;
     private TextView tvBloque;
     private PreguntasAdapter adapter;
+    private com.example.zavira_movil.ui.ProgressAreaView progressAreaView;
 
-    private ProgressBar progressBloque;
     private int totalPreguntas = 25;
 
     private final List<PreguntaAcademica> preguntas = new ArrayList<>();
@@ -55,7 +55,7 @@ public class TestAcademico extends AppCompatActivity {
         rvPreguntas   = findViewById(R.id.rvPreguntas);
         btnEnviar     = findViewById(R.id.btnEnviar);
         tvBloque      = findViewById(R.id.tvBloque);
-        progressBloque = findViewById(R.id.progressBloque);
+        progressAreaView = findViewById(R.id.progressAreaView);
 
         rvPreguntas.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PreguntasAdapter(this, new ArrayList<>());
@@ -71,8 +71,6 @@ public class TestAcademico extends AppCompatActivity {
                 return;
             }
             
-            actualizarProgreso(); // Actualizar progreso normal
-
             boolean esUltimo = (idxBloque == bloques.size() - 1);
             if (esUltimo) enviar();
             else {
@@ -115,7 +113,6 @@ public class TestAcademico extends AppCompatActivity {
                 preguntas.addAll(res.body().getPreguntas());
                 totalPreguntas = preguntas.size();
 
-                progressBloque.setMax(totalPreguntas);
 
                 // Orden esperado de áreas
                 String[] areasOrdenadas = {"Matematicas", "Lenguaje", "Ciencias", "sociales", "Ingles"};
@@ -146,6 +143,7 @@ public class TestAcademico extends AppCompatActivity {
                         sub.add(lista.get(i));
                     }
                     
+                    android.util.Log.d("TestAcademico", "Área: " + areaEsperada + " - Preguntas disponibles: " + lista.size() + ", Tomadas: " + sub.size());
                     bloques.add(sub);
                     nombresBloque.add(obtenerNombreArea(areaEsperada));
                 }
@@ -174,7 +172,6 @@ public class TestAcademico extends AppCompatActivity {
                 }
 
                 idxBloque = 0;
-                progressBloque.setProgress(0); // Resetear progreso al inicio
                 mostrarBloque();
                 toast("Sesión iniciada");
             }
@@ -190,15 +187,40 @@ public class TestAcademico extends AppCompatActivity {
 
     private void mostrarBloque() {
         List<PreguntaAcademica> bloque = bloques.get(idxBloque);
-        adapter.setPreguntas(bloque, respuestasGlobales);
+        String nombreArea = nombresBloque.get(idxBloque);
+        
+        // Log para verificar cantidad de preguntas
+        android.util.Log.d("TestAcademico", "Mostrando bloque: " + nombreArea + " con " + bloque.size() + " preguntas");
+        
+        // Calcular número de pregunta inicial para este bloque
+        int preguntaInicial = 0;
+        for (int i = 0; i < idxBloque; i++) {
+            preguntaInicial += bloques.get(i).size();
+        }
+        
+        adapter.setPreguntas(bloque, respuestasGlobales, nombreArea, preguntaInicial);
+        
+        // Forzar actualización del RecyclerView
+        if (rvPreguntas != null) {
+            rvPreguntas.post(() -> {
+                adapter.notifyDataSetChanged();
+                rvPreguntas.requestLayout();
+            });
+        }
 
-        tvBloque.setText(nombresBloque.get(idxBloque));
+        tvBloque.setText(nombreArea);
+        
+        // Actualizar barra de progreso de áreas
+        if (progressAreaView != null) {
+            progressAreaView.setAreaActual(idxBloque);
+        }
 
         boolean esUltimo = (idxBloque == bloques.size() - 1);
         btnEnviar.setText(esUltimo ? "Enviar respuestas" : "Siguiente");
-
-        // Usar animación lenta cuando se carga un nuevo bloque
-        actualizarProgreso(true);
+        
+        // Cambiar color del botón según el área
+        int colorArea = obtenerColorArea(nombreArea);
+        btnEnviar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(colorArea));
         
         // Hacer scroll al inicio del RecyclerView al cargar un nuevo bloque
         if (rvPreguntas != null) {
@@ -211,58 +233,15 @@ public class TestAcademico extends AppCompatActivity {
         }
     }
 
-    private void actualizarProgreso() {
-        actualizarProgreso(false);
-    }
-    
-    private void actualizarProgreso(boolean animacionLenta) {
-        int respondidas = respuestasGlobales.size();
-        int porcentaje = totalPreguntas > 0 ? (int) ((respondidas / (float) totalPreguntas) * 100) : 0;
-
-        if (animacionLenta && respondidas > 1) {
-            // Si hay varias respuestas ya respondidas, animar pregunta por pregunta
-            animarProgresoPreguntaPorPregunta(respondidas, totalPreguntas, porcentaje);
-        } else {
-            // Actualización normal cuando el usuario responde una pregunta nueva
-            ObjectAnimator anim = ObjectAnimator.ofInt(progressBloque, "progress", progressBloque.getProgress(), respondidas);
-            anim.setDuration(800);
-            anim.start();
-        }
-    }
-    
-    private void animarProgresoPreguntaPorPregunta(int respondidas, int total, int porcentajeFinal) {
-        // Resetear la barra a 0 primero
-        progressBloque.setProgress(0);
-        
-        // Si no hay respuestas, solo mostrar 0
-        if (respondidas == 0) {
-            return;
-        }
-        
-        // Calcular el progreso por pregunta
-        int progresoPorPregunta = total > 0 ? (total * 100 / total) / total : 0;
-        int delay = 0;
-        
-        // Animar pregunta por pregunta con delay entre cada una
-        for (int i = 1; i <= respondidas; i++) {
-            final int preguntaNum = i;
-            final int nuevoProgreso = i;
-            
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                ObjectAnimator anim = ObjectAnimator.ofInt(progressBloque, "progress", progressBloque.getProgress(), nuevoProgreso);
-                anim.setDuration(600);
-                anim.start();
-            }, delay);
-            
-            delay += 400; // Delay de 400ms entre cada pregunta
-        }
-        
-        // Al final, asegurar que esté en el progreso final exacto
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            ObjectAnimator animFinal = ObjectAnimator.ofInt(progressBloque, "progress", progressBloque.getProgress(), respondidas);
-            animFinal.setDuration(300);
-            animFinal.start();
-        }, delay);
+    private int obtenerColorArea(String area) {
+        if (area == null) return android.graphics.Color.parseColor("#004AAD");
+        String areaLower = area.toLowerCase();
+        if (areaLower.contains("matem")) return android.graphics.Color.parseColor("#E53935"); // Rojo
+        if (areaLower.contains("leng") || areaLower.contains("lect")) return android.graphics.Color.parseColor("#1E88E5"); // Azul
+        if (areaLower.contains("cien")) return android.graphics.Color.parseColor("#43A047"); // Verde
+        if (areaLower.contains("soci")) return android.graphics.Color.parseColor("#FB8C00"); // Naranja
+        if (areaLower.contains("ing")) return android.graphics.Color.parseColor("#8E24AA"); // Morado
+        return android.graphics.Color.parseColor("#004AAD");
     }
 
     private String normalizarArea(String area) {
@@ -328,7 +307,6 @@ public class TestAcademico extends AppCompatActivity {
 
     private void enviar() {
         adapter.collectSeleccionesTo(respuestasGlobales);
-        actualizarProgreso();
 
         if (respuestasGlobales.size() < preguntas.size()) {
             toast("Faltan preguntas por responder");

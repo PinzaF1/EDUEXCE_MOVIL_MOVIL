@@ -128,7 +128,7 @@ public class PerfilFragment extends Fragment {
 
         binding.icon.setOnClickListener(v -> showPickerDialog());
         cargarFotoPreferida(null);
-        
+
         // Punto verde - hacerlo movible manualmente
         View statusDot = binding.getRoot().findViewById(R.id.statusDot);
         View fotoFrame = binding.getRoot().findViewById(R.id.fotoFrame);
@@ -176,12 +176,12 @@ public class PerfilFragment extends Fragment {
         View btnEditarContacto = binding.getRoot().findViewById(R.id.btnEditarContacto);
         if (btnEditarContacto != null) {
             btnEditarContacto.setOnClickListener(v -> {
-                if (perfilUserId == null) {
-                    android.widget.Toast.makeText(requireContext(), "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                abrirEditorContacto();
-            });
+            if (perfilUserId == null) {
+                android.widget.Toast.makeText(requireContext(), "No se puede editar: sin ID de usuario", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            abrirEditorContacto();
+        });
         }
 
         // Click en "Cambiar contraseña"
@@ -354,7 +354,7 @@ public class PerfilFragment extends Fragment {
         dialog.setCanceledOnTouchOutside(true);
         dialog.show();
     }
-    
+
     private ScrollView findScrollView(android.view.ViewGroup parent) {
         for (int i = 0; i < parent.getChildCount(); i++) {
             android.view.View child = parent.getChildAt(i);
@@ -469,13 +469,13 @@ public class PerfilFragment extends Fragment {
             guardarPathFoto(saved.getAbsolutePath());
             
             // Cargar la foto desde el archivo guardado (más confiable que el URI)
-            Glide.with(requireContext())
+        Glide.with(requireContext())
                     .load(saved)
-                    .placeholder(R.drawable.usuario)
+                .placeholder(R.drawable.usuario)
                     .skipMemoryCache(true) // No usar cache en memoria
                     .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE) // No usar cache en disco
-                    .into(binding.icon);
-            
+                .into(binding.icon);
+
             // Notificar INMEDIATAMENTE a otras pantallas que la foto se actualizó
             notificarFotoActualizada(saved.getAbsolutePath());
             
@@ -606,7 +606,7 @@ public class PerfilFragment extends Fragment {
             sp.edit().putString(k, byName.getAbsolutePath()).apply();
             return;
         }
-        
+
         // Si no hay archivo local, cargar desde URL remota
         if (remoteUrl != null && !remoteUrl.trim().isEmpty() && !"null".equalsIgnoreCase(remoteUrl.trim())) {
             Glide.with(this)
@@ -774,7 +774,7 @@ public class PerfilFragment extends Fragment {
         etCorreo.setText(textOrEmpty(binding.tvCorreo));
         etTelefono.setText(textOrEmpty(binding.tvTelefono));
         etDireccion.setText(textOrEmpty(binding.tvDireccion));
-        
+
         // Cambiar color del borde a azul cuando el campo está enfocado
         View.OnFocusChangeListener focusListener = (v, hasFocus) -> {
             TextInputLayout til = null;

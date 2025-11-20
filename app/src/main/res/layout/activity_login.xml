@@ -1,194 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F6FA"
-    android:fillViewport="true">
+    android:background="@android:color/white">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/rootLoginContainer"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp">
+        android:background="@android:color/transparent"
+        android:fillViewport="true">
 
-        <!-- Contenido, centrado horizontal y con sesgo vertical hacia arriba -->
-        <LinearLayout
-            android:id="@+id/content"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/rootLoginContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.38">
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <!-- Título principal -->
+            <!-- Contenedor cuadrado para el logo -->
+
+            <!-- Texto "EDUEXCE" en negro -->
+            <FrameLayout
+                android:id="@+id/containerLogo"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@android:color/transparent"
+                android:padding="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.505"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.155">
+
+                <!-- Logo EduExce -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Logo EduExce"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/iconoeduexce" />
+            </FrameLayout>
+
+            <!-- Contenedor del formulario centrado -->
+
             <TextView
-                android:id="@+id/tvTitulo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Iniciar Sesión"
-                android:textColor="#111827"
-                android:textSize="28sp"
+                android:id="@+id/tvEduExce"
+                android:layout_width="174dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="8dp"
+                android:letterSpacing="0.1"
+                android:text="EduExce"
+                android:textColor="@color/brand_blue"
+                android:textSize="34sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="18dp" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.548"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/containerLogo" />
 
-            <!-- Card centrada; ancho máx para pantallas grandes -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:maxWidth="520dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardCornerRadius="18dp"
-                app:cardUseCompatPadding="true"
-                app:cardElevation="6dp">
+            <LinearLayout
+                android:id="@+id/llFormulario"
+                android:layout_width="351dp"
+                android:layout_height="300dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="48dp"
+                android:layout_marginEnd="32dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvEduExce"
+                app:layout_constraintVertical_bias="0.051">
 
-                <LinearLayout
+                <!-- Campo Documento -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilDocumento"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="18dp">
+                    android:layout_marginBottom="16dp"
+                    app:boxBackgroundColor="#F5F5F5"
+                    app:boxCornerRadiusBottomEnd="50dp"
+                    app:boxCornerRadiusBottomStart="50dp"
+                    app:boxCornerRadiusTopEnd="50dp"
+                    app:boxCornerRadiusTopStart="50dp"
+                    app:boxStrokeColor="@android:color/transparent"
+                    app:hintEnabled="false">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Credenciales de Acceso"
-                        android:textColor="#0F172A"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginBottom="2dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ingrese su número de documento y contraseña"
-                        android:textColor="#8E95A3"
-                        android:textSize="13sp"
-                        android:layout_marginBottom="14dp" />
-
-                    <!-- Documento -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilDocumento"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDocumento"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:boxBackgroundMode="filled"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxBackgroundColor="#EAF1FF"
-                        app:hintEnabled="true">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etDocumento"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:gravity="center_vertical"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:textSize="16sp"
-                            android:singleLine="true"
-                            android:hint="Número de documento"
-                            android:inputType="number"
-                            android:imeOptions="actionNext"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
-                            android:includeFontPadding="false"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="10dp" />
-
-                    <!-- Fila: etiqueta Contraseña + enlace Olvido -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_height="56dp"
+                        android:background="@drawable/selector_input_field"
                         android:gravity="center_vertical"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="2dp">
+                        android:hint="Número de documento"
+                        android:imeOptions="actionNext"
+                        android:includeFontPadding="false"
+                        android:inputType="number"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:singleLine="true"
+                        android:textColor="#111827"
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Contraseña"
-                            android:textColor="#0F172A"
-                            android:textSize="14sp"
-                            android:textStyle="bold"/>
+                <!-- Campo Contraseña -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPassword"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:boxBackgroundColor="#F5F5F5"
+                    app:boxCornerRadiusBottomEnd="50dp"
+                    app:boxCornerRadiusBottomStart="50dp"
+                    app:boxCornerRadiusTopEnd="50dp"
+                    app:boxCornerRadiusTopStart="50dp"
+                    app:boxStrokeColor="@android:color/transparent"
+                    app:endIconMode="password_toggle"
+                    app:endIconTint="#2563EB"
+                    app:hintEnabled="false">
 
-                        <TextView
-                            android:id="@+id/tvOlvideContra"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="¿Olvidó su contraseña?"
-                            android:textColor="#2D79FF"
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-
-                    <!-- Contraseña -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilPassword"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:endIconMode="password_toggle"
-                        app:boxBackgroundMode="filled"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxBackgroundColor="#EAF1FF">
+                        android:layout_height="56dp"
+                        android:background="@drawable/selector_input_field"
+                        android:gravity="center_vertical"
+                        android:hint="Contraseña"
+                        android:imeOptions="actionDone"
+                        android:includeFontPadding="false"
+                        android:inputType="textPassword"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:singleLine="true"
+                        android:textColor="#111827"
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etPassword"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:gravity="center_vertical"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:textSize="16sp"
-                            android:singleLine="true"
-                            android:hint="Contraseña"
-                            android:inputType="textPassword"
-                            android:imeOptions="actionDone"
-                            android:textColor="#111827"
-                            android:textColorHint="#9CA3AF"
-                            android:includeFontPadding="false"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                <!-- Botón de inicio de sesión azul -->
+                <Button
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="67dp"
+                    android:backgroundTint="#2563EB"
+                    android:text="Iniciar Sesión"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp" />
 
-                    <!-- Botón de inicio de sesión -->
-                    <Button
-                        android:id="@+id/btnLogin"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="18dp"
-                        android:text="Iniciar Sesión"
-                        android:textAllCaps="false"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white"
-                        android:backgroundTint="@color/primaryyy" />
+                <!-- Loader -->
+                <TextView
+                    android:id="@+id/tvOlvideContra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:text="¿Olvidaste tu contraseña?"
+                    android:textColor="#050505"
+                    android:textSize="14sp" />
 
-                    <!-- Loader -->
-                    <ProgressBar
-                        android:id="@+id/progress"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="14dp"
-                        android:visibility="gone" />
+                <ProgressBar
+                    android:id="@+id/progress"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="14dp"
+                    android:indeterminateTint="#2563EB"
+                    android:visibility="gone" />
 
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>

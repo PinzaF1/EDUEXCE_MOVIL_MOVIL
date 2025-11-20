@@ -140,12 +140,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Header Container (blanco con difuminado oscuro debajo de la foto, se extiende detrás de la status bar) - SOLO en Home -->
+    <!-- Header Container con color sólido #44B7CC - SOLO en Home -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_header_blur_dark"
+        android:background="#44B7CC"
         android:paddingTop="48dp"
         android:paddingBottom="16dp"
         android:paddingStart="16dp"
@@ -167,12 +167,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Avatar circular (44dp) con fondo azul -->
+            <!-- Avatar circular (44dp) con borde blanco -->
             <FrameLayout
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/bg_avatar_circle_blue">
+                android:background="@drawable/bg_avatar_circle_white">
                 
                 <ImageView
                     android:id="@+id/ivAvatar"
@@ -198,7 +198,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="¡Hola,"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -207,7 +207,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Usuario!"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:paddingStart="4dp" />

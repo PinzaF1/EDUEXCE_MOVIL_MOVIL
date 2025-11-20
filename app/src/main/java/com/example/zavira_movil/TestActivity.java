@@ -2,12 +2,15 @@ package com.example.zavira_movil;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -37,14 +40,17 @@ public class TestActivity extends AppCompatActivity {
 
     private LinearLayout container;
     private Button btnEnviar;
-    private ProgressBar progressBar;
-    private TextView tvProgresoBloque;
-    private TextView tvTituloBloque;
     private android.widget.ScrollView scrollView;
+    
+    // Indicador de progreso visual
+    private View circle1, circle2, circle3, circle4;
+    private TextView number1, number2, number3, number4;
+    private TextView tvTituloBloqueActual;
+    private View line1, line2, line3;
 
     private final List<PreguntasKolb> preguntas = new ArrayList<>();
     private final android.util.SparseIntArray respuestas = new android.util.SparseIntArray();
-    private final List<CardView> tarjetasPreguntas = new ArrayList<>();
+    private final List<LinearLayout> tarjetasPreguntas = new ArrayList<>();
     private final Map<Integer, LinearLayout> opcionesLayouts = new LinkedHashMap<>();
     private int bloqueActual = 0;
     private static final int PREGUNTAS_POR_BLOQUE = 9;
@@ -57,18 +63,42 @@ public class TestActivity extends AppCompatActivity {
 
         container = findViewById(R.id.questionsContainer);
         btnEnviar = findViewById(R.id.btnEnviar);
-        progressBar = findViewById(R.id.progressBloque);
-        tvProgresoBloque = findViewById(R.id.tvProgresoBloque);
-        tvTituloBloque = findViewById(R.id.tvTituloBloque);
         
-        // Obtener el ScrollView padre del contenedor
-        View parent = container;
+        // Inicializar indicador de progreso visual
+        try {
+            circle1 = findViewById(R.id.circle1);
+            circle2 = findViewById(R.id.circle2);
+            circle3 = findViewById(R.id.circle3);
+            circle4 = findViewById(R.id.circle4);
+            number1 = findViewById(R.id.number1);
+            number2 = findViewById(R.id.number2);
+            number3 = findViewById(R.id.number3);
+            number4 = findViewById(R.id.number4);
+            tvTituloBloqueActual = findViewById(R.id.tvTituloBloqueActual);
+            line1 = findViewById(R.id.line1);
+            line2 = findViewById(R.id.line2);
+            line3 = findViewById(R.id.line3);
+            
+            // Inicializar indicador de progreso solo si todos los elementos existen
+            if (circle1 != null && circle2 != null && circle3 != null && circle4 != null &&
+                number1 != null && number2 != null && number3 != null && number4 != null &&
+                tvTituloBloqueActual != null && line1 != null && line2 != null && line3 != null) {
+                // Se actualizará después de cargar las preguntas
+            } else {
+                android.util.Log.w("TestActivity", "Algunos elementos del indicador de progreso no se encontraron");
+            }
+        } catch (Exception e) {
+            android.util.Log.e("TestActivity", "Error al inicializar indicador de progreso", e);
+        }
+        
+        // Obtener el ScrollView desde el layout - buscar en la jerarquía
+        android.view.ViewParent parent = container.getParent();
+        while (parent != null && !(parent instanceof android.widget.ScrollView)) {
+            parent = parent.getParent();
+        }
         if (parent instanceof android.widget.ScrollView) {
             scrollView = (android.widget.ScrollView) parent;
         }
-
-        progressBar.setProgress(0);
-        tvProgresoBloque.setText("Bloque 1 - Progreso: 0 / 9");
 
         btnEnviar.setOnClickListener(v -> validarBloqueActual());
         cargar();
@@ -86,7 +116,7 @@ public class TestActivity extends AppCompatActivity {
         api.getPreguntas().enqueue(new Callback<List<PreguntasKolb>>() {
             @Override
             public void onResponse(Call<List<PreguntasKolb>> c, Response<List<PreguntasKolb>> r) {
-                btnEnviar.setText("Enviar respuestas");
+                btnEnviar.setText("Siguiente");
                 if (!r.isSuccessful() || r.body() == null) {
                     toast("No se pudieron cargar las preguntas (" + r.code() + ")");
                     return;
@@ -94,12 +124,11 @@ public class TestActivity extends AppCompatActivity {
                 preguntas.clear();
                 preguntas.addAll(r.body());
                 
-                // Debug: ver primera pregunta (Log eliminado para evitar mensajes en Home)
-                // if (!preguntas.isEmpty()) {
-                //     PreguntasKolb primera = preguntas.get(0);
-                //     android.util.Log.d("TestActivity", "Primera pregunta - id: " + primera.getId_pregunta_estilo_aprendizajes() + 
-                //         ", tipo: '" + primera.getTipo_pregunta() + "', titulo: '" + primera.getTitulo() + "'");
-                // }
+                // Actualizar etiquetas de los bloques con los tipos de pregunta
+                actualizarEtiquetasBloques();
+                
+                // Inicializar indicador de progreso después de cargar las preguntas
+                actualizarIndicadorProgreso();
                 
                 render();
                 btnEnviar.setEnabled(true);
@@ -107,7 +136,7 @@ public class TestActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<PreguntasKolb>> c, Throwable t) {
-                btnEnviar.setText("Enviar respuestas");
+                btnEnviar.setText("Siguiente");
                 toast("Error al cargar: " + t.getMessage());
             }
         });
@@ -134,57 +163,47 @@ public class TestActivity extends AppCompatActivity {
         int inicio = bloque * PREGUNTAS_POR_BLOQUE;
         int fin = Math.min(inicio + PREGUNTAS_POR_BLOQUE, preguntas.size());
 
-        // Actualizar el título del bloque en el TextView del layout usando tipo_pregunta
-        String tituloBloqueTexto = "Bloque " + (bloque + 1);
-        if (inicio < preguntas.size()) {
-            String tipoPregunta = preguntas.get(inicio).getTipo_pregunta();
-            
-            // Debug: mostrar valores
-            // Log eliminado para evitar mensajes en Home
-            // android.util.Log.d("TestActivity", "Bloque " + (bloque + 1) + " - tipo: '" + tipoPregunta + "'");
-            
-            if (tipoPregunta != null && !tipoPregunta.isEmpty()) {
-                tituloBloqueTexto = tipoPregunta;
-            }
-        }
-        
-        // Actualizar el TextView del layout con el título correcto
-        if (tvTituloBloque != null) {
-            tvTituloBloque.setText(tituloBloqueTexto);
-        }
+        // Ya no se usa tvTituloBloque, los nombres están en los círculos
 
         // ---- Bloque visual para las preguntas ----
         LinearLayout bloqueLayout = new LinearLayout(this);
         bloqueLayout.setOrientation(LinearLayout.VERTICAL);
-        bloqueLayout.setPadding(24, 24, 24, 24);
-        bloqueLayout.setBackgroundResource(R.drawable.bg_card);
-        bloqueLayout.setElevation(6f);
+        bloqueLayout.setPadding(0, 0, 0, 0);
 
         // ---- Agregar las 9 preguntas del bloque ----
         for (int i = inicio; i < fin; i++) {
             PreguntasKolb p = preguntas.get(i);
 
-            CardView card = new CardView(this);
-            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+            // Contenedor sin card, directamente LinearLayout
+            LinearLayout inner = new LinearLayout(this);
+            inner.setOrientation(LinearLayout.VERTICAL);
+            inner.setPadding(12, 12, 12, 12);
+            LinearLayout.LayoutParams innerParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            cardParams.setMargins(0, 12, 0, 12);
-            card.setLayoutParams(cardParams);
-            card.setRadius(18f);
-            card.setCardElevation(4f);
-            card.setUseCompatPadding(true);
-            card.setCardBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
+            innerParams.setMargins(0, 8, 0, 8);
+            inner.setLayoutParams(innerParams);
 
-            LinearLayout inner = new LinearLayout(this);
-            inner.setOrientation(LinearLayout.VERTICAL);
-            inner.setPadding(24, 24, 24, 24);
+            // Label "Pregunta X" en la parte superior
+            TextView labelPregunta = new TextView(this);
+            labelPregunta.setText("Pregunta " + (i + 1));
+            labelPregunta.setTextSize(11);
+            labelPregunta.setTextColor(Color.parseColor("#60A5FA")); // Azul claro
+            labelPregunta.setPadding(10, 5, 10, 5);
+            labelPregunta.setBackgroundResource(R.drawable.bg_label_pregunta);
+            labelPregunta.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            ((LinearLayout.LayoutParams) labelPregunta.getLayoutParams()).setMargins(0, 0, 0, 8);
 
             TextView enunciado = new TextView(this);
-            enunciado.setText((i + 1) + ". " + p.getPregunta());
-            enunciado.setTextSize(15);
-            enunciado.setTextColor(ContextCompat.getColor(this, android.R.color.black));
-            enunciado.setPadding(0, 8, 0, 16);
+            enunciado.setText(p.getPregunta());
+            enunciado.setTextSize(14);
+            enunciado.setTextColor(ContextCompat.getColor(this, android.R.color.black)); // Negro
+            enunciado.setPadding(0, 0, 0, 12);
+            enunciado.setTypeface(null, android.graphics.Typeface.BOLD);
 
             // Labels para las opciones (como en la imagen)
             String[] labels = {"1", "2", "3", "4"};
@@ -201,17 +220,41 @@ public class TestActivity extends AppCompatActivity {
             boolean puedeResponder = puedeResponderPregunta(i, inicio);
             
             for (int v = 1; v <= 4; v++) {
+                // FrameLayout para contener el botón y el checkmark
+                FrameLayout frameOption = new FrameLayout(this);
+                frameOption.setLayoutParams(new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                ));
+                ((LinearLayout.LayoutParams) frameOption.getLayoutParams()).setMargins(4, 0, 4, 0);
+                
                 // Cada opción es un botón personalizado
                 android.widget.Button opcionBtn = new android.widget.Button(this);
-                opcionBtn.setLayoutParams(new LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                opcionBtn.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
                 ));
                 opcionBtn.setTag(v);
                 opcionBtn.setText(labels[v - 1] + "\n" + labelsSub[v - 1]);
-                opcionBtn.setTextSize(14);
-                opcionBtn.setPadding(8, 12, 8, 12);
+                opcionBtn.setTextSize(12);
+                opcionBtn.setPadding(6, 8, 6, 8);
                 opcionBtn.setBackgroundResource(R.drawable.bg_option_button);
-                opcionBtn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+                opcionBtn.setTextColor(Color.parseColor("#60A5FA")); // Texto azul claro y sutil
+                opcionBtn.setGravity(android.view.Gravity.CENTER);
+                
+                // ImageView para el checkmark (inicialmente invisible)
+                ImageView checkmark = new ImageView(this);
+                FrameLayout.LayoutParams checkParams = new FrameLayout.LayoutParams(
+                    28, 28
+                );
+                checkParams.gravity = android.view.Gravity.TOP | android.view.Gravity.END;
+                checkParams.setMargins(0, -4, -4, 0); // Posicionar en la esquina superior derecha, ligeramente fuera
+                checkmark.setLayoutParams(checkParams);
+                checkmark.setImageResource(R.drawable.ic_check_circle);
+                checkmark.setVisibility(View.GONE);
+                checkmark.setTag("checkmark_" + v);
+                
+                frameOption.addView(opcionBtn);
+                frameOption.addView(checkmark);
                 
                 // Deshabilitar si no puede responder (hay preguntas anteriores sin responder)
                 if (!puedeResponder && respuestas.get(i, 0) == 0) {
@@ -233,44 +276,74 @@ public class TestActivity extends AppCompatActivity {
                     // Resetear todos los botones del grupo
                     for (int j = 0; j < opcionesLayout.getChildCount(); j++) {
                         View child = opcionesLayout.getChildAt(j);
-                        child.setSelected(false);
-                        child.setBackgroundResource(R.drawable.bg_option_button);
+                        if (child instanceof FrameLayout) {
+                            FrameLayout frame = (FrameLayout) child;
+                            // Buscar el botón dentro del FrameLayout
+                            for (int k = 0; k < frame.getChildCount(); k++) {
+                                View childFrame = frame.getChildAt(k);
+                                if (childFrame instanceof android.widget.Button) {
+                                    android.widget.Button btn = (android.widget.Button) childFrame;
+                                    btn.setSelected(false);
+                                    btn.setBackgroundResource(R.drawable.bg_option_button);
+                                    btn.setTextColor(Color.parseColor("#60A5FA")); // Texto azul claro y sutil
+                                } else if (childFrame instanceof ImageView) {
+                                    // Ocultar checkmark
+                                    childFrame.setVisibility(View.GONE);
+                                }
+                            }
+                        }
                     }
                     
                     // Marcar el seleccionado
+                    View parentFrame = (View) view.getParent();
+                    if (parentFrame instanceof FrameLayout) {
+                        FrameLayout frame = (FrameLayout) parentFrame;
                     view.setSelected(true);
-                    view.setBackgroundResource(R.drawable.bg_option_selected);
+                        if (view instanceof android.widget.Button) {
+                            android.widget.Button btn = (android.widget.Button) view;
+                            btn.setBackgroundResource(R.drawable.bg_option_selected);
+                            btn.setTextColor(ContextCompat.getColor(TestActivity.this, android.R.color.white)); // Texto blanco sobre fondo azul
+                            
+                            // Mostrar checkmark
+                            for (int k = 0; k < frame.getChildCount(); k++) {
+                                View childFrame = frame.getChildAt(k);
+                                if (childFrame instanceof ImageView) {
+                                    childFrame.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        }
+                    }
                     
                     // Habilitar la siguiente pregunta
                     habilitarSiguientePregunta(idx + 1, inicio, fin);
                     
                     actualizarProgreso();
-                    card.setCardBackgroundColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
                     
                     // Remover borde rojo si estaba marcada
-                    android.graphics.drawable.GradientDrawable normal = new android.graphics.drawable.GradientDrawable();
-                    normal.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-                    normal.setCornerRadius(18f);
-                    normal.setColor(ContextCompat.getColor(this, android.R.color.white));
-                    card.setBackground(null);
+                    View preguntaView = (View) view.getParent().getParent().getParent(); // FrameLayout -> LinearLayout (opciones) -> LinearLayout (inner)
+                    if (preguntaView instanceof LinearLayout) {
+                        preguntaView.setBackground(null);
+                    }
                 });
                 
-                opcionesLayout.addView(opcionBtn);
+                opcionesLayout.addView(frameOption);
                 
                 // Marcar si ya estaba seleccionado
                 if (respuestas.get(i, 0) == v) {
                     opcionBtn.setSelected(true);
                     opcionBtn.setBackgroundResource(R.drawable.bg_option_selected);
+                    opcionBtn.setTextColor(ContextCompat.getColor(this, android.R.color.white)); // Texto blanco sobre fondo azul
+                    checkmark.setVisibility(View.VISIBLE);
                 }
             }
 
+            inner.addView(labelPregunta);
             inner.addView(enunciado);
             inner.addView(opcionesLayout);
-            card.addView(inner);
-            bloqueLayout.addView(card);
+            bloqueLayout.addView(inner);
             
-            // Guardar referencia a la tarjeta para validación (en orden)
-            tarjetasPreguntas.add(card);
+            // Guardar referencia a la pregunta para validación (en orden)
+            tarjetasPreguntas.add(inner);
         }
 
         container.addView(bloqueLayout);
@@ -278,7 +351,7 @@ public class TestActivity extends AppCompatActivity {
         
         // Actualizar texto del botón
         if (bloqueActual < TOTAL_BLOQUES - 1) {
-            btnEnviar.setText("Continuar al siguiente bloque");
+            btnEnviar.setText("Siguiente");
         } else {
             btnEnviar.setText("Enviar respuestas");
         }
@@ -319,7 +392,21 @@ public class TestActivity extends AppCompatActivity {
         if (opcionesLayout != null) {
             for (int j = 0; j < opcionesLayout.getChildCount(); j++) {
                 View child = opcionesLayout.getChildAt(j);
-                if (child instanceof android.widget.Button) {
+                // Los botones ahora están dentro de FrameLayouts
+                if (child instanceof FrameLayout) {
+                    FrameLayout frame = (FrameLayout) child;
+                    for (int k = 0; k < frame.getChildCount(); k++) {
+                        View childFrame = frame.getChildAt(k);
+                        if (childFrame instanceof android.widget.Button) {
+                            android.widget.Button btn = (android.widget.Button) childFrame;
+                            if (!btn.isSelected()) {
+                                btn.setEnabled(true);
+                                btn.setAlpha(1.0f);
+                            }
+                        }
+                    }
+                } else if (child instanceof android.widget.Button) {
+                    // Compatibilidad con el código anterior
                     android.widget.Button btn = (android.widget.Button) child;
                     if (!btn.isSelected()) {
                         btn.setEnabled(true);
@@ -335,66 +422,8 @@ public class TestActivity extends AppCompatActivity {
     }
     
     private void actualizarProgreso(boolean animacionLenta) {
-        // Contar solo las respuestas del bloque actual
-        int inicio = bloqueActual * PREGUNTAS_POR_BLOQUE;
-        int fin = Math.min(inicio + PREGUNTAS_POR_BLOQUE, preguntas.size());
-        int respondidasBloque = 0;
-        
-        for (int i = inicio; i < fin; i++) {
-            if (respuestas.get(i, 0) != 0) respondidasBloque++;
-        }
-
-        int totalBloque = fin - inicio;
-        int porcentaje = totalBloque > 0 ? (int) ((respondidasBloque / (float) totalBloque) * 100) : 0;
-
-        if (animacionLenta && respondidasBloque > 1) {
-            // Si hay varias respuestas ya respondidas, animar pregunta por pregunta
-            animarProgresoPreguntaPorPregunta(respondidasBloque, totalBloque, porcentaje);
-        } else {
-            // Actualización normal cuando el usuario responde una pregunta nueva
-            ObjectAnimator anim = ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), porcentaje);
-            anim.setDuration(800); // Duración más lenta para que se vea mejor
-            anim.start();
-            tvProgresoBloque.setText("Bloque " + (bloqueActual + 1) + " - Progreso: " + respondidasBloque + " / " + totalBloque);
-        }
-    }
-    
-    private void animarProgresoPreguntaPorPregunta(int respondidas, int total, int porcentajeFinal) {
-        // Resetear la barra a 0 primero
-        progressBar.setProgress(0);
-        
-        // Si no hay respuestas, solo mostrar 0
-        if (respondidas == 0) {
-            tvProgresoBloque.setText("Bloque " + (bloqueActual + 1) + " - Progreso: 0 / " + total);
-            return;
-        }
-        
-        // Calcular el porcentaje por pregunta
-        int porcentajePorPregunta = 100 / total;
-        int delay = 0;
-        
-        // Animar pregunta por pregunta con delay entre cada una
-        for (int i = 1; i <= respondidas; i++) {
-            final int preguntaNum = i;
-            final int nuevoProgreso = i * porcentajePorPregunta;
-            
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                ObjectAnimator anim = ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), nuevoProgreso);
-                anim.setDuration(600); // Duración más lenta para cada pregunta
-                anim.start();
-                tvProgresoBloque.setText("Bloque " + (bloqueActual + 1) + " - Progreso: " + preguntaNum + " / " + total);
-            }, delay);
-            
-            delay += 400; // Delay de 400ms entre cada pregunta
-        }
-        
-        // Al final, asegurar que esté en el porcentaje final exacto
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            ObjectAnimator animFinal = ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), porcentajeFinal);
-            animFinal.setDuration(300);
-            animFinal.start();
-            tvProgresoBloque.setText("Bloque " + (bloqueActual + 1) + " - Progreso: " + respondidas + " / " + total);
-        }, delay);
+        // Ya no hay barra de progreso, solo actualizamos el indicador visual de bloques
+        // El progreso se muestra visualmente en los círculos del indicador
     }
 
     private void validarBloqueActual() {
@@ -418,25 +447,24 @@ public class TestActivity extends AppCompatActivity {
             // Marcar en rojo solo el borde de las preguntas sin responder
             for (int idxRelativo : preguntasFaltantes) {
                 if (idxRelativo >= 0 && idxRelativo < tarjetasPreguntas.size()) {
-                    CardView card = tarjetasPreguntas.get(idxRelativo);
-                    card.setCardBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
+                    LinearLayout preguntaLayout = tarjetasPreguntas.get(idxRelativo);
                     // Agregar borde rojo
                     android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
                     border.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-                    border.setCornerRadius(18f);
-                    border.setStroke(3, ContextCompat.getColor(this, R.color.rojo));
+                    border.setCornerRadius(12f);
+                    border.setStroke(2, ContextCompat.getColor(this, R.color.rojo));
                     border.setColor(ContextCompat.getColor(this, android.R.color.white));
-                    card.setBackground(border);
+                    preguntaLayout.setBackground(border);
                 }
             }
             
             // Hacer scroll a la primera pregunta faltante
             if (primeraFaltante >= 0 && primeraFaltante < tarjetasPreguntas.size() && scrollView != null) {
-                CardView cardFaltante = tarjetasPreguntas.get(primeraFaltante);
+                LinearLayout preguntaFaltante = tarjetasPreguntas.get(primeraFaltante);
                 scrollView.post(() -> {
                     // Obtener la posición de la tarjeta dentro del contenedor
                     int[] location = new int[2];
-                    cardFaltante.getLocationOnScreen(location);
+                    preguntaFaltante.getLocationOnScreen(location);
                     int[] containerLocation = new int[2];
                     container.getLocationOnScreen(containerLocation);
                     
@@ -458,7 +486,158 @@ public class TestActivity extends AppCompatActivity {
         } else {
             // Avanzar al siguiente bloque
             bloqueActual++;
+            actualizarIndicadorProgreso();
             mostrarBloque(bloqueActual);
+        }
+    }
+    
+    private void actualizarEtiquetasBloques() {
+        if (tvTituloBloqueActual == null) {
+            android.util.Log.w("TestActivity", "tvTituloBloqueActual no encontrado");
+            return;
+        }
+        
+        if (preguntas.isEmpty()) {
+            android.util.Log.w("TestActivity", "No hay preguntas cargadas aún");
+            return;
+        }
+        
+        try {
+            // Obtener el tipo_pregunta del bloque actual
+            int inicio = bloqueActual * PREGUNTAS_POR_BLOQUE;
+            if (inicio < preguntas.size()) {
+                String tipoPregunta = preguntas.get(inicio).getTipo_pregunta();
+                android.util.Log.d("TestActivity", "Bloque actual " + (bloqueActual + 1) + " - tipo_pregunta: '" + tipoPregunta + "'");
+                if (tipoPregunta != null && !tipoPregunta.isEmpty()) {
+                    tvTituloBloqueActual.setText(tipoPregunta);
+                } else {
+                    tvTituloBloqueActual.setText("Bloque " + (bloqueActual + 1));
+                }
+            } else {
+                tvTituloBloqueActual.setText("Bloque " + (bloqueActual + 1));
+            }
+        } catch (Exception e) {
+            android.util.Log.e("TestActivity", "Error al actualizar título del bloque", e);
+            e.printStackTrace();
+        }
+    }
+    
+    private String formatearEnDosLineas(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return "";
+        }
+        
+        // Dividir por espacios
+        String[] palabras = texto.trim().split("\\s+");
+        
+        if (palabras.length == 1) {
+            // Si solo hay una palabra, dividirla por la mitad si es larga
+            if (palabras[0].length() > 8) {
+                int mitad = palabras[0].length() / 2;
+                return palabras[0].substring(0, mitad) + "\n" + palabras[0].substring(mitad);
+            }
+            return palabras[0];
+        } else if (palabras.length == 2) {
+            // Dos palabras: una arriba, otra abajo
+            return palabras[0] + "\n" + palabras[1];
+        } else {
+            // Más de dos palabras: primera arriba, resto abajo
+            StringBuilder arriba = new StringBuilder(palabras[0]);
+            StringBuilder abajo = new StringBuilder();
+            for (int i = 1; i < palabras.length; i++) {
+                if (i > 1) abajo.append(" ");
+                abajo.append(palabras[i]);
+            }
+            return arriba.toString() + "\n" + abajo.toString();
+        }
+    }
+    
+    private void actualizarIndicadorProgreso() {
+        // Validar que todos los elementos existan antes de actualizar
+        if (circle1 == null || circle2 == null || circle3 == null || circle4 == null ||
+            number1 == null || number2 == null || number3 == null || number4 == null ||
+            line1 == null || line2 == null || line3 == null) {
+            android.util.Log.w("TestActivity", "No se puede actualizar indicador: elementos faltantes");
+            return;
+        }
+        
+        try {
+            int blueColor = ContextCompat.getColor(this, R.color.nav_blue);
+            int grayColor = 0xFF9E9E9E;
+            int whiteColor = ContextCompat.getColor(this, android.R.color.white);
+            
+            // Actualizar bloque 1
+            if (bloqueActual >= 0) {
+                if (bloqueActual == 0) {
+                    // Bloque activo
+                    circle1.setBackgroundResource(R.drawable.bg_progress_circle_active);
+                    number1.setTextColor(whiteColor);
+                } else {
+                    // Bloque completado
+                    circle1.setBackgroundResource(R.drawable.bg_progress_circle_completed);
+                    number1.setTextColor(whiteColor);
+                }
+                line1.setBackgroundColor(bloqueActual > 0 ? blueColor : 0xFFE0E0E0);
+            } else {
+                circle1.setBackgroundResource(R.drawable.bg_progress_circle_inactive);
+                number1.setTextColor(grayColor);
+            }
+            
+            // Actualizar bloque 2
+            if (bloqueActual >= 1) {
+                if (bloqueActual == 1) {
+                    // Bloque activo
+                    circle2.setBackgroundResource(R.drawable.bg_progress_circle_active);
+                    number2.setTextColor(whiteColor);
+                } else {
+                    // Bloque completado
+                    circle2.setBackgroundResource(R.drawable.bg_progress_circle_completed);
+                    number2.setTextColor(whiteColor);
+                }
+                line1.setBackgroundColor(blueColor);
+                line2.setBackgroundColor(bloqueActual > 1 ? blueColor : 0xFFE0E0E0);
+            } else {
+                circle2.setBackgroundResource(R.drawable.bg_progress_circle_inactive);
+                number2.setTextColor(grayColor);
+                line1.setBackgroundColor(0xFFE0E0E0);
+            }
+            
+            // Actualizar bloque 3
+            if (bloqueActual >= 2) {
+                if (bloqueActual == 2) {
+                    // Bloque activo
+                    circle3.setBackgroundResource(R.drawable.bg_progress_circle_active);
+                    number3.setTextColor(whiteColor);
+                } else {
+                    // Bloque completado
+                    circle3.setBackgroundResource(R.drawable.bg_progress_circle_completed);
+                    number3.setTextColor(whiteColor);
+                }
+                line2.setBackgroundColor(blueColor);
+                line3.setBackgroundColor(bloqueActual > 2 ? blueColor : 0xFFE0E0E0);
+            } else {
+                circle3.setBackgroundResource(R.drawable.bg_progress_circle_inactive);
+                number3.setTextColor(grayColor);
+                line2.setBackgroundColor(0xFFE0E0E0);
+            }
+            
+            // Actualizar bloque 4
+            if (bloqueActual >= 3) {
+                // Bloque activo
+                circle4.setBackgroundResource(R.drawable.bg_progress_circle_active);
+                number4.setTextColor(whiteColor);
+                line3.setBackgroundColor(blueColor);
+            } else {
+                circle4.setBackgroundResource(R.drawable.bg_progress_circle_inactive);
+                number4.setTextColor(grayColor);
+                line3.setBackgroundColor(0xFFE0E0E0);
+            }
+            
+            // Actualizar el título del bloque actual
+            actualizarEtiquetasBloques();
+        } catch (Exception e) {
+            android.util.Log.e("TestActivity", "Error al actualizar indicador de progreso", e);
+            e.printStackTrace();
         }
     }
 
@@ -490,7 +669,7 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<KolbResponse> c, Response<KolbResponse> r) {
                 btnEnviar.setEnabled(true);
-                btnEnviar.setText("Enviar respuestas");
+                btnEnviar.setText("Siguiente");
 
                 if (!r.isSuccessful() || r.body() == null) {
                     toast("Error " + r.code());
@@ -511,7 +690,7 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<KolbResponse> c, Throwable t) {
                 btnEnviar.setEnabled(true);
-                btnEnviar.setText("Enviar respuestas");
+                btnEnviar.setText("Siguiente");
                 toast("Fallo: " + t.getMessage());
             }
         });
