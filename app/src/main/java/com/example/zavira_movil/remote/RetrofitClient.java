@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public final class RetrofitClient {
 
     // ✅ URL NGROK ACTUALIZADA (con soporte OpenAI/IA)
-    private static final String BASE_URL = "https://unimparted-henrietta-uninspissated.ngrok-free.dev/";
+    private static final String BASE_URL = "https://churnable-nimbly-norbert.ngrok-free.dev/";
 
     // DEBUG LOCAL (comentado hasta resolver firewall):
     // private static final String BASE_URL = "http://192.168.1.5:3333/";

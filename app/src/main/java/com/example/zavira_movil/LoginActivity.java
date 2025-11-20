@@ -351,28 +351,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 binding.progress.setVisibility(View.GONE);
                 binding.btnLogin.setEnabled(true);
+                binding.btnLogin.setAlpha(1.0f);
 
                 if (!response.isSuccessful()) {
-                    String errorMessage = "Error en el servidor";
-                    try {
-                        if (response.errorBody() != null) {
-                            String errorBody = response.errorBody().string();
-                            if (!errorBody.isEmpty()) {
-                                errorMessage = new Gson().fromJson(errorBody, String.class);
-                            }
-                        }
-                    } catch (Exception e) {
-                        Log.e("LOGIN_ERROR", "Error al leer el mensaje de error", e);
-                    }
-                    
-                    if (response.code() == 401) {
-                        errorMessage = "Usuario o contraseña incorrectos";
-                        // Mostrar errores visuales en los campos
-                        setFieldError(binding.etDocumento, binding.tilDocumento, "Credenciales incorrectas");
-                        setFieldError(binding.etPassword, binding.tilPassword, "Credenciales incorrectas");
-                    }
-                    
-                    Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    // Usar ErrorHandler para mostrar error con opción de reintentar
+                    com.example.zavira_movil.utils.ErrorHandler.handleHttpError(
+                        LoginActivity.this,
+                        response,
+                        () -> doLogin() // Callback para reintentar
+                    );
                     return;
                 }
 
@@ -421,19 +408,17 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // Restaurar estado del botón
                 binding.progress.setVisibility(View.GONE);
                 binding.btnLogin.setEnabled(true);
-                
-                String errorMessage = "Error de conexión";
-                if (t instanceof java.net.ConnectException || t instanceof java.net.UnknownHostException) {
-                    errorMessage = "No se pudo conectar al servidor. Verifica tu conexión a Internet.";
-                } else if (t instanceof java.net.SocketTimeoutException) {
-                    errorMessage = "Tiempo de espera agotado. Intenta de nuevo.";
-                } else {
-                    errorMessage = "Error: " + t.getMessage();
-                }
-                
-                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                binding.btnLogin.setAlpha(1.0f);
+
+                // Usar ErrorHandler para manejar excepción de red
+                com.example.zavira_movil.utils.ErrorHandler.handleNetworkException(
+                    LoginActivity.this,
+                    t,
+                    () -> doLogin() // Callback para reintentar
+                );
             }
         });
     }
