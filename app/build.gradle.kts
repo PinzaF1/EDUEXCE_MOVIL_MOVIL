@@ -97,4 +97,15 @@ dependencies {
     // CircleProgress (JitPack)
     implementation("com.github.lzyzsd:circleprogress:1.2.1")
 
+    // Test dependencies (Unit tests)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test:core:1.4.0")
+    testImplementation("androidx.test.ext:junit:1.1.3")
+    
+    // Android Test dependencies (Instrumentation tests)
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestUtil("androidx.test:orchestrator:1.4.0")
 }
